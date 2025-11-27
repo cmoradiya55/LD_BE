@@ -14,4 +14,17 @@ export const typeOrmAsyncOptions: TypeOrmModuleAsyncOptions = {
     logging: config.get<string>('APP_DEBUG') === 'true',
     synchronize: false,
   }),
+
+  async dataSourceFactory(options) {
+    const { DataSource } = await import('typeorm');
+    if (!options) {
+      throw new Error('DataSource options are not defined');
+    }
+    const dataSource = new DataSource(options);
+
+    await dataSource.initialize();
+    console.log('🚀 Database connected successfully!');
+
+    return dataSource;
+  },
 };
