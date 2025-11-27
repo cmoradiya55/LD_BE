@@ -40,8 +40,6 @@ async function bootstrap() {
 
   app.useGlobalFilters(new AllExceptionsFilter(logger));
 
-
-
   // -------------------------
   // Dummy route for testing
   // -------------------------
@@ -54,4 +52,7 @@ async function bootstrap() {
   await app.listen(port);
   console.log(`Application is running on: http://localhost:${port}/${prefix}`);
 }
-bootstrap();
+bootstrap().catch((err) => {
+  console.error('Error during app bootstrap:', err);
+  process.exit(1);
+});
