@@ -5,17 +5,15 @@ import { ConfigService } from '@nestjs/config';
 import compression from 'compression';
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { validationExceptionFactory } from './common/utils/validation.utils';
-import { getLogLevels } from './common/utils/logger.utils';
+import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { AllExceptionsFilter } from './common/filters/http-exception.filter';
 
 async function bootstrap() {
-  const logger = new Logger('Bootstrap');
-  const app = await NestFactory.create(AppModule, {
-    logger: getLogLevels(),
-  });
+  const app = await NestFactory.create(AppModule);
 
   const prefix = 'api/v1';
   const config = app.get(ConfigService);
+  const logger = app.get(WINSTON_MODULE_NEST_PROVIDER);
   const port = config.get('app.port') || 3000;
 
   app.use(helmet()); // Secure your app by setting various HTTP headers
@@ -38,6 +36,7 @@ async function bootstrap() {
   app.setGlobalPrefix(prefix);
   app.enableShutdownHooks();
 
+  app.useLogger(logger);
   app.useGlobalFilters(new AllExceptionsFilter(logger));
 
   // -------------------------

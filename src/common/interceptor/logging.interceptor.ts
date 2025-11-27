@@ -1,9 +1,12 @@
-import { CallHandler, ExecutionContext, Injectable, Logger, NestInterceptor } from '@nestjs/common';
+import { CallHandler, ExecutionContext, Inject, Injectable, Logger, NestInterceptor } from '@nestjs/common';
 import { Observable, tap } from 'rxjs';
+import { Logger as WinstonLogger } from 'winston';
 
 @Injectable()
 export class LoggingInterceptor implements NestInterceptor {
-    private readonly logger = new Logger('HTTP');
+    constructor(
+        @Inject('WINSTON_MODULE_NEST_PROVIDER') private readonly logger: WinstonLogger,
+    ) { }
 
     intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
         const req = context.switchToHttp().getRequest();
@@ -16,7 +19,18 @@ export class LoggingInterceptor implements NestInterceptor {
 
         const start = Date.now();
 
-        this.logger.log(`[REQ] ${method} ${url} - ${ip} - ${userAgent}`);
+        // --- REQUEST ---
+        this.logger.info({
+            type: 'http_request',
+            method,
+            url,
+            ip,
+            userAgent,
+            body,
+            query,
+            params,
+        });
+
 
         if (body && Object.keys(body).length) {
             this.logger.debug(`[BODY] ${JSON.stringify(body)}`);
@@ -34,16 +48,25 @@ export class LoggingInterceptor implements NestInterceptor {
             tap({
                 next: () => {
                     const responseTime = Date.now() - start;
-                    this.logger.log(
-                        `[RES] ${method} ${url} - ${res.statusCode} - ${responseTime}ms`
-                    );
+                    this.logger.info({
+                        type: 'http_response',
+                        method,
+                        url,
+                        statusCode: res.statusCode,
+                        responseTimeMs: responseTime,
+                    });
                 },
                 error: (err) => {
                     const responseTime = Date.now() - start;
-                    this.logger.error(
-                        `[ERR] ${method} ${url} - ${err.status || 500} - ${responseTime}ms - ${err.message}`,
-                        err.stack
-                    );
+                    this.logger.error({
+                        type: 'http_error',
+                        method,
+                        url,
+                        statusCode: err.status || 500,
+                        responseTimeMs: responseTime,
+                        message: err.message,
+                        stack: err.stack,
+                    });
                 },
             }),
         );

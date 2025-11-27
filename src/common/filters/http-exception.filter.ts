@@ -13,7 +13,7 @@ import { ResponseType } from '../enums/response-type.enum';
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
     constructor(
-        private readonly logger: LoggerService,
+        @Inject('WINSTON_MODULE_NEST_PROVIDER') private readonly logger: LoggerService,
     ) { }
 
     catch(exception: unknown, host: ArgumentsHost): void {
@@ -51,6 +51,10 @@ export class AllExceptionsFilter implements ExceptionFilter {
             } else {
                 message = exceptionResponse as string;
             }
+            this.logger.error(
+                exception.message,
+                { path: request.url, timestamp: new Date().toISOString(), stack: exception.stack },
+            );
 
             this.logger.warn(
                 `[Error]: ${message} ${status}
@@ -59,10 +63,15 @@ export class AllExceptionsFilter implements ExceptionFilter {
             )
         } else {
             const isExceptionInstanceError = exception instanceof Error;
+
             this.logger.error(
-                `[Unexpected Error]: ${exception}
-                 [Request]: ${request.method} - ${request.url}`,
-                isExceptionInstanceError ? exception.stack : '',
+                exception.message,
+                {
+                    method: request.method,
+                    path: request.url,
+                    timestamp: new Date().toISOString(),
+                    stack: exception.stack
+                },
             );
 
             message = isExceptionInstanceError ? exception.message : 'An unexpected error occurred.';
@@ -81,6 +90,8 @@ export class AllExceptionsFilter implements ExceptionFilter {
                 ...[errors && errors.length > 0 && { errors }],
                 ...[data && { data }],
             }
+
+            return;
         }
     }
 
