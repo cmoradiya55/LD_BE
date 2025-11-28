@@ -1,33 +1,48 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Param, Query } from '@nestjs/common';
 import { SellCarService } from './sell-car.service';
 import { ApiResponseUtil } from '@common/utils/api-response.utils';
 import { MODULE_PREFIX } from '@common/constants/app.constant';
-import { CarBrandResource } from './resources/abc';
+import { CarBrandResource } from './resources/car-brand.resource';
+import { CarBrandDto } from './dto/car-brand.dto';
+import { CarModelParamDto, CarModelQueryDto } from './dto/car-model.dto';
+import { CarModelResource } from './resources/car-model.resource';
 
 @Controller(`${MODULE_PREFIX.CUSTOMER}/sell-car`)
 export class SellCarController {
   constructor(private readonly sellCarService: SellCarService) { }
 
   // Step 1: Get all brands
-  @Get('brands')
-  async getBrands() {
-    const data = await this.sellCarService.findCarBrands();
+  @Get('brand')
+  async getBrands(@Query() query: CarBrandDto) {
+    const data = await this.sellCarService.findCarBrands(query);
 
     return ApiResponseUtil.success(
       CarBrandResource.collection(data),
       'Car brands fetched successfully');
   }
 
-  // // Step 2: Get years by brand
-  // @Get('brands/:brandId/years')
-  // getYearsByBrand(@Param('brandId') brandId: string) { }
+  // Step 2: Get years by brand
+  @Get('brand/:brandId/years')
+  async getYearsByBrand(@Param('brandId') brandId: number) {
+    const data = await this.sellCarService.findYearsByBrand(brandId);
+    return ApiResponseUtil.success(
+      data,
+      'Years fetched successfully'
+    );
+  }
 
-  // // Step 3: Get models by brand & year
-  // @Get('brands/:brandId/years/:year/models')
-  // getModelsByBrandAndYear(
-  //   @Param('brandId') brandId: string,
-  //   @Param('year') year: number,
-  // ) { }
+  // Step 3: Get models by brand & year
+  @Get('brand/:brandId/year/:year/models')
+  async getModelsByBrandAndYear(
+    @Param() param: CarModelParamDto,
+    @Query() query: CarModelQueryDto,
+  ) {
+    const data = await this.sellCarService.findModelsByBrandAndYear(param, query);
+    return ApiResponseUtil.success(
+      CarModelResource.collection(data),
+      'Car models fetched successfully'
+    );
+  }
 
   // // Step 4: Get variants by model
   // @Get('models/:modelId/variants')

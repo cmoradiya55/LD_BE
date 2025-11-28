@@ -129,6 +129,7 @@ export class ApiResponseUtil {
 
     // 404 - Not Found
     static notFound<T>(message = 'Not Found', data?: T): ErrorResponse<T> {
+        console.log('========= 404 NOT FOUND =========');
         return {
             code: HttpStatus.NOT_FOUND,
             type: ResponseType.NOT_FOUND,

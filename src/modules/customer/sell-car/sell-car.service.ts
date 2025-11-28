@@ -1,17 +1,48 @@
 import { BaseService } from '@common/base/base.service';
-import { Injectable } from '@nestjs/common';
+import { ApiResponseUtil } from '@common/utils/api-response.utils';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CarBrandRepository } from '@repository/car/car-brand.repository';
+import { CarBrandDto } from './dto/car-brand.dto';
+import { CarModelRepository } from '@repository/car/car-model.repository';
+import { CarModelParamDto, CarModelQueryDto } from './dto/car-model.dto';
 
 @Injectable()
 export class SellCarService {
     constructor(
         private readonly baseService: BaseService,
-        private readonly carBrandRepo: CarBrandRepository
+        private readonly carBrandRepo: CarBrandRepository,
+        private readonly carModelRepo: CarModelRepository,
     ) { }
 
-    async findCarBrands() {
+    async findCarBrands(query: CarBrandDto) {
         return this.baseService.catch(async () => {
-            return await this.carBrandRepo.findAllForCustomerApp();
+            return await this.carBrandRepo.findAllForCustomerApp(query?.search);
         })
+    }
+
+    async findYearsByBrand(brandId: number) {
+        return this.baseService.catch(async () => {
+            const yearRange = await this.carBrandRepo.findYearRangeByBrandId(brandId);
+            if (!yearRange) throw new NotFoundException(`Car brand not found`);
+
+            const startYear = yearRange.operation_start_year;
+            const endYear = yearRange.operation_end_year ?? new Date().getFullYear();
+
+            // Generate years array
+            const years: number[] = [];
+            for (let year = endYear; year >= startYear; year--) {
+                years.push(year);
+            }
+
+            return years;
+        });
+    }
+
+    async findModelsByBrandAndYear(param: CarModelParamDto, query: CarModelQueryDto) {
+        return this.baseService.catch(async () => {
+            const { brandId, year } = param;
+            const { search } = query;
+            return await this.carModelRepo.findByBrandIdAndYear(brandId, year, search);
+        });
     }
 }

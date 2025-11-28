@@ -1,4 +1,4 @@
-import { NestFactory } from '@nestjs/core';
+import { HttpAdapterHost, NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import helmet from 'helmet';
 import { ConfigService } from '@nestjs/config';
@@ -37,7 +37,9 @@ async function bootstrap() {
   app.enableShutdownHooks();
 
   app.useLogger(logger);
-  app.useGlobalFilters(new AllExceptionsFilter(logger));
+  
+  const httpAdapterHost = app.get(HttpAdapterHost);
+  app.useGlobalFilters(new AllExceptionsFilter(httpAdapterHost, logger));
 
   // -------------------------
   // Dummy route for testing

@@ -9,6 +9,7 @@ import { City } from '@entity/general/city.entity';
 import { Color } from '@entity/general/color.entity';
 import { Feature } from '@entity/general/feature.entity';
 import { Pincode } from '@entity/general/pincode.entity';
+import { CarModelRepository } from './car/car-model.repository';
 
 @Module({
   imports: [
@@ -25,10 +26,12 @@ import { Pincode } from '@entity/general/pincode.entity';
     ]),
   ],
   providers: [
-    CarBrandRepository
+    CarBrandRepository,
+    CarModelRepository
   ],
   exports: [
-    CarBrandRepository
+    CarBrandRepository,
+    CarModelRepository
   ],
 })
 export class RepositoriesModule { }
