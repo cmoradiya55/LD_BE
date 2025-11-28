@@ -5,6 +5,8 @@ import { CarBrandRepository } from '@repository/car/car-brand.repository';
 import { CarBrandDto } from './dto/car-brand.dto';
 import { CarModelRepository } from '@repository/car/car-model.repository';
 import { CarModelParamDto, CarModelQueryDto } from './dto/car-model.dto';
+import { CarVariantParamDto, CarVariantQueryDto } from './dto/car-variant.dto';
+import { CarVariantRepository, FuelTypeGroup } from '@repository/car/car-variant.repository';
 
 @Injectable()
 export class SellCarService {
@@ -12,6 +14,7 @@ export class SellCarService {
         private readonly baseService: BaseService,
         private readonly carBrandRepo: CarBrandRepository,
         private readonly carModelRepo: CarModelRepository,
+        private readonly carVariantRepo: CarVariantRepository,
     ) { }
 
     async findCarBrands(query: CarBrandDto) {
@@ -43,6 +46,13 @@ export class SellCarService {
             const { brandId, year } = param;
             const { search } = query;
             return await this.carModelRepo.findByBrandIdAndYear(brandId, year, search);
+        });
+    }
+
+    async getVariantsByBrandYearAndModel(param: CarVariantParamDto) {
+        return this.baseService.catch(async () => {
+            const { year, modelId } = param;
+            return await this.carVariantRepo.findByBrandIdYear(year, modelId);
         });
     }
 }

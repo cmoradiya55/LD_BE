@@ -6,6 +6,9 @@ import { CarBrandResource } from './resources/car-brand.resource';
 import { CarBrandDto } from './dto/car-brand.dto';
 import { CarModelParamDto, CarModelQueryDto } from './dto/car-model.dto';
 import { CarModelResource } from './resources/car-model.resource';
+import { CarVariantParamDto, CarVariantQueryDto } from './dto/car-variant.dto';
+import { CarVariantResource } from './resources/car-variant.resource';
+import { FuelTypeGroupResource } from './resources/fuel-type-group.resource';
 
 @Controller(`${MODULE_PREFIX.CUSTOMER}/sell-car`)
 export class SellCarController {
@@ -44,9 +47,19 @@ export class SellCarController {
     );
   }
 
-  // // Step 4: Get variants by model
-  // @Get('models/:modelId/variants')
-  // getVariantsByModel(@Param('modelId') modelId: string) { }
+  // Step 4: Get variants by model
+  @Get('year/:year/model/:modelId/variants')
+  async getVariantsByBrandYearAndModel(
+    @Param() param: CarVariantParamDto,
+  ): Promise<any> {
+    const variants = await this.sellCarService.getVariantsByBrandYearAndModel(param);
+
+    return ApiResponseUtil.success(
+      FuelTypeGroupResource.fromGroupedVariants(variants),
+      'Car variants fetched successfully'
+    );
+  }
+
 
   // // Final: Submit car for selling
   // @Post()

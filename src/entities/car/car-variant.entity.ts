@@ -123,6 +123,9 @@ export class CarVariant {
   @UpdateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   updated_at: Date;
 
+  @Column({ type: 'date', nullable: true })
+  discontinued_date: Date | null;
+
   /** FK RELATION */
   @ManyToOne(() => CarModel)
   @JoinColumn({ name: 'model_id' })
