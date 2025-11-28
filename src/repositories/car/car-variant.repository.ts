@@ -53,10 +53,6 @@ export class CarVariantRepository {
             .orderBy('variant.fuel_type', 'ASC')
             .addOrderBy('variant.id', 'DESC');
 
-        if (search) {
-            query.andWhere('variant.name ILIKE :search', { search: `%${search}%` });
-        }
-
         return query.getMany();
     }
 }
