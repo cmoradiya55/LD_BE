@@ -9,7 +9,8 @@ import { WinstonModule } from 'nest-winston';
 import { LoggerConfigService } from './common/utils/logger.utils';
 import { RepositoriesModule } from './repositories/repositories.module';
 import { CustomerModule } from './modules/customer/customer.module';
-import { AdminModule } from './modules/admin/customer.module';
+import { AdminModule } from './modules/admin/admin.module';
+import { BaseModule } from '@common/base/base.module';
 
 @Module({
   imports: [
@@ -30,6 +31,9 @@ import { AdminModule } from './modules/admin/customer.module';
     
     // Repositories
     RepositoriesModule,
+
+    // Global modules
+    BaseModule,
 
     // Feature modules
     CustomerModule,
