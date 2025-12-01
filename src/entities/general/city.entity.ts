@@ -4,7 +4,9 @@ import {
     Column,
     CreateDateColumn,
     UpdateDateColumn,
+    OneToMany,
 } from 'typeorm';
+import { Pincode } from './pincode.entity';
 
 @Entity('cities')
 export class City {
@@ -25,4 +27,7 @@ export class City {
 
     @UpdateDateColumn({ type: 'timestamp', default: () => 'NOW()' })
     updated_at: Date;
+
+    @OneToMany(() => Pincode, p => p.city)
+    pincodes: Pincode[];
 }

@@ -15,6 +15,9 @@ export class Pincode {
     @Column({ type: 'varchar', length: 10 })
     pincode: string;
 
+    @Column({ type: 'varchar', length: 255 })
+    area_name: string;
+
     @Column({ type: 'int', nullable: true })
     city_id: number | null;
 
