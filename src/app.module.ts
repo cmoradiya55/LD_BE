@@ -11,6 +11,7 @@ import { RepositoriesModule } from './repositories/repositories.module';
 import { CustomerModule } from './modules/customer/customer.module';
 import { AdminModule } from './modules/admin/admin.module';
 import { BaseModule } from '@common/base/base.module';
+import { StorageModule } from './common/providers/storage/storage.module';
 
 @Module({
   imports: [
@@ -37,7 +38,8 @@ import { BaseModule } from '@common/base/base.module';
 
     // Feature modules
     CustomerModule,
-    AdminModule
+    AdminModule,
+    StorageModule
   ],
   controllers: [AppController],
   providers: [AppService],
