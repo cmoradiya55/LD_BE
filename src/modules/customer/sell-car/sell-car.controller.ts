@@ -9,6 +9,8 @@ import { CarModelResource } from './resources/car-model.resource';
 import { CarVariantParamDto, CarVariantQueryDto } from './dto/car-variant.dto';
 import { CarVariantResource } from './resources/car-variant.resource';
 import { FuelTypeGroupResource } from './resources/fuel-type-group.resource';
+import { CitySuggestionDto } from './dto/city-suggestion.dto';
+import { PincodeCitySuggestionResource } from './resources/pincode-city-suggestion.resource';
 
 @Controller(`${MODULE_PREFIX.CUSTOMER}/sell-car`)
 export class SellCarController {
@@ -60,9 +62,25 @@ export class SellCarController {
     );
   }
 
+  @Get('city-suggestions')
+  async getCitySuggestions(@Query() queryDto: CitySuggestionDto) {
+    const { data, total, page, limit } = await this.sellCarService.getCitySuggestions(queryDto);
+    return ApiResponseUtil.paginated(
+      PincodeCitySuggestionResource.collection(data),
+      // data,
+      page,
+      limit,
+      total,
+      'City suggestions fetched successfully'
+    );
+  }
+
 
   // // Final: Submit car for selling
   // @Post()
   // submitCarForSale(@Body() dto: CreateSellCarDto) { }
-
+  private toTitle(text: string) {
+    if (!text) return text;
+    return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
+  }
 }

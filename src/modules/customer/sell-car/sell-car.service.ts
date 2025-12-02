@@ -7,6 +7,9 @@ import { CarModelRepository } from '@repository/car/car-model.repository';
 import { CarModelParamDto, CarModelQueryDto } from './dto/car-model.dto';
 import { CarVariantParamDto, CarVariantQueryDto } from './dto/car-variant.dto';
 import { CarVariantRepository, FuelTypeGroup } from '@repository/car/car-variant.repository';
+import { CityRepository } from '@repository/general/city.repository';
+import { CitySuggestionDto } from './dto/city-suggestion.dto';
+import { PincodeRepository } from '@repository/general/pincode.repository';
 
 @Injectable()
 export class SellCarService {
@@ -15,6 +18,7 @@ export class SellCarService {
         private readonly carBrandRepo: CarBrandRepository,
         private readonly carModelRepo: CarModelRepository,
         private readonly carVariantRepo: CarVariantRepository,
+        private readonly pincodeRepo: PincodeRepository,
     ) { }
 
     async findCarBrands(query: CarBrandDto) {
@@ -53,6 +57,13 @@ export class SellCarService {
         return this.baseService.catch(async () => {
             const { year, modelId } = param;
             return await this.carVariantRepo.findByBrandIdYear(year, modelId);
+        });
+    }
+
+    async getCitySuggestions(queryDto: CitySuggestionDto) {
+        return this.baseService.catch(async () => {
+            const { q, page, limit } = queryDto;
+            return this.pincodeRepo.getPincodeAndCitySuggestion(q, page, limit);
         });
     }
 }

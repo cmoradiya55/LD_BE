@@ -11,6 +11,8 @@ import { Feature } from '@entity/general/feature.entity';
 import { Pincode } from '@entity/general/pincode.entity';
 import { CarModelRepository } from './car/car-model.repository';
 import { CarVariantRepository } from './car/car-variant.repository';
+import { CityRepository } from './general/city.repository';
+import { PincodeRepository } from './general/pincode.repository';
 
 @Module({
   imports: [
@@ -30,11 +32,15 @@ import { CarVariantRepository } from './car/car-variant.repository';
     CarBrandRepository,
     CarModelRepository,
     CarVariantRepository,
+    CityRepository,
+    PincodeRepository,
   ],
   exports: [
     CarBrandRepository,
     CarModelRepository,
-    CarVariantRepository
+    CarVariantRepository,
+    CityRepository,
+    PincodeRepository,
   ],
 })
 export class RepositoriesModule { }

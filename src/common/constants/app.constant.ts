@@ -10,6 +10,12 @@ export const SORT_ORDER = {
 
 export const MIN_CAR_BRAND_YEAR = 1900;
 
+export const PAGINATION_DEFAULTS = {
+    PAGE: 1,
+    LIMIT: 10,
+    MAXIMUM_LIMIT: 50,
+} as const;
+
 // Allowed File Extensions and Content Types
 export const ALLOWED_FILE_TYPES: Record<string, string[]> = {
     'image/jpeg': ['jpg', 'jpeg'],
