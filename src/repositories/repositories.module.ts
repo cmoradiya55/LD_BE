@@ -13,6 +13,10 @@ import { CarModelRepository } from './car/car-model.repository';
 import { CarVariantRepository } from './car/car-variant.repository';
 import { CityRepository } from './general/city.repository';
 import { PincodeRepository } from './general/pincode.repository';
+import { UsedCarRepository } from './used-car/used-car.repository';
+import { UsedCar } from '@entity/used-car/used-car.entity';
+import { UsedCarCustomerPhoto } from '@entity/used-car/used-car-customer-photo.entity';
+import { UsedCarCustomerPhotoRepository } from './used-car/used-car-customer-photo.repository';
 
 @Module({
   imports: [
@@ -26,6 +30,9 @@ import { PincodeRepository } from './general/pincode.repository';
       Color,
       Feature,
       Pincode,
+
+      UsedCar,
+      UsedCarCustomerPhoto
     ]),
   ],
   providers: [
@@ -34,6 +41,8 @@ import { PincodeRepository } from './general/pincode.repository';
     CarVariantRepository,
     CityRepository,
     PincodeRepository,
+    UsedCarRepository,
+    UsedCarCustomerPhotoRepository
   ],
   exports: [
     CarBrandRepository,
@@ -41,6 +50,8 @@ import { PincodeRepository } from './general/pincode.repository';
     CarVariantRepository,
     CityRepository,
     PincodeRepository,
+    UsedCarRepository,
+    UsedCarCustomerPhotoRepository
   ],
 })
 export class RepositoriesModule { }

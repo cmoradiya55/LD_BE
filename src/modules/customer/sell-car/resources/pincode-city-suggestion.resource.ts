@@ -10,10 +10,13 @@ export class PincodeCitySuggestionResource extends BaseResource<Pincode> {
 
     toJSON() {
         return {
-            pincode_id: this.data.id,
-            city_id: this.data.city.id,
+            formatted: `${this.data.pincode}, ${this.data.area_name}, ${this.toTitle(this.data.city.city_name)}, ${this.toTitle(this.data.city.state_name)}`,
             is_active: this.data.city.is_active,
-            formatted: `${this.data.pincode}, ${this.data.area_name}, ${this.toTitle(this.data.city.city_name)}, ${this.toTitle(this.data.city.state_name)}`
+            city_id: this.data.city.id,
+            city: this.toTitle(this.data.city.city_name),
+            pincode_id: this.data.id,
+            pincode: this.data.pincode,
+            area_name: this.data.area_name,
         };
     }
 }

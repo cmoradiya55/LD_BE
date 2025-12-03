@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Query } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { SellCarService } from './sell-car.service';
 import { ApiResponseUtil } from '@common/utils/api-response.utils';
 import { MODULE_PREFIX } from '@common/constants/app.constant';
@@ -7,10 +7,11 @@ import { CarBrandDto } from './dto/car-brand.dto';
 import { CarModelParamDto, CarModelQueryDto } from './dto/car-model.dto';
 import { CarModelResource } from './resources/car-model.resource';
 import { CarVariantParamDto, CarVariantQueryDto } from './dto/car-variant.dto';
-import { CarVariantResource } from './resources/car-variant.resource';
 import { FuelTypeGroupResource } from './resources/fuel-type-group.resource';
 import { CitySuggestionDto } from './dto/city-suggestion.dto';
 import { PincodeCitySuggestionResource } from './resources/pincode-city-suggestion.resource';
+import { CurrentUser } from '@common/decorators/current-user.decorator';
+import { CreateSellCarDto } from './dto/create-sell-car.dto';
 
 @Controller(`${MODULE_PREFIX.CUSTOMER}/sell-car`)
 export class SellCarController {
@@ -67,7 +68,6 @@ export class SellCarController {
     const { data, total, page, limit } = await this.sellCarService.getCitySuggestions(queryDto);
     return ApiResponseUtil.paginated(
       PincodeCitySuggestionResource.collection(data),
-      // data,
       page,
       limit,
       total,
@@ -75,12 +75,13 @@ export class SellCarController {
     );
   }
 
-
-  // // Final: Submit car for selling
-  // @Post()
-  // submitCarForSale(@Body() dto: CreateSellCarDto) { }
-  private toTitle(text: string) {
-    if (!text) return text;
-    return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
+  // Final: Submit car for selling
+  @Post()
+  async submitCarForSale(@CurrentUser() user: any, @Body() dto: CreateSellCarDto) {
+    await this.sellCarService.submitCarForSale(user, dto);
+    return ApiResponseUtil.success(
+      null,
+      'Your request has been submitted successfully. Our team will contact you shortly.'
+    );
   }
 }

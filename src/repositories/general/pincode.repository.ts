@@ -51,4 +51,14 @@ export class PincodeRepository {
         const [data, total] = await qb.getManyAndCount();
         return { data, total, page, limit };
     }
+
+    async isPincodeActive(pincodeId: number, manager?: EntityManager): Promise<boolean> {
+        const repo = await this.getRepo(manager);
+        const pincode = await repo.findOne({
+            select: { id: true },
+            where: { id: pincodeId, city: { is_active: true } },
+            relations: ['city'],
+        });
+        return !!pincode;
+    }
 }
