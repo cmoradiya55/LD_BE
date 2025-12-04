@@ -6,6 +6,18 @@ export enum FuelType {
     HYBRID = 5,
 }
 
+export enum BodyType {
+    SEDAN = 1,
+    SUB_COMPACT_SUV = 2,
+    SUV = 3,
+    HATCHBACK = 4,
+    MUV = 5,
+    COUPE = 6,
+    CONVERTIBLE = 7,
+    PICKUP = 8,
+    WAGON = 9,
+}
+
 export const FuelTypeLabel: Record<number, string> = {
     [FuelType.PETROL]: 'Petrol',
     [FuelType.DIESEL]: 'Diesel',
@@ -17,17 +29,11 @@ export const FuelTypeLabel: Record<number, string> = {
 export enum TransmissionType {
     MANUAL = 1,
     AUTOMATIC = 2,
-    CVT = 3,
-    DCT = 4,
-    AMT = 5,
 }
 
 export const TransmissionTypeLabel: Record<number, string> = {
     [TransmissionType.MANUAL]: 'Manual',
     [TransmissionType.AUTOMATIC]: 'Automatic',
-    [TransmissionType.CVT]: 'CVT',
-    [TransmissionType.DCT]: 'DCT',
-    [TransmissionType.AMT]: 'AMT',
 };
 
 export enum OwnershipType {
@@ -61,4 +67,12 @@ export enum UsedCarListingStatus {
     SOLD = 4,
     REJECTED = 5,
     EXPIRED = 6,
+}
+
+export enum SafetyRating {
+    ONE = 1,
+    TWO = 2,
+    THREE = 3,
+    FOUR = 4,
+    FIVE = 5,
 }

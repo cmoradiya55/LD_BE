@@ -10,7 +10,6 @@ import {
     ManyToOne,
     OneToMany,
     JoinColumn,
-    Index,
 } from 'typeorm';
 import { CarBrand } from '@entity/car/car-brand.entity';
 import { CarModel } from '@entity/car/car-model.entity';

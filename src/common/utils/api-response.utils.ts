@@ -38,12 +38,16 @@ export class ApiResponseUtil {
 
     // 201 - Created
     static created<T>(data?: T, message = 'Resource created successfully'): ApiResponse<T> {
-        return {
+        const res = {
             code: HttpStatus.CREATED,
             type: ResponseType.CREATED,
             message,
-            data
+        };
+
+        if (data) {
+            res['data'] = data;
         }
+        return res;
     }
 
     // 202 - Accepted
