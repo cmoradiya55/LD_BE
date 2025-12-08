@@ -54,27 +54,22 @@ export const USED_CAR_SEARCH_COLUMNS: string[] = [
 export const USED_CAR_LIST_SELECT_COLUMNS: string[] = [
     // Used car
     'uc.id as "id"',
+    'uc.slug as "slug"',
     'uc.registration_year as "registrationYear"',
     'uc.owner_type as "ownerType"',
-    'uc.km_driven_range as "kmDrivenRange"',
     'uc.km_driven as "kmDriven"',
-    'uc.expected_price as "expectedPrice"',
+    'uc.final_price as "finalPrice"',
+    'uc.rto_code as "rtoCode"',
     'uc.status as "status"',
     'uc.created_at as "createdAt"',
     // Brand
-    'b.id as "brandId"',
     'b.display_name as "brandName"',
-    'b.logo_url as "brandLogo"',
     // Model
-    'm.id as "modelId"',
     'm.display_name as "modelName"',
-    'm.body_type as "bodyType"',
     // Variant
-    'v.id as "variantId"',
     'v.display_name as "variantName"',
     'v.fuel_type as "fuelType"',
     'v.transmission_type as "transmissionType"',
-    'v.seating_capacity as "seats"',
     // Photo
     // 'ph.url as "primaryPhoto"',
 ];

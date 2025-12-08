@@ -16,6 +16,8 @@ import { UsedCar } from '@entity/used-car/used-car.entity';
 import { UsedCarListingStatus } from '@common/enums/car-detail.enum';
 import { UsedCarCustomerPhotoRepository } from '@repository/used-car/used-car-customer-photo.repository';
 import { UsedCarCustomerPhoto } from '@entity/used-car/used-car-customer-photo.entity';
+import { VehicleHelper } from '@common/helpers/vehicle-helper';
+import { SlugHelper } from '@common/helpers/slug.helper';
 
 @Injectable()
 export class SellCarService {
@@ -96,6 +98,8 @@ export class SellCarService {
                 manager,
             );
 
+            const { original, clean, rtoCode } = VehicleHelper.normalizeRegistration(registrationNumber);
+
             // 2. validate pincode is valid
             const isPincodeActive = await this.pincodeRepo.isPincodeActive(pincodeId, manager);
             if (!isPincodeActive) throw new NotFoundException('The provided pincode is not serviceable');
@@ -120,10 +124,22 @@ export class SellCarService {
                 km_driven_range: odometerReading,
                 pincode_id: pincodeId,
                 expected_price: expectedPrice,
-                registration_number: registrationNumber,
+                registration_number: original,
+                registration_number_clean: clean,
+                rto_code: rtoCode,
                 status: UsedCarListingStatus.PENDING
             } as UsedCar, manager);
             const savedUsedCar = await this.usedCarRepo.save([usedCar], manager);
+
+            const slug = SlugHelper.generateUsedCarSlug(
+                result.brand.slug,    // e.g., "maruti"
+                result.model.slug,    // e.g., "swift"
+                result.variant.slug,  // e.g., "vxi"
+                savedUsedCar[0].id     // 1234
+            );
+
+            savedUsedCar[0].slug = slug;
+            await this.usedCarRepo.save([savedUsedCar[0]], manager);
 
             const usedCarPhotos = this.usedCarCustomerPhotoRepo.createMultiple(
                 photos.map(photoKey => ({
@@ -138,3 +154,7 @@ export class SellCarService {
         }, true);
     }
 }
+function extractRTOCodeFromRegistrationNumber(registrationNumber: string) {
+    throw new Error('Function not implemented.');
+}
+

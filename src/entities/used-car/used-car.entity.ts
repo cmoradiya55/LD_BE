@@ -23,6 +23,9 @@ export class UsedCar {
     @PrimaryGeneratedColumn()
     id: number;
 
+    @Column({ name: 'slug', type: 'varchar', length: 255 })
+    slug: string;
+
     @Column({ name: 'user_id', type: 'int' })
     user_id: number;
 
@@ -51,6 +54,12 @@ export class UsedCar {
 
     @Column({ name: 'registration_number', type: 'varchar', length: 20 })
     registration_number: string;
+
+    @Column({ name: 'registration_number_clean', type: 'varchar', length: 20 })
+    registration_number_clean: string;
+
+    @Column({ name: 'rto_code', type: 'varchar', length: 10 })
+    rto_code: string;
 
     // Location
     @Column({ name: 'pincode_id', type: 'int' })

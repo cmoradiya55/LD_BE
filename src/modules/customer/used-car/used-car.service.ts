@@ -24,16 +24,7 @@ export class UsedCarService {
             //     brandLogo: this.getFullUrl(item.brandLogo),
             // }));
 
-            return {
-                // data: dataWithFullUrls,
-                data: result,
-                meta: {
-                    total: result.total,
-                    page: result.page,
-                    limit: result.limit,
-                    totalPages: result.totalPages,
-                },
-            };
+            return result;
         })
     }
 }

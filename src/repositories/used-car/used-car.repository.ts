@@ -9,13 +9,13 @@ import { QBHelper } from '@common/helpers/query-builder.helper';
 import { USED_CAR_FILTER_CONFIG, USED_CAR_LIST_SELECT_COLUMNS, USED_CAR_SEARCH_COLUMNS, USED_CAR_TABLE_ALIASES, USED_CAR_TABLES } from './config/used-car-query.filter.config';
 import { SelectQueryBuilder } from 'typeorm/browser';
 import { USED_CAR_SORT_CONFIG } from './config/used-car-query.sort.config';
+import { VehicleHelper } from '@common/helpers/vehicle-helper';
 
 export interface UsedCarListResult {
     data: any[];
     total: number;
     page: number;
     limit: number;
-    totalPages: number;
 }
 
 @Injectable()
@@ -34,13 +34,13 @@ export class UsedCarRepository {
         manager?: EntityManager,
     ): Promise<void> {
         const repo = this.getRepo(manager);
+        const { clean, rtoCode } = VehicleHelper.normalizeRegistration(registrationNumber);
+
         const queryBuilder = repo
             .createQueryBuilder()
             .select(['uc.id as "id"'])
-            .from('used_car', 'uc')
-            .where('uc.registration_number = :registrationNumber', {
-                registrationNumber: registrationNumber.toUpperCase().trim()
-            })
+            .where('uc.rto_code = :rtoCode', { rtoCode })
+            .andWhere('uc.registration_number_clean = :clean', { clean })
             .andWhere('uc.deleted_at IS NULL')
             .andWhere('uc.status NOT IN (:...whitelistedStatuses)', {
                 whitelistedStatuses: WHITELISTED_STATUSES_FOR_DUPLICATE_CHECK,
@@ -107,7 +107,6 @@ export class UsedCarRepository {
             total,
             page,
             limit,
-            totalPages: Math.ceil(total / limit),
         };
     }
 
