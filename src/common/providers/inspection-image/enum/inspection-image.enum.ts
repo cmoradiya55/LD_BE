@@ -35,14 +35,14 @@ export const InspectionImageSubtype = {
 } as const;
 
 export const IMAGE_TYPE_NAMES: Record<number, string> = {
-    1: 'Exterior',
-    2: 'Interior',
-    3: 'Engine',
-    4: 'Tyres',
-    5: 'Documents',
-    6: 'Damage',
-    7: 'Underbody',
-    8: 'Electrical',
-    9: 'Features',
-    10: 'Verification',
+    [InspectionImageType.EXTERIOR]: 'Exterior',
+    [InspectionImageType.INTERIOR]: 'Interior',
+    [InspectionImageType.ENGINE]: 'Engine',
+    [InspectionImageType.TYRES]: 'Tyres',
+    [InspectionImageType.DOCUMENTS]: 'Documents',
+    [InspectionImageType.DAMAGE]: 'Damage',
+    [InspectionImageType.UNDERBODY]: 'Underbody',
+    [InspectionImageType.ELECTRICAL]: 'Electrical',
+    [InspectionImageType.FEATURES]: 'Features',
+    [InspectionImageType.TEST_DRIVE]: 'Verification',
 };

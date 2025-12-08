@@ -3,8 +3,9 @@
 // =============================================
 
 import { SelectQueryBuilder, Brackets, ObjectLiteral } from 'typeorm';
-import { getMeta, getWhitelist, getWhitelistSQL, WhitelistMeta } from '../config/inspection-image-whitelist.config';
+import { getWhitelist, getWhitelistSQL } from '../config/inspection-image-whitelist.config';
 import { IMAGE_TYPE_NAMES } from '../enum/inspection-image.enum';
+import { SORT_ORDER } from '@common/constants/app.constant';
 
 export interface ImageQueryOptions {
     vehicleId?: number;
@@ -20,10 +21,7 @@ export interface ProcessedImage {
     type: number;
     subtype: number | null;
     url: string;
-    thumb: string | null;
     title: string | null;
-    label: string;
-    order: number;
 }
 
 export interface ImageSection {
@@ -45,12 +43,12 @@ export class InspectionImageQueryHelper {
         qb: SelectQueryBuilder<T>,
         options: ImageQueryOptions
     ): SelectQueryBuilder<T> {
-        const { 
-            vehicleId, 
-            vehicleIds, 
-            applyWhitelist = true, 
+        const {
+            vehicleId,
+            vehicleIds,
+            applyWhitelist = true,
             alias = 'img',
-            activeOnly = true 
+            activeOnly = true
         } = options;
 
         // Vehicle filter
@@ -85,9 +83,9 @@ export class InspectionImageQueryHelper {
         }
 
         // Default ordering
-        qb.addOrderBy(`${alias}.image_type`, 'ASC')
-          .addOrderBy(`${alias}.image_subtype`, 'ASC')
-          .addOrderBy(`${alias}.sort_order`, 'ASC');
+        qb.addOrderBy(`${alias}.image_type`, SORT_ORDER.ASC)
+            .addOrderBy(`${alias}.image_subtype`, SORT_ORDER.ASC)
+            .addOrderBy(`${alias}.sort_order`, SORT_ORDER.ASC);
 
         return qb;
     }
@@ -112,7 +110,7 @@ export class InspectionImageQueryHelper {
         
         let sql = `
             SELECT ${alias}.id, ${alias}.vehicle_id, ${alias}.image_type, ${alias}.image_subtype,
-                   ${alias}.image_url, ${alias}.thumbnail_url, ${alias}.title
+                   ${alias}.image_url, ${alias}.title
             FROM inspection_images ${alias}
             WHERE ${alias}.vehicle_id = ${vehicleIdColumn}
               AND ${alias}.is_active = true
@@ -146,39 +144,24 @@ export class InspectionImageQueryHelper {
                 type: img.image_type,
                 subtype: img.image_subtype,
                 url: img.image_url,
-                thumb: img.thumbnail_url,
                 title: img.title,
-                label: IMAGE_TYPE_NAMES[img.image_type] || 'Other',
-                order: idx,
             }));
         }
 
         const result: ProcessedImage[] = [];
-        const counts = new Map<string, number>();
 
         for (const img of images) {
-            const meta = getMeta(img.image_type, img.image_subtype);
-            if (!meta) continue;
-
-            const key = `${img.image_type}-${img.image_subtype}`;
-            const cnt = counts.get(key) || 0;
-            if (cnt >= meta.max) continue;
-
-            counts.set(key, cnt + 1);
             result.push({
                 id: img.id,
                 vehicleId: img.vehicle_id,
                 type: img.image_type,
                 subtype: img.image_subtype,
                 url: img.image_url,
-                thumb: img.thumbnail_url,
                 title: img.title,
-                label: meta.label,
-                order: meta.order,
             });
         }
 
-        return result.sort((a, b) => a.order - b.order);
+        return result.sort((a, b) => a.id - b.id);
     }
 
     /**
@@ -222,6 +205,6 @@ export class InspectionImageQueryHelper {
                 name: IMAGE_TYPE_NAMES[type] || 'Other',
                 images: imgs,
             }))
-            .sort((a, b) => (a.images[0]?.order ?? 999) - (b.images[0]?.order ?? 999));
+            .sort((a, b) => (a.images[0]?.id) - (b.images[0]?.id));
     }
 }

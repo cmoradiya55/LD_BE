@@ -1,4 +1,5 @@
 // src/repositories/car.repository.ts
+import { SORT_ORDER } from '@common/constants/app.constant';
 import { FuelTypeLabel } from '@common/enums/car-detail.enum';
 import { CarVariant } from '@entity/car/car-variant.entity';
 import { Injectable } from '@nestjs/common';
@@ -50,8 +51,8 @@ export class CarVariantRepository {
                         });
                 }),
             )
-            .orderBy('variant.fuel_type', 'ASC')
-            .addOrderBy('variant.id', 'DESC');
+            .orderBy('variant.fuel_type', SORT_ORDER.ASC)
+            .addOrderBy('variant.id', SORT_ORDER.DESC);
 
         return query.getMany();
     }

@@ -2,7 +2,7 @@
 // entities/inspection-image.entity.ts
 // =============================================
 
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne, JoinColumn, Index } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne, JoinColumn, Index, UpdateDateColumn } from 'typeorm';
 import { UsedCar } from './used-car.entity';
 
 @Entity('inspection_images')
@@ -26,9 +26,6 @@ export class InspectionImage {
     @Column({ type: 'varchar', length: 500 })
     image_url: string;
 
-    @Column({ type: 'varchar', length: 500, nullable: true })
-    thumbnail_url: string;
-
     @Column({ type: 'varchar', length: 150, nullable: true })
     title: string;
 
@@ -49,6 +46,9 @@ export class InspectionImage {
 
     @CreateDateColumn()
     created_at: Date;
+
+    @UpdateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+    updated_at: Date;
 
     @ManyToOne(() => UsedCar, usedCar => usedCar.inspectionImages, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'vehicle_id' })

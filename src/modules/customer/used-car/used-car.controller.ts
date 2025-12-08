@@ -1,9 +1,10 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Controller, Get, Param, Query } from '@nestjs/common';
 import { UsedCarService } from './used-car.service';
 import { MODULE_PREFIX } from '@common/constants/app.constant';
 import { UsedCarListingDto } from './dto/used-car-listing.dto';
 import { ApiResponseUtil } from '@common/utils/api-response.utils';
 import { UsedCarListingResource } from './resources/used-car-listing.resource';
+import { UsedCarDetailParamDto } from './dto/used-car-detail.dto';
 
 @Controller(`${MODULE_PREFIX.CUSTOMER}/used-car`)
 export class UsedCarController {
@@ -23,4 +24,14 @@ export class UsedCarController {
     return data;
   }
 
+  @Get(':slug')
+  async getUsedCarDetailBySlug(@Param() params: UsedCarDetailParamDto) {
+    const data = await this.usedCarService.getUsedCarDetailBySlug(params);
+    console.log("Used car data:", data);
+    return ApiResponseUtil.success(
+      data,
+      // UsedCarListingResource.collection(data),
+      'Car details fetched successfully'
+    );
+  }
 }

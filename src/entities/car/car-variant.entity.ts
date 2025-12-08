@@ -6,8 +6,10 @@ import {
   JoinColumn,
   CreateDateColumn,
   UpdateDateColumn,
+  OneToMany,
 } from 'typeorm';
 import { CarModel } from './car-model.entity';
+import { CarVariantFeature } from './car-variant-feature.entity';
 
 @Entity('variants')
 export class CarVariant {
@@ -130,4 +132,8 @@ export class CarVariant {
   @ManyToOne(() => CarModel)
   @JoinColumn({ name: 'model_id' })
   model: CarModel;
+
+  // variant feature relation
+  @OneToMany(() => CarVariantFeature, (variantFeature) => variantFeature.variant)
+  variantFeatures: CarVariantFeature[];
 }

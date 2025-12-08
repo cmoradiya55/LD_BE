@@ -10,6 +10,9 @@ import { USED_CAR_FILTER_CONFIG, USED_CAR_LIST_SELECT_COLUMNS, USED_CAR_SEARCH_C
 import { SelectQueryBuilder } from 'typeorm/browser';
 import { USED_CAR_SORT_CONFIG } from './config/used-car-query.sort.config';
 import { VehicleHelper } from '@common/helpers/vehicle-helper';
+import { InspectionImageQueryHelper } from '@common/providers/inspection-image/helper/inspection-image.helper';
+import { InspectionImage } from '@entity/used-car/inspection-image.entity';
+import { SORT_ORDER } from '@common/constants/app.constant';
 
 export interface UsedCarListResult {
     data: any[];
@@ -66,17 +69,17 @@ export class UsedCarRepository {
     }
 
     /**
-         * Find used cars with filters, search, and pagination
-         */
+     * Find used cars with filters, search, and pagination
+     */
     async findUsedCars(
-        manager: EntityManager,
         dto: UsedCarListingDto,
     ): Promise<UsedCarListResult> {
         const { search, page, limit, safetyRating, sortBy } = dto;
         const skip = (page - 1) * limit;
+        const repo = this.getRepo();
 
-        // Build query
-        const queryBuilder = this.createBaseListQuery(manager)
+        // Build query`
+        const queryBuilder = this.createBaseListQuery()
             .addSelect('COUNT(*) OVER() as "totalCount"');
 
         // Apply filters
@@ -110,11 +113,96 @@ export class UsedCarRepository {
         };
     }
 
+    /**
+     * Find used cars details with it's images, fetaures, specifications etc.
+     */
+    async getUsedCarDetailBySlug(
+        slug: string,
+    ): Promise<any> {
+        const repo = this.getRepo();
+
+        // Debug: Check if slug exists
+        const exists = await repo
+            .createQueryBuilder('used_car')
+            .where('used_car.slug = :slug', { slug })
+            .getOne();
+
+        console.log('Slug search:', slug);
+        console.log('Record found:', exists);
+
+        // without debug
+
+        // First get the used car with basic relations
+        const usedCarQb = repo
+            .createQueryBuilder('used_car')
+            .leftJoin('used_car.brand', 'brand')
+            .leftJoin('used_car.model', 'model')
+            .leftJoin('used_car.variant', 'variant')
+            .leftJoin('variant.variantFeatures', 'variant_features')
+            .leftJoin('variant_features.feature', 'feature')
+            .where('used_car.slug = :slug', { slug })
+            .andWhere('used_car.deleted_at IS NULL')
+            .select([
+                // Used car fields
+                'used_car.id',
+                'used_car.registration_year',
+                'used_car.owner_type',
+                'used_car.km_driven',
+                'used_car.registration_number',
+                'used_car.final_price',
+
+                // Brand
+                'brand.display_name',
+
+                // Model
+                'model.display_name',
+
+                // Variant
+                'variant.display_name',
+                'variant.fuel_type',
+                'variant.transmission_type',
+
+                // Variant features
+                'variant_features.feature_value',
+                'feature.name',
+                'feature.display_name',
+            ])
+        // .getOne();
+
+        console.log("Slug in repo:", usedCarQb.getSql());
+
+        const usedCar = await usedCarQb.getOne();
+
+        if (!usedCar) {
+            return null;
+        }
+
+        // Get images using the helper
+        const imageQb = repo.manager
+            .getRepository(InspectionImage)
+            .createQueryBuilder('img')
+            .orderBy('img.image_type', SORT_ORDER.ASC)
+            .addOrderBy('img.sort_order', SORT_ORDER.ASC);
+
+        InspectionImageQueryHelper.applyFilters(imageQb, {
+            vehicleId: usedCar.id,
+            applyWhitelist: true,
+            activeOnly: true,
+        });
+
+        const rawImages = await imageQb.getMany();
+
+        return {
+            ...usedCar,
+            images: rawImages,
+        };
+    }
 
     // ============ Private Methods ============
 
-    private createBaseListQuery(manager: EntityManager): SelectQueryBuilder<any> {
-        return manager
+    private createBaseListQuery(): SelectQueryBuilder<any> {
+        const repo = this.getRepo();
+        return repo
             .createQueryBuilder()
             .select(USED_CAR_LIST_SELECT_COLUMNS)
             .from(USED_CAR_TABLES.usedCar, USED_CAR_TABLE_ALIASES.usedCar)
