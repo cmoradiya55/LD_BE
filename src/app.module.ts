@@ -12,6 +12,7 @@ import { CustomerModule } from './modules/customer/customer.module';
 import { AdminModule } from './modules/admin/admin.module';
 import { BaseModule } from '@common/base/base.module';
 import { StorageModule } from './common/providers/storage/storage.module';
+import { CommonModule } from './modules/common/common.module';
 
 @Module({
   imports: [
@@ -39,7 +40,8 @@ import { StorageModule } from './common/providers/storage/storage.module';
     // Feature modules
     CustomerModule,
     AdminModule,
-    StorageModule
+    StorageModule,
+    CommonModule
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -9,7 +9,6 @@ export class CommonHelper {
 
     // ============ Image url ============
     static buildImageUrl(key?: string | null, defaultValue: string | null = null): string | null {
-        console.log('key', key);
         if (key !== null && key !== undefined && key !== '') {
             if (/^https?:\/\//i.test(key)) {
                 return key;

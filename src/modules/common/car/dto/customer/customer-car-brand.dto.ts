@@ -1,3 +1,3 @@
 import { SearchQueryDto } from "@common/dto/search-query.dto";
 
-export class CarBrandDto extends SearchQueryDto { }
+export class CustomerCarBrandDto extends SearchQueryDto { }

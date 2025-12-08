@@ -3,7 +3,7 @@ import { SearchQueryDto } from "@common/dto/search-query.dto";
 import { Type } from "class-transformer";
 import { IsInt, IsNotEmpty, Min } from "class-validator";
 
-export class CarVariantParamDto {
+export class CustomerCarVariantParamDto {
     @IsNotEmpty()
     @Type(() => Number)
     @IsInt()
@@ -16,4 +16,4 @@ export class CarVariantParamDto {
     modelId: number;
 }
 
-export class CarVariantQueryDto extends SearchQueryDto { }
+export class CustomerCarVariantQueryDto extends SearchQueryDto { }

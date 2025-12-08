@@ -3,20 +3,20 @@ import { BaseResource } from "@common/utils/resource.utils";
 import { CarVariant } from "@entity/car/car-variant.entity";
 import { CarVariantResource } from "./car-variant.resource";
 
-interface FuelTypeGroup {
+interface CustomerFuelTypeGroup {
     fuelType: string;
     fuelTypeId: number;
     variants: CarVariant[];
 }
 
-interface FuelTypeGroupResponse {
+interface CustomerFuelTypeGroupResponse {
     fuelType: string;
     fuelTypeId: number;
     variants: ReturnType<CarVariantResource['toJSON']>[];
 }
 
-export class FuelTypeGroupResource extends BaseResource<FuelTypeGroup, FuelTypeGroupResponse> {
-    toJSON(): FuelTypeGroupResponse {
+export class CustomerFuelTypeGroupResource extends BaseResource<CustomerFuelTypeGroup, CustomerFuelTypeGroupResponse> {
+    toJSON(): CustomerFuelTypeGroupResponse {
         return {
             fuelType: this.data.fuelType,
             fuelTypeId: this.data.fuelTypeId,
@@ -25,7 +25,7 @@ export class FuelTypeGroupResource extends BaseResource<FuelTypeGroup, FuelTypeG
     }
 
     // Static method to transform grouped data from repository
-    static fromGroupedVariants(variants: CarVariant[]): FuelTypeGroupResponse[] {
+    static fromGroupedVariants(variants: CarVariant[]): CustomerFuelTypeGroupResponse[] {
         const groupedMap = new Map<number, CarVariant[]>();
 
         variants.forEach((variant) => {
@@ -35,12 +35,12 @@ export class FuelTypeGroupResource extends BaseResource<FuelTypeGroup, FuelTypeG
         });
 
         return Array.from(groupedMap.entries()).map(([fuelTypeId, variants]) => {
-            const group: FuelTypeGroup = {
+            const group: CustomerFuelTypeGroup = {
                 fuelType: FuelTypeLabel[fuelTypeId] || 'Other',
                 fuelTypeId,
                 variants,
             };
-            return new FuelTypeGroupResource(group).toJSON();
+            return new CustomerFuelTypeGroupResource(group).toJSON();
         });
     }
 }
