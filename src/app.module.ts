@@ -13,6 +13,7 @@ import { AdminModule } from './modules/admin/admin.module';
 import { BaseModule } from '@common/base/base.module';
 import { StorageModule } from './common/providers/storage/storage.module';
 import { CommonModule } from './modules/common/common.module';
+import { InspectionImageModule } from './common/providers/inspection-image/inspection-image.module';
 
 @Module({
   imports: [
@@ -41,7 +42,8 @@ import { CommonModule } from './modules/common/common.module';
     CustomerModule,
     AdminModule,
     StorageModule,
-    CommonModule
+    CommonModule,
+    InspectionImageModule
   ],
   controllers: [AppController],
   providers: [AppService],

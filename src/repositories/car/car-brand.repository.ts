@@ -60,12 +60,15 @@ export class CarBrandRepository {
             .createQueryBuilder('b')
             .select([
                 'b.id as "brandId"',
+                'b.slug as "brandSlug"',
                 'b.operation_start_year as "startYear"',
                 'b.operation_end_year as "endYear"',
                 'm.id as "modelId"',
+                'm.slug as "modelSlug"',
                 'm.production_start_year as "modelStartYear"',
                 'm.production_end_year as "modelEndYear"',
                 'v.id as "variantId"',
+                'v.slug as "variantSlug"',
                 'v.model_year as "variantModelYear"',
                 'v.discontinued_date as "variantDiscontinuedDate"',
             ])

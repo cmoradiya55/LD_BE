@@ -71,7 +71,6 @@ export class CarController {
   @Get('models')
   async getModelsByBrandOrModel(@Query() query: CustomerCarModelSearchInFilterQueryDto) {
     const data = await this.carService.findModelsByBrandOrModel(query);
-    console.log('data', data);
     return ApiResponseUtil.success(
       CustomerCarModelSearchResource.collection(data),
       'Car models fetched successfully'

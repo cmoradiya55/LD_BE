@@ -37,7 +37,7 @@ export class UsedCarRepository {
         const { clean, rtoCode } = VehicleHelper.normalizeRegistration(registrationNumber);
 
         const queryBuilder = repo
-            .createQueryBuilder()
+            .createQueryBuilder('uc')
             .select(['uc.id as "id"'])
             .where('uc.rto_code = :rtoCode', { rtoCode })
             .andWhere('uc.registration_number_clean = :clean', { clean })

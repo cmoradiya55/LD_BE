@@ -84,9 +84,9 @@ export class SellCarService {
             const savedUsedCar = await this.usedCarRepo.save([usedCar], manager);
 
             const slug = SlugHelper.generateUsedCarSlug(
-                result.brand.slug,    // e.g., "maruti"
-                result.model.slug,    // e.g., "swift"
-                result.variant.slug,  // e.g., "vxi"
+                result.brandSlug,    // e.g., "maruti"
+                result.modelSlug,    // e.g., "swift"
+                result.variantSlug,  // e.g., "vxi"
                 savedUsedCar[0].id     // 1234
             );
 
