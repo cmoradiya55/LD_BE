@@ -14,7 +14,6 @@ export class UsedCarController {
   @Get()
   async getUsedCars(@Query() query: UsedCarListingDto) {
     const { data, page, total, limit } = await this.usedCarService.findUsedCars(query);
-    console.log("Used car listing data:", data);
     return ApiResponseUtil.paginated(
       UsedCarListingResource.collection(data),
       page,
@@ -28,8 +27,8 @@ export class UsedCarController {
   async getUsedCarDetailBySlug(@Param() params: UsedCarDetailParamDto) {
     const data = await this.usedCarService.getUsedCarDetailBySlug(params);
     return ApiResponseUtil.success(
+      'Car details fetched successfully',
       new UsedCarDetailResource(data),
-      'Car details fetched successfully'
     );
   }
 }

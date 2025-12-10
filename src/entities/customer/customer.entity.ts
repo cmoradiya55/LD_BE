@@ -63,10 +63,10 @@ export class Customer {
     is_blocked: boolean;
 
     @Column({ name: 'blocked_reason', type: 'text', nullable: true })
-    blocked_reason: string;
+    blocked_reason: string | null;
 
     @Column({ name: 'blocked_at', type: 'timestamptz', nullable: true })
-    blocked_at: Date;
+    blocked_at: Date | null;
 
     // Timestamps
     @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })

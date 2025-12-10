@@ -1,4 +1,12 @@
 export class CommonHelper {
+
+    // ============ OTP ============
+    static generateOtp(): string {
+        return process.env.NODE_ENV === 'development'
+            ? (123456).toString()
+            : Math.floor(100000 + Math.random() * 900000).toString();
+    }
+
     // ============ TEXT & STRING ============
     static text(text: string | null | undefined, defaultValue: string | null = null): string | null {
         if (text !== null && text !== undefined && text !== '') {

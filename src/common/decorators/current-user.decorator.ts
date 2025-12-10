@@ -7,9 +7,8 @@ const userData = {
 }
 
 const getCurrentUserByContext = (data: string | undefined, context: ExecutionContext) => {
-    // const user = context.switchToHttp().getRequest().user;
-    // return data ? user?.[data] : user;
-    return data ? userData?.[data] : userData;
+    const user = context.switchToHttp().getRequest().user;
+    return data ? user?.[data] : user;
 }
 
 export const CurrentUser = createParamDecorator(

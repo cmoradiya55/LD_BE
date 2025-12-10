@@ -19,8 +19,9 @@ export class CarController {
     const data = await this.carService.findCarBrands(query);
 
     return ApiResponseUtil.success(
+      'Car brands fetched successfully',
       CustomerCarBrandResource.collection(data),
-      'Car brands fetched successfully');
+    );
   }
 
   @Get(':brandId/models')
@@ -29,8 +30,8 @@ export class CarController {
   ) {
     const data = await this.carService.findModelsByBrand(param);
     return ApiResponseUtil.success(
+      'Car models fetched successfully',
       CustomerCarModelFilterListingResource.collection(data),
-      'Car models fetched successfully'
     );
   }
 
@@ -39,8 +40,8 @@ export class CarController {
   async getYearsByBrand(@Param('brandId') brandId: number) {
     const data = await this.carService.findYearsByBrand(brandId);
     return ApiResponseUtil.success(
+      'Years fetched successfully',
       data,
-      'Years fetched successfully'
     );
   }
 
@@ -51,8 +52,8 @@ export class CarController {
   ) {
     const data = await this.carService.findModelsByBrandAndYear(param, query);
     return ApiResponseUtil.success(
+      'Car models fetched successfully',
       CustomerCarModelResource.collection(data),
-      'Car models fetched successfully'
     );
   }
 
@@ -63,8 +64,8 @@ export class CarController {
     const variants = await this.carService.getVariantsByBrandYearAndModel(param);
 
     return ApiResponseUtil.success(
+      'Car variants fetched successfully',
       CustomerFuelTypeGroupResource.fromGroupedVariants(variants),
-      'Car variants fetched successfully'
     );
   }
 
@@ -72,8 +73,8 @@ export class CarController {
   async getModelsByBrandOrModel(@Query() query: CustomerCarModelSearchInFilterQueryDto) {
     const data = await this.carService.findModelsByBrandOrModel(query);
     return ApiResponseUtil.success(
+      'Car models fetched successfully',
       CustomerCarModelSearchResource.collection(data),
-      'Car models fetched successfully'
     );
   }
 }

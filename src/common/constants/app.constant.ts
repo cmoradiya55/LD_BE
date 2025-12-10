@@ -28,3 +28,8 @@ export const MIN_FILE_UPLOAD_REQUIRED = 1;
 export const MAX_FILE_UPLOAD_ALLOWED = 20;
 
 export const S3_BUCKET_FOLDERS = [] as const;
+
+export const OTP_EXPIRY_MS = {
+    MOBILE: 10 * 60 * 1000,
+    EMAIL: 10 * 60 * 1000,
+} as const;

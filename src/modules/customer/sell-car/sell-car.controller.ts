@@ -28,7 +28,6 @@ export class SellCarController {
   async submitCarForSale(@CurrentUser() user: any, @Body() dto: CreateSellCarDto) {
     await this.sellCarService.submitCarForSale(user, dto);
     return ApiResponseUtil.created(
-      null,
       'Your request has been submitted successfully. Our team will contact you shortly.'
     );
   }
