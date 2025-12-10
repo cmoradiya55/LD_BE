@@ -78,7 +78,7 @@ export class CarVariant {
   num_gears: number | null;
 
   @Column({ type: 'smallint', nullable: true })
-  boot_space_litres: number | null;
+  boot_space_liters: number | null;
 
   @Column({ type: 'smallint' })
   seating_capacity: number;

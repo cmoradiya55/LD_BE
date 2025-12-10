@@ -5,6 +5,7 @@ import { UsedCarListingDto } from './dto/used-car-listing.dto';
 import { ApiResponseUtil } from '@common/utils/api-response.utils';
 import { UsedCarListingResource } from './resources/used-car-listing.resource';
 import { UsedCarDetailParamDto } from './dto/used-car-detail.dto';
+import { UsedCarDetailResource } from './resources/used-car-detail.resource';
 
 @Controller(`${MODULE_PREFIX.CUSTOMER}/used-car`)
 export class UsedCarController {
@@ -21,16 +22,13 @@ export class UsedCarController {
       total,
       'Cars fetched successfully'
     );
-    return data;
   }
 
   @Get(':slug')
   async getUsedCarDetailBySlug(@Param() params: UsedCarDetailParamDto) {
     const data = await this.usedCarService.getUsedCarDetailBySlug(params);
-    console.log("Used car data:", data);
     return ApiResponseUtil.success(
-      data,
-      // UsedCarListingResource.collection(data),
+      new UsedCarDetailResource(data),
       'Car details fetched successfully'
     );
   }

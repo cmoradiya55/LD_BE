@@ -15,7 +15,7 @@ export class UsedCarService {
      * Get used cars list with filters and pagination
      */
     async findUsedCars(query: UsedCarListingDto) {
-        return this.baseService.catch(async (manager) => {
+        return this.baseService.catch(async () => {
             const result = await this.usedCarRepository.findUsedCars(query);
 
             // // Prepend S3 base URL to photos
@@ -24,6 +24,8 @@ export class UsedCarService {
             //     primaryPhoto: this.getFullUrl(item.primaryPhoto),
             //     brandLogo: this.getFullUrl(item.brandLogo),
             // }));
+
+            console.log("Used car listing result in service:", result);
 
             return result;
         })

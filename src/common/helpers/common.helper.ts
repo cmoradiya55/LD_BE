@@ -57,6 +57,10 @@ export class CommonHelper {
         return number;
     }
 
+    static maskRegistrationNumber(number: string): string {
+        return number.substring(0, 5) + '-**-' + number.substring(number.length - 4);
+    }
+
     // ============ HTTP OPERATIONS ============
     static getOperation(method: string): string {
         switch (method.toUpperCase()) {

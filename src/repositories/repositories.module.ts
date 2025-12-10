@@ -17,6 +17,7 @@ import { UsedCarRepository } from './used-car/used-car.repository';
 import { UsedCar } from '@entity/used-car/used-car.entity';
 import { UsedCarCustomerPhoto } from '@entity/used-car/used-car-customer-photo.entity';
 import { UsedCarCustomerPhotoRepository } from './used-car/used-car-customer-photo.repository';
+import { InspectionImage } from '@entity/used-car/inspection-image.entity';
 
 @Module({
   imports: [
@@ -32,7 +33,8 @@ import { UsedCarCustomerPhotoRepository } from './used-car/used-car-customer-pho
       Pincode,
 
       UsedCar,
-      UsedCarCustomerPhoto
+      UsedCarCustomerPhoto,
+      InspectionImage
     ]),
   ],
   providers: [

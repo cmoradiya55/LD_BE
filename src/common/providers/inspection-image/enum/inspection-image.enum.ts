@@ -34,7 +34,7 @@ export const InspectionImageSubtype = {
     ODOMETER: 1001,
 } as const;
 
-export const IMAGE_TYPE_NAMES: Record<number, string> = {
+export const IMAGE_TYPE_NAMES: Record<typeof InspectionImageType[keyof typeof InspectionImageType], string> = {
     [InspectionImageType.EXTERIOR]: 'Exterior',
     [InspectionImageType.INTERIOR]: 'Interior',
     [InspectionImageType.ENGINE]: 'Engine',

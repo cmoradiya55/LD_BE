@@ -76,3 +76,9 @@ export enum SafetyRating {
     FOUR = 4,
     FIVE = 5,
 }
+
+export enum FeatureValueType {
+    BOOLEAN = 1,
+    TEXT = 2,
+    NUMBER = 3,
+}

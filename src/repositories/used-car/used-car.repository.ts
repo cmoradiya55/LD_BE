@@ -26,6 +26,8 @@ export class UsedCarRepository {
     constructor(
         @InjectRepository(UsedCar)
         private readonly usedCarRepository: Repository<UsedCar>,
+        @InjectRepository(InspectionImage)
+        private readonly inspectionImageRepository: Repository<InspectionImage>,
     ) { }
 
     private getRepo(manager?: EntityManager): Repository<UsedCar> {
@@ -76,7 +78,6 @@ export class UsedCarRepository {
     ): Promise<UsedCarListResult> {
         const { search, page, limit, safetyRating, sortBy } = dto;
         const skip = (page - 1) * limit;
-        const repo = this.getRepo();
 
         // Build query`
         const queryBuilder = this.createBaseListQuery()
@@ -121,17 +122,6 @@ export class UsedCarRepository {
     ): Promise<any> {
         const repo = this.getRepo();
 
-        // Debug: Check if slug exists
-        const exists = await repo
-            .createQueryBuilder('used_car')
-            .where('used_car.slug = :slug', { slug })
-            .getOne();
-
-        console.log('Slug search:', slug);
-        console.log('Record found:', exists);
-
-        // without debug
-
         // First get the used car with basic relations
         const usedCarQb = repo
             .createQueryBuilder('used_car')
@@ -150,6 +140,7 @@ export class UsedCarRepository {
                 'used_car.km_driven',
                 'used_car.registration_number',
                 'used_car.final_price',
+                'used_car.rto_code',
 
                 // Brand
                 'brand.display_name',
@@ -161,15 +152,31 @@ export class UsedCarRepository {
                 'variant.display_name',
                 'variant.fuel_type',
                 'variant.transmission_type',
+                'variant.boot_space_liters',
+                'variant.seating_capacity',
+                'variant.ground_clearance_mm',
+
+                'variant.engine_displacement_cc',
+                'variant.cylinders',
+                'variant.max_power_ps',
+                'variant.max_power_rpm',
+                'variant.max_torque_nm',
+                'variant.max_torque_rpm',
+                'variant.fuel_tank_litres',
+                'variant.mileage_kmpl',
+                'variant.battery_capacity_kwh',
+                'variant.electric_range_km',
+                'variant.electric_motor_power_kw',
+                'variant.electric_motor_torque_nm',
+                'variant.num_gears',
 
                 // Variant features
                 'variant_features.feature_value',
+                'variant_features.feature_id',
                 'feature.name',
                 'feature.display_name',
-            ])
-        // .getOne();
-
-        console.log("Slug in repo:", usedCarQb.getSql());
+                'feature.value_type',
+            ]);
 
         const usedCar = await usedCarQb.getOne();
 
@@ -178,8 +185,7 @@ export class UsedCarRepository {
         }
 
         // Get images using the helper
-        const imageQb = repo.manager
-            .getRepository(InspectionImage)
+        const imageQb = this.inspectionImageRepository
             .createQueryBuilder('img')
             .orderBy('img.image_type', SORT_ORDER.ASC)
             .addOrderBy('img.sort_order', SORT_ORDER.ASC);
@@ -203,9 +209,8 @@ export class UsedCarRepository {
     private createBaseListQuery(): SelectQueryBuilder<any> {
         const repo = this.getRepo();
         return repo
-            .createQueryBuilder()
+            .createQueryBuilder(USED_CAR_TABLE_ALIASES.usedCar)
             .select(USED_CAR_LIST_SELECT_COLUMNS)
-            .from(USED_CAR_TABLES.usedCar, USED_CAR_TABLE_ALIASES.usedCar)
             .innerJoin(USED_CAR_TABLES.brand, USED_CAR_TABLE_ALIASES.brand, `${USED_CAR_TABLE_ALIASES.brand}.id = ${USED_CAR_TABLE_ALIASES.usedCar}.brand_id`)
             .innerJoin(USED_CAR_TABLES.model, USED_CAR_TABLE_ALIASES.model, `${USED_CAR_TABLE_ALIASES.model}.id = ${USED_CAR_TABLE_ALIASES.usedCar}.model_id`)
             .innerJoin(USED_CAR_TABLES.variant, USED_CAR_TABLE_ALIASES.variant, `${USED_CAR_TABLE_ALIASES.variant}.id = ${USED_CAR_TABLE_ALIASES.usedCar}.variant_id`)
