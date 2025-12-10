@@ -1,6 +1,5 @@
 // src/repositories/car.repository.ts
 import { UsedCarCustomerPhoto } from '@entity/used-car/used-car-customer-photo.entity';
-import { UsedCar } from '@entity/used-car/used-car.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { EntityManager, Repository } from 'typeorm';

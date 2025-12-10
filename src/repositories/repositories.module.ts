@@ -18,6 +18,14 @@ import { UsedCar } from '@entity/used-car/used-car.entity';
 import { UsedCarCustomerPhoto } from '@entity/used-car/used-car-customer-photo.entity';
 import { UsedCarCustomerPhotoRepository } from './used-car/used-car-customer-photo.repository';
 import { InspectionImage } from '@entity/used-car/inspection-image.entity';
+import { Customer } from '@entity/customer/customer.entity';
+import { CustomerOtp } from '@entity/customer/customer-otp.entity';
+import { CustomerRefreshToken } from '@entity/customer/customer-refresh-token.entity';
+import { CustomerFcmToken } from '@entity/customer/customer-fcm-token.entity';
+import { CustomerRepository } from './customer/customer.repository';
+import { CustomerOtpRepository } from './customer/customer-otp.repository';
+import { CustomerRefreshTokenRepository } from './customer/customer-refresh-token.repository';
+import { CustomerFcmTokenRepository } from './customer/customer-fcm-token.repository';
 
 @Module({
   imports: [
@@ -34,7 +42,12 @@ import { InspectionImage } from '@entity/used-car/inspection-image.entity';
 
       UsedCar,
       UsedCarCustomerPhoto,
-      InspectionImage
+      InspectionImage,
+
+      Customer,
+      CustomerOtp,
+      CustomerRefreshToken,
+      CustomerFcmToken,
     ]),
   ],
   providers: [
@@ -44,7 +57,12 @@ import { InspectionImage } from '@entity/used-car/inspection-image.entity';
     CityRepository,
     PincodeRepository,
     UsedCarRepository,
-    UsedCarCustomerPhotoRepository
+    UsedCarCustomerPhotoRepository,
+
+    CustomerRepository,
+    CustomerOtpRepository,
+    CustomerRefreshTokenRepository,
+    CustomerFcmTokenRepository,
   ],
   exports: [
     CarBrandRepository,
@@ -53,7 +71,13 @@ import { InspectionImage } from '@entity/used-car/inspection-image.entity';
     CityRepository,
     PincodeRepository,
     UsedCarRepository,
-    UsedCarCustomerPhotoRepository
+    UsedCarCustomerPhotoRepository,
+
+
+    CustomerRepository,
+    CustomerOtpRepository,
+    CustomerRefreshTokenRepository,
+    CustomerFcmTokenRepository,
   ],
 })
 export class RepositoriesModule { }

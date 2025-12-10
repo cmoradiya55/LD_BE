@@ -45,7 +45,6 @@ export const USED_CAR_SEARCH_COLUMNS: string[] = [
     'b.display_name',
     'm.display_name',
     'v.display_name',
-    'uc.registration_number',
 ];
 
 /**

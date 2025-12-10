@@ -12,7 +12,7 @@ export class CarBrandRepository {
         private readonly repo: Repository<CarBrand>,
     ) { }
 
-    private async getRepo(manager): Promise<Repository<CarBrand>> {
+    private async getRepo(manager?: EntityManager): Promise<Repository<CarBrand>> {
         return manager ? manager.getRepository(CarBrand) : this.repo;
     }
 
