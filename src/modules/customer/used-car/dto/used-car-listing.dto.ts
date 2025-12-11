@@ -21,11 +21,6 @@ class UsedCarFilterDto {
     @IsPositiveIntArray()
     modelId?: number[];
 
-    @IsOptional()
-    @TransformToNumberArray()
-    @IsPositiveIntArray()
-    variantId?: number[];
-
     // ============ Year Filter ============
     @IsOptional()
     @TransformToNumberArray()

@@ -1,6 +1,7 @@
 import { registerAs } from "@nestjs/config";
 
 export const appConfig = registerAs('app', () => ({
+    apiPrefix: process.env.APP_API_PREFIX,
     port: process.env.APP_PORT || 3000,
     corsOrigin: process.env.CORS_ORIGIN,
     name: process.env.APP_NAME || 'Dream Foundation',

@@ -1,9 +1,9 @@
 // src/repositories/car.repository.ts
-import { WHITELISTED_STATUSES_FOR_DUPLICATE_CHECK } from '@common/constants/used-car.constant';
+import { BLACKLISTED_STATUS } from '@common/constants/used-car.constant';
 import { UsedCar } from '@entity/used-car/used-car.entity';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { EntityManager, Repository } from 'typeorm';
+import { EntityManager, In, Not, Repository } from 'typeorm';
 import { UsedCarListingDto } from '../../modules/customer/used-car/dto/used-car-listing.dto';
 import { QBHelper } from '@common/helpers/query-builder.helper';
 import { USED_CAR_FILTER_CONFIG, USED_CAR_LIST_SELECT_COLUMNS, USED_CAR_SEARCH_COLUMNS, USED_CAR_TABLE_ALIASES, USED_CAR_TABLES } from './config/used-car-query.filter.config';
@@ -38,6 +38,8 @@ export class UsedCarRepository {
         registrationNumber: string,
         manager?: EntityManager,
     ): Promise<void> {
+        if (!BLACKLISTED_STATUS.length) throw new BadRequestException('Contact administrator: Internal configuration error');
+
         const repo = this.getRepo(manager);
         const { clean, rtoCode } = VehicleHelper.normalizeRegistration(registrationNumber);
 
@@ -47,8 +49,8 @@ export class UsedCarRepository {
             .where('uc.rto_code = :rtoCode', { rtoCode })
             .andWhere('uc.registration_number_clean = :clean', { clean })
             .andWhere('uc.deleted_at IS NULL')
-            .andWhere('uc.status NOT IN (:...whitelistedStatuses)', {
-                whitelistedStatuses: WHITELISTED_STATUSES_FOR_DUPLICATE_CHECK,
+            .andWhere('uc.status NOT IN (:...blacklistedStatuses)', {
+                blacklistedStatuses: BLACKLISTED_STATUS,
             });
 
         const existingListing = await queryBuilder.getRawOne();
@@ -68,6 +70,60 @@ export class UsedCarRepository {
     async save(entity: UsedCar[], manager?: EntityManager): Promise<UsedCar[]> {
         const repo = this.getRepo(manager);
         return await repo.save(entity);
+    }
+
+    async findByIds(
+        ids: number[],
+        page: number,
+        limit: number,
+    ): Promise<UsedCarListResult> {
+        if (!BLACKLISTED_STATUS.length) throw new BadRequestException('Contact administrator: Internal configuration error');
+
+        if (!ids.length) {
+            return {
+                data: [],
+                total: 0,
+                page,
+                limit,
+            };
+        }
+        // Build query
+        const queryBuilder = this.createBaseListQuery()
+            .addSelect('COUNT(*) OVER() as "totalCount"')
+            .andWhere('uc.id IN (:...ids)', { ids });
+
+
+        const skip = (page - 1) * limit;
+        // Execute query
+        const data = await queryBuilder
+            .offset(skip)
+            .limit(limit)
+            .getRawMany();
+
+        // Extract total and clean data
+        const { cleanedData, total } = QBHelper.extractTotalAndCleanData(data);
+
+        return {
+            data: cleanedData,
+            total,
+            page,
+            limit,
+        };
+    }
+
+    async findById(
+        id: number,
+        manager?: EntityManager,
+    ): Promise<UsedCar | null> {
+        const repo = this.getRepo(manager);
+        if (!BLACKLISTED_STATUS.length) throw new BadRequestException('Contact administrator: Internal configuration error');
+
+        return await repo.findOne({
+            where: {
+                id,
+                status: Not(In(BLACKLISTED_STATUS))
+            },
+        });
     }
 
     /**
@@ -207,6 +263,8 @@ export class UsedCarRepository {
     // ============ Private Methods ============
 
     private createBaseListQuery(): SelectQueryBuilder<any> {
+        if (!BLACKLISTED_STATUS.length) throw new BadRequestException('Contact administrator: Internal configuration error');
+
         const repo = this.getRepo();
         return repo
             .createQueryBuilder(USED_CAR_TABLE_ALIASES.usedCar)
@@ -219,6 +277,9 @@ export class UsedCarRepository {
             //     USED_CAR_TABLE_ALIASES.photo,
             //     `${USED_CAR_TABLE_ALIASES.photo}.used_car_id = ${USED_CAR_TABLE_ALIASES.usedCar}.id AND ${USED_CAR_TABLE_ALIASES.photo}.is_primary = true AND ${USED_CAR_TABLE_ALIASES.photo}.deleted_at IS NULL`,
             // )
-            .where(`${USED_CAR_TABLE_ALIASES.usedCar}.deleted_at IS NULL`);
+            .where(`${USED_CAR_TABLE_ALIASES.usedCar}.deleted_at IS NULL`)
+            .andWhere(`${USED_CAR_TABLE_ALIASES.usedCar}.status NOT IN (:...blacklistedStatuses)`, {
+                blacklistedStatuses: BLACKLISTED_STATUS,
+            });
     }
 }

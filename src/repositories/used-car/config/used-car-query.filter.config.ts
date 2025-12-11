@@ -22,7 +22,6 @@ export const USED_CAR_FILTER_CONFIG: FilterConfig[] = [
     // Array filters (IN)
     { field: 'brandId', column: 'uc.brand_id', operator: 'in' },
     { field: 'modelId', column: 'uc.model_id', operator: 'in' },
-    { field: 'variantId', column: 'uc.variant_id', operator: 'in' },
     { field: 'modelYear', column: 'uc.registration_year', operator: 'in' },
     { field: 'fuelType', column: 'v.fuel_type', operator: 'in' },
     { field: 'bodyType', column: 'm.body_type', operator: 'in' },

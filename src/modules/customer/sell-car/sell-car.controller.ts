@@ -15,11 +15,11 @@ export class SellCarController {
   async getCitySuggestions(@Query() queryDto: CitySuggestionDto) {
     const { data, total, page, limit } = await this.sellCarService.getCitySuggestions(queryDto);
     return ApiResponseUtil.paginated(
+      'City suggestions fetched successfully',
       PincodeCitySuggestionResource.collection(data),
       page,
       limit,
       total,
-      'City suggestions fetched successfully'
     );
   }
 

@@ -15,11 +15,11 @@ export class UsedCarController {
   async getUsedCars(@Query() query: UsedCarListingDto) {
     const { data, page, total, limit } = await this.usedCarService.findUsedCars(query);
     return ApiResponseUtil.paginated(
+      'Cars fetched successfully',
       UsedCarListingResource.collection(data),
       page,
       limit,
       total,
-      'Cars fetched successfully'
     );
   }
 

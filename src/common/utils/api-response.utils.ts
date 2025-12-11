@@ -77,11 +77,11 @@ export class ApiResponseUtil {
 
     // 200 - Paginated Response
     static paginated<T>(
+        message = 'Success',
         data: T,
         page: number,
         limit: number,
         total: number,
-        message = 'Success'
     ): PaginatedResponse<T> {
         return {
             code: HttpStatus.OK,

@@ -1,5 +1,5 @@
 import { Customer } from '@entity/customer/customer.entity';
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { EntityManager, Repository, FindOptionsWhere, LessThanOrEqual, IsNull, Or } from 'typeorm';
 
@@ -8,9 +8,9 @@ export class CustomerRepository {
     constructor(
         @InjectRepository(Customer)
         private readonly repo: Repository<Customer>,
-    ) {}
+    ) { }
 
-    private async getRepo(manager?: EntityManager): Promise<Repository<Customer>> {
+    private getRepo(manager?: EntityManager): Repository<Customer> {
         return manager ? manager.getRepository(Customer) : this.repo;
     }
 
@@ -28,7 +28,7 @@ export class CustomerRepository {
 
     /**
      * Merge default conditions with custom conditions
-     */
+    */
     private mergeConditions(
         customConditions: FindOptionsWhere<Customer> | FindOptionsWhere<Customer>[],
     ): FindOptionsWhere<Customer> | FindOptionsWhere<Customer>[] {
@@ -50,18 +50,22 @@ export class CustomerRepository {
     /**
      * Find customer by mobile number
      */
-    async findByMobile(
+    async findByMobileOrThrowError(
         mobileCountryCode: number,
         mobileNo: number,
         manager?: EntityManager,
-    ): Promise<Customer | null> {
-        const repo = await this.getRepo(manager);
-        return await repo.findOne({
+    ): Promise<Customer> {
+        const repo = this.getRepo(manager);
+        const customer = await repo.findOne({
             where: this.mergeConditions({
                 mobile_country_code: mobileCountryCode,
                 mobile_no: mobileNo,
             }),
         });
+        if (!customer) {
+            throw new NotFoundException('Customer not found');
+        }
+        return customer;
     }
 
     /**
@@ -79,6 +83,7 @@ export class CustomerRepository {
                 mobile_country_code: mobileCountryCode,
                 mobile_no: mobileNo,
             },
+            withDeleted: true,
         });
     }
 
@@ -152,10 +157,19 @@ export class CustomerRepository {
     /**
      * Create new customer
      */
-    async create(data: Partial<Customer>, manager?: EntityManager): Promise<Customer> {
-        const repo = await this.getRepo(manager);
-        const customer = repo.create(data);
-        return await repo.save(customer);
+    create(data: Customer, manager?: EntityManager): Customer {
+        const repo = this.getRepo(manager);
+        return repo.create(data);
+    }
+
+    async save(entity: Customer, manager?: EntityManager): Promise<Customer> {
+        const repo = this.getRepo(manager);
+        return await repo.save(entity);
+    }
+
+    async saveBulk(entity: Customer[], manager?: EntityManager): Promise<Customer[]> {
+        const repo = this.getRepo(manager);
+        return await repo.save(entity);
     }
 
     /**
