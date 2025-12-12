@@ -78,7 +78,7 @@ export const USED_CAR_LIST_SELECT_COLUMNS: string[] = [
 export const USED_CAR_DETAIL_SELECT_COLUMNS: string[] = [
     // Used car
     'uc.id as "id"',
-    'uc.user_id as "userId"',
+    'uc.customer_id as "userId"',
     'uc.registration_year as "registrationYear"',
     'uc.owner_type as "ownerType"',
     'uc.km_driven_range as "kmDrivenRange"',

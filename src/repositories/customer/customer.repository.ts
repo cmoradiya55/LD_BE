@@ -279,7 +279,7 @@ export class CustomerRepository {
      * Soft delete customer
      */
     async softDelete(id: number, manager?: EntityManager): Promise<void> {
-        const repo = await this.getRepo(manager);
+        const repo = this.getRepo(manager);
         await repo.softDelete(id);
     }
 

@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn, CreateDateColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn, CreateDateColumn, DeleteDateColumn } from 'typeorm';
 import { Customer } from './customer.entity';
 import { CustomerDeviceType } from '@common/enums/customer.enum';
 
@@ -54,6 +54,9 @@ export class CustomerRefreshToken {
     // Timestamps
     @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
     created_at: Date;
+
+    @DeleteDateColumn({ name: 'deleted_at', type: 'timestamptz', nullable: true })
+    deleted_at: Date;
 
     // Relations
     @ManyToOne(() => Customer, customer => customer.refreshTokens)

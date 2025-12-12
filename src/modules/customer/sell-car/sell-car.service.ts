@@ -67,7 +67,7 @@ export class SellCarService {
             if (!result) throw new BadRequestException('Some of the selected car details are invalid');
 
             const usedCar = this.usedCarRepo.create({
-                user_id: user.id,
+                customer_id: user.id,
                 brand_id: brandId,
                 registration_year: year,
                 model_id: modelId,

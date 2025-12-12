@@ -202,4 +202,11 @@ export class CustomerOtpRepository {
             where: { id },
         });
     }
+
+    async softDeleteByCustomerId(customerId: number, manager?: EntityManager): Promise<void> {
+        const repo = this.getRepo(manager);
+        await repo.softDelete({
+            customer_id: customerId,
+        });
+    }
 }

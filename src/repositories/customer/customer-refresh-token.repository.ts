@@ -8,7 +8,7 @@ export class CustomerRefreshTokenRepository {
     constructor(
         @InjectRepository(CustomerRefreshToken)
         private readonly repo: Repository<CustomerRefreshToken>,
-    ) {}
+    ) { }
 
     /**
      * Get repository (supports transactions)
@@ -332,6 +332,13 @@ export class CustomerRefreshTokenRepository {
                 customer_id: customerId,
                 is_revoked: true,
             },
+        });
+    }
+
+    async softDeleteByCustomerId(customerId: number, manager?: EntityManager): Promise<void> {
+        const repo = this.getRepo(manager);
+        await repo.softDelete({
+            customer_id: customerId,
         });
     }
 }

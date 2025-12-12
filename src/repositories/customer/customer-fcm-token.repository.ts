@@ -300,4 +300,11 @@ export class CustomerFcmTokenRepository {
         });
         return count > 0;
     }
+
+    async softDeleteByCustomerId(customerId: number, manager?: EntityManager): Promise<void> {
+        const repo = this.getRepo(manager);
+        await repo.softDelete({
+            customer_id: customerId,
+        });
+    }
 }

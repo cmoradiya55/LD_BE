@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Ip, Post, Put, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Ip, Post, Put, UseGuards } from '@nestjs/common';
 import { ProfileService } from './profile.service';
 import { MODULE_PREFIX } from '@common/constants/app.constant';
 import { CurrentUser } from '@common/decorators/current-user.decorator';
@@ -9,6 +9,8 @@ import { CustomerProfileResource } from './resources/customer-profile.resource';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { SendEmailVerificationOtpDto } from './dto/send-email-verification-otp.dto';
 import { VerifyEmailVerificationOtpDto } from './dto/verify-email-verification-otp.dto';
+import { RequestDeleteOtpDto } from './dto/request-delete-otp.dto';
+import { ConfirmDeleteDto } from './dto/confirm-delete.dto';
 
 @Controller(`${MODULE_PREFIX.CUSTOMER}/profile`)
 @UseGuards(CJwtAuthGuard)
@@ -63,6 +65,32 @@ export class ProfileController {
 
     return ApiResponseUtil.success(
       'Email verification OTP verified successfully',
+    );
+  }
+
+  @Post('delete/send-otp')
+  async sendProfileDeleteOtp(
+    @CurrentUser() customer: Customer,
+    @Body() dto: RequestDeleteOtpDto,
+    @Ip() ip: string
+  ) {
+    await this.profileService.sendProfileDeleteOtp(customer, dto, ip);
+
+    return ApiResponseUtil.success(
+      'Account deletion OTP sent successfully',
+    );
+  }
+
+
+  @Delete('delete')
+  async confirmProfileDelete(
+    @CurrentUser() customer: Customer,
+    @Body() dto: ConfirmDeleteDto,
+  ) {
+    await this.profileService.confirmProfileDelete(customer, dto);
+
+    return ApiResponseUtil.success(
+      'Account deleted successfully',
     );
   }
 }

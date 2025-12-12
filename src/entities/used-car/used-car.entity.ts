@@ -27,8 +27,8 @@ export class UsedCar {
     @Column({ name: 'slug', type: 'varchar', length: 255 })
     slug: string;
 
-    @Column({ name: 'user_id', type: 'int' })
-    user_id: number;
+    @Column({ name: 'customer_id', type: 'int' })
+    customer_id: number;
 
     // Car details
     @Column({ name: 'brand_id', type: 'int' })

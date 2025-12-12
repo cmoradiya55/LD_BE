@@ -8,4 +8,5 @@ export enum CustomerDeviceType {
 export enum CustomerOtpType {
     REGISTRATION_OR_LOGIN = 1,
     EMAIL_VERIFY = 2,
+    ACCOUNT_DELETE = 3,
 }

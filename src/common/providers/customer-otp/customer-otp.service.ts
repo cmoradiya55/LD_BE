@@ -3,6 +3,9 @@ import { CustomerOtpType } from '@common/enums/customer.enum';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { CustomerOtpRepository } from '@repository/customer/customer-otp.repository';
 import { EntityManager } from 'typeorm';
+import { GenerateOtpAndSaveDto } from './dto/generate-otp-and-save.dto';
+import { CustomerOtp } from '@entity/customer/customer-otp.entity';
+import { CommonHelper } from '@common/helpers/common.helper';
 
 @Injectable()
 export class CustomerOtpService {
@@ -44,6 +47,33 @@ export class CustomerOtpService {
         await this.otpRepo.markAsVerified(otpEntity.id, manager);
 
         return;
+    }
+
+    async generateOtpAndSave(customerId: number, dto: GenerateOtpAndSaveDto, manager?: EntityManager): Promise<CustomerOtp> {
+        return this.baseService.catch(async () => {
+            const { identifier, otpType, otpExpiryMs, otpLength, requestIp } = dto;
+            // Generate OTP
+            const otp = CommonHelper.generateOtp(otpLength);
+            const expiresAt = new Date(Date.now() + otpExpiryMs);
+
+            // Invalidate previous OTPs
+            await this.otpRepo.invalidatePreviousOtps(identifier, otpType, manager);
+
+            // Create new OTP
+            const otpEntity = this.otpRepo.create({
+                customer_id: customerId,
+                identifier: identifier,
+                otp,
+                otp_type: otpType,
+                expires_at: expiresAt,
+                request_ip: requestIp,
+            } as CustomerOtp, manager);
+
+            const otpData = await this.otpRepo.save(otpEntity, manager);
+            console.log('OTP Data:', otpData);
+            return otpData;
+
+        });
     }
 
 }

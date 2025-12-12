@@ -65,6 +65,9 @@ export class Customer {
     @Column({ name: 'blocked_reason', type: 'text', nullable: true })
     blocked_reason: string | null;
 
+    @Column({ name: 'account_delete_reason', type: 'text', nullable: true })
+    account_delete_reason: string | null;
+
     @Column({ name: 'blocked_at', type: 'timestamptz', nullable: true })
     blocked_at: Date | null;
 

@@ -4,13 +4,17 @@ import { CustomerRepository } from '@repository/customer/customer.repository';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { Customer } from '@entity/customer/customer.entity';
 import { SendEmailVerificationOtpDto } from './dto/send-email-verification-otp.dto';
-import { CommonHelper } from '@common/helpers/common.helper';
 import { OTP_EXPIRY_MS } from '@common/constants/app.constant';
 import { CustomerOtpRepository } from '@repository/customer/customer-otp.repository';
 import { CustomerOtpType } from '@common/enums/customer.enum';
-import { CustomerOtp } from '@entity/customer/customer-otp.entity';
 import { VerifyEmailVerificationOtpDto } from './dto/verify-email-verification-otp.dto';
 import { CustomerOtpService } from '@common/providers/customer-otp/customer-otp.service';
+import { RequestDeleteOtpDto } from './dto/request-delete-otp.dto';
+import { GenerateOtpAndSaveDto } from '@common/providers/customer-otp/dto/generate-otp-and-save.dto';
+import { ConfirmDeleteDto } from './dto/confirm-delete.dto';
+import { CustomerFcmTokenRepository } from '@repository/customer/customer-fcm-token.repository';
+import { CustomerRefreshTokenRepository } from '@repository/customer/customer-refresh-token.repository';
+import { UsedCarRepository } from '@repository/used-car/used-car.repository';
 
 @Injectable()
 export class ProfileService {
@@ -19,6 +23,9 @@ export class ProfileService {
         private readonly customerRepo: CustomerRepository,
         private readonly otpRepo: CustomerOtpRepository,
         private readonly customerOtpService: CustomerOtpService,
+        private readonly customerFcmTokenRepo: CustomerFcmTokenRepository,
+        private readonly customerRefreshTokenRepo: CustomerRefreshTokenRepository,
+        private readonly usedCarRepo: UsedCarRepository,
     ) { }
 
     /**
@@ -96,26 +103,13 @@ export class ProfileService {
             const existingCustomer = await this.customerRepo.findByEmailExcludingId(email, customer.id);
             if (existingCustomer) throw new ConflictException('Email is already in use by another account');
 
-            // Generate OTP
-            const otp = CommonHelper.generateOtp();
-            const expiresAt = new Date(Date.now() + OTP_EXPIRY_MS.EMAIL);
-
-            // Invalidate previous OTPs
-            await this.otpRepo.invalidatePreviousOtps(identifier, otpType);
-
-            // Create new OTP
-            const otpEntity = this.otpRepo.create({
-                customer_id: customer.id,
-                identifier: email,
-                otp,
-                otp_type: otpType,
-                expires_at: expiresAt,
-                request_ip: requestIp,
-            } as CustomerOtp);
-
-            const otpData = await this.otpRepo.save(otpEntity);
-            console.log('OTP Data:', otpData);
-
+            // Generate OTP and save in database
+            const otpData = await this.customerOtpService.generateOtpAndSave(customer.id, {
+                identifier,
+                otpType,
+                otpExpiryMs: OTP_EXPIRY_MS.EMAIL,
+                requestIp,
+            } as GenerateOtpAndSaveDto)
             // send otp to email
         });
     }
@@ -151,67 +145,48 @@ export class ProfileService {
     /**
      * Request OTP for account deletion
      */
-    async requestDeleteOtp(customerId: number, reason?: string) {
-        return this.baseService.catch(async () => {
-            // // Get customer mobile
-            // const customer = await this.customerRepo.getCustomerMobile(customerId);
-            // if (!customer) {
-            //     throw new NotFoundException('Customer not found');
-            // }
+    async sendProfileDeleteOtp(customer: Customer, dto: RequestDeleteOtpDto, requestIp: string) {
+        return this.baseService.catch(async (manager) => {
+            const { reason } = dto;
 
-            // // Generate and send OTP
-            // const otp = await this.otpService.generateAndSend({
-            //     countryCode: customer.mobile_country_code,
-            //     mobileNo: customer.mobile_no,
-            //     purpose: OTP_PURPOSE.ACCOUNT_DELETE,
-            //     customerId,
-            //     metadata: { reason },
-            // });
+            await this.customerRepo.update(customer.id, {
+                account_delete_reason: reason,
+            }, manager);
 
-            // // Mask mobile number for response
-            // const maskedMobile = this.maskMobileNumber(customer.mobile_no.toString());
 
-            // return {
-            //     message: 'OTP sent successfully',
-            //     maskedMobile: `+${customer.mobile_country_code} ${maskedMobile}`,
-            //     expiresIn: 300, // 5 minutes
-            // };
-        });
+            // Generate OTP and save in database
+            const otpData = await this.customerOtpService.generateOtpAndSave(customer.id, {
+                identifier: `${customer.mobile_country_code}${customer.mobile_no}`,
+                otpType: CustomerOtpType.ACCOUNT_DELETE,
+                otpExpiryMs: OTP_EXPIRY_MS.ACCOUNT_DELETE,
+                requestIp,
+            } as GenerateOtpAndSaveDto, manager);
+
+            // send otp to mobile number
+        }, true);
     }
 
     /**
      * Confirm account deletion with OTP
      */
-    async confirmDelete(customerId: number, otp: string) {
-        return this.baseService.catch(async () => {
-            // // Get customer mobile for OTP verification
-            // const customer = await this.customerRepo.getCustomerMobile(customerId);
-            // if (!customer) {
-            //     throw new NotFoundException('Customer not found');
-            // }
+    async confirmProfileDelete(customer: Customer, dto: ConfirmDeleteDto) {
+        return this.baseService.catch(async (manager) => {
+            const { otp } = dto;
+            const identifier = `${customer.mobile_country_code}${customer.mobile_no}`;
+            const otpType = CustomerOtpType.ACCOUNT_DELETE;
 
-            // // Verify OTP
-            // const isValid = await this.otpService.verify({
-            //     countryCode: customer.mobile_country_code,
-            //     mobileNo: customer.mobile_no,
-            //     otp,
-            //     purpose: OTP_PURPOSE.ACCOUNT_DELETE,
-            //     customerId,
-            // });
+            await this.customerOtpService.verifyOtp(
+                identifier,
+                otp,
+                otpType,
+                manager
+            );
 
-            // if (!isValid) {
-            //     throw new BadRequestException('Invalid or expired OTP');
-            // }
-
-            // // Soft delete customer
-            // await this.customerRepo.softDeleteCustomer(customerId);
-
-            // // Optionally: Invalidate all tokens, sessions, etc.
-            // // await this.authService.invalidateAllSessions(customerId);
-
-            // return {
-            //     message: 'Account deleted successfully',
-            // };
-        });
+            await this.customerRepo.softDelete(customer.id, manager);
+            await this.otpRepo.softDeleteByCustomerId(customer.id, manager);
+            await this.customerFcmTokenRepo.softDeleteByCustomerId(customer.id, manager);
+            await this.customerRefreshTokenRepo.softDeleteByCustomerId(customer.id, manager);
+            await this.usedCarRepo.softDeleteByCustomerId(customer.id, manager);
+        }, true);
     }
 }

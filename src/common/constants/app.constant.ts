@@ -34,6 +34,7 @@ export const S3_BUCKET_FOLDERS = [] as const;
 export const OTP_EXPIRY_MS = {
     MOBILE: 10 * 60 * 1000,
     EMAIL: 10 * 60 * 1000,
+    ACCOUNT_DELETE: 10 * 60 * 1000,
 } as const;
 
 export const JWT_TOKEN_TYPES = {
