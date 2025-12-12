@@ -1,6 +1,7 @@
+import { IsDeviceId } from '@common/decorators/is-device-id.decorator';
 import { IsString } from 'class-validator';
 
 export class CAuthRefreshTokenDto {
-    @IsString()
+    @IsDeviceId()
     device_id: string;
 }

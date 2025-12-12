@@ -1,3 +1,5 @@
+export const CUSTOMER_OTP_LENGTH = 6;
+
 export const MODULE_PREFIX = {
     ADMIN: 'admin',
     CUSTOMER: 'customer',

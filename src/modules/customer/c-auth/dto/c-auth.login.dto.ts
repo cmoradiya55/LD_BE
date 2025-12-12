@@ -1,5 +1,7 @@
 import { IsInt, IsString, IsPositive, Length, IsOptional, Min, Max } from 'class-validator';
 import { Type } from 'class-transformer';
+import { IsOtp } from '@common/decorators/is-otp.decorator';
+import { IsDeviceId } from '@common/decorators/is-device-id.decorator';
 
 export class CAuthLoginDto {
     @IsInt()
@@ -13,11 +15,10 @@ export class CAuthLoginDto {
     @Type(() => Number)
     mobile_no: number;
 
-    @IsString()
-    @Length(6, 6)
+    @IsOtp()
     otp: string;
 
-    @IsString()
+    @IsDeviceId()
     device_id: string;
 
     @IsInt()

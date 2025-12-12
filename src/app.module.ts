@@ -14,6 +14,7 @@ import { BaseModule } from '@common/base/base.module';
 import { StorageModule } from './common/providers/storage/storage.module';
 import { CommonModule } from './modules/common/common.module';
 import { InspectionImageModule } from './common/providers/inspection-image/inspection-image.module';
+import { CustomerOtpModule } from './common/providers/customer-otp/customer-otp.module';
 
 @Module({
   imports: [
@@ -43,7 +44,8 @@ import { InspectionImageModule } from './common/providers/inspection-image/inspe
     AdminModule,
     StorageModule,
     CommonModule,
-    InspectionImageModule
+    InspectionImageModule,
+    CustomerOtpModule
   ],
   controllers: [AppController],
   providers: [AppService],

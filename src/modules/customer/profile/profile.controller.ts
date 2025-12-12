@@ -1,0 +1,68 @@
+import { Body, Controller, Get, Ip, Post, Put, UseGuards } from '@nestjs/common';
+import { ProfileService } from './profile.service';
+import { MODULE_PREFIX } from '@common/constants/app.constant';
+import { CurrentUser } from '@common/decorators/current-user.decorator';
+import { Customer } from '@entity/customer/customer.entity';
+import { CJwtAuthGuard } from '../c-auth/guards/jwt-c-auth.guard';
+import { ApiResponseUtil } from '@common/utils/api-response.utils';
+import { CustomerProfileResource } from './resources/customer-profile.resource';
+import { UpdateProfileDto } from './dto/update-profile.dto';
+import { SendEmailVerificationOtpDto } from './dto/send-email-verification-otp.dto';
+import { VerifyEmailVerificationOtpDto } from './dto/verify-email-verification-otp.dto';
+
+@Controller(`${MODULE_PREFIX.CUSTOMER}/profile`)
+@UseGuards(CJwtAuthGuard)
+export class ProfileController {
+  constructor(private readonly profileService: ProfileService) { }
+
+  /**
+  * Get current customer profile
+  */
+  @Get()
+  async getProfile(@CurrentUser() customer: Customer) {
+    return ApiResponseUtil.success(
+      'Profile fetched successfully',
+      new CustomerProfileResource(customer),
+    );
+  }
+  /**
+      * Update customer profile
+      */
+  @Put()
+  async updateProfile(
+    @CurrentUser() customer: Customer,
+    @Body() dto: UpdateProfileDto,
+  ) {
+    const data = await this.profileService.updateProfile(customer, dto);
+
+    return ApiResponseUtil.success(
+      'Profile updated successfully',
+      new CustomerProfileResource(data),
+    );
+  }
+
+  @Post('email-otp/send')
+  async sendEmailVerificationOtp(
+    @CurrentUser() customer: Customer,
+    @Body() dto: SendEmailVerificationOtpDto,
+    @Ip() ip: string
+  ) {
+    await this.profileService.sendEmailVerificationOtp(customer, dto, ip);
+
+    return ApiResponseUtil.success(
+      'Email verification OTP sent successfully',
+    );
+  }
+
+  @Post('email-otp/verify')
+  async verifyEmailVerificationOtp(
+    @CurrentUser() customer: Customer,
+    @Body() dto: VerifyEmailVerificationOtpDto,
+  ) {
+    await this.profileService.verifyEmailVerificationOtp(customer, dto);
+
+    return ApiResponseUtil.success(
+      'Email verification OTP verified successfully',
+    );
+  }
+}

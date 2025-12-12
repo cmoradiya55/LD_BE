@@ -7,9 +7,11 @@ import { JwtStrategy } from './strategy/jwt.strategy';
 import { CJwtAuthGuard } from './guards/jwt-c-auth.guard';
 import { PassportModule } from '@nestjs/passport';
 import { JwtTokenService } from './jwt-token.service';
+import { CustomerOtpModule } from '@common/providers/customer-otp/customer-otp.module';
 
 @Module({
   imports: [
+    CustomerOtpModule,
     RepositoriesModule,
     JwtModule,
     PassportModule

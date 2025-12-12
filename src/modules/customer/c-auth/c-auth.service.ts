@@ -18,6 +18,7 @@ import { CustomerOtp } from '@entity/customer/customer-otp.entity';
 import { EntityManager } from 'typeorm';
 import { Request, Response } from 'express';
 import { JwtTokenService } from './jwt-token.service';
+import { CustomerOtpService } from '@common/providers/customer-otp/customer-otp.service';
 
 
 export interface DeviceInfo {
@@ -39,6 +40,7 @@ export class CAuthService {
         private readonly fcmTokenRepo: CustomerFcmTokenRepository,
         private readonly jwtTokenService: JwtTokenService,
         private readonly configService: ConfigService,
+        private readonly customerOtpService: CustomerOtpService
     ) {
         // Schedule cleanup
         this.scheduleTokenCleanup();
@@ -82,13 +84,13 @@ export class CAuthService {
             const expiresAt = new Date(Date.now() + OTP_EXPIRY_MS.MOBILE);
 
             // Invalidate previous OTPs
-            await this.otpRepo.invalidatePreviousOtps(country_code, mobile_no, otpType);
+            const identifier = `${country_code}${mobile_no}`;
+            await this.otpRepo.invalidatePreviousOtps(identifier, otpType);
 
             // Create new OTP
             const otpEntity = this.otpRepo.create({
                 customer_id: customer?.id,
-                mobile_country_code: country_code,
-                mobile_no: mobile_no,
+                identifier: identifier,
                 otp,
                 otp_type: otpType,
                 expires_at: expiresAt,
@@ -130,14 +132,25 @@ export class CAuthService {
                 device_name,
                 fcm_token
             } = dto;
+            const otpType = CustomerOtpType.REGISTRATION_OR_LOGIN;
 
             // Step 1: Verify OTP
-            const customer = await this.verifyOtp(
-                country_code,
-                mobile_no,
+            const identifier = `${country_code}${mobile_no}`;
+            await this.customerOtpService.verifyOtp(
+                identifier,
                 otp,
+                otpType,
                 manager
             );
+
+            // Get or create customer
+            const customer = await this.customerRepo.findByMobileOrThrowError(country_code, mobile_no, manager);
+            if (!customer.is_mobile_verified) {
+                await this.customerRepo.update(customer.id, {
+                    is_mobile_verified: true,
+                    mobile_verified_at: new Date(),
+                }, manager);
+            }
 
             // Step 2:Update customer login info
             await this.customerRepo.updateLoginInfo(
@@ -186,50 +199,6 @@ export class CAuthService {
                 customer,
             };
         }, true);
-    }
-
-    /**
-     * Verify OTP
-     */
-    private async verifyOtp(
-        mobileCountryCode: number,
-        mobileNo: number,
-        otp: string,
-        manager?: EntityManager,
-    ): Promise<Customer> {
-        const otpEntity = await this.otpRepo.findActiveOtp(
-            mobileCountryCode,
-            mobileNo,
-            otp,
-            CustomerOtpType.REGISTRATION_OR_LOGIN,
-            manager
-        );
-
-        if (!otpEntity) {
-            throw new BadRequestException('Invalid OTP');
-        }
-
-        if (new Date() > otpEntity.expires_at) {
-            throw new BadRequestException('OTP expired');
-        }
-
-        if (otpEntity.attempts >= otpEntity.max_attempts) {
-            throw new BadRequestException('Max attempts exceeded');
-        }
-
-        // Mark as verified
-        await this.otpRepo.markAsVerified(otpEntity.id, manager);
-
-        // Get or create customer
-        let customer = await this.customerRepo.findByMobileOrThrowError(mobileCountryCode, mobileNo);
-        if (!customer.is_mobile_verified) {
-            await this.customerRepo.update(customer.id, {
-                is_mobile_verified: true,
-                mobile_verified_at: new Date(),
-            });
-        }
-
-        return customer;
     }
 
     /**

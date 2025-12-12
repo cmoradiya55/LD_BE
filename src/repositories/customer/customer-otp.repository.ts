@@ -10,7 +10,7 @@ export class CustomerOtpRepository {
     constructor(
         @InjectRepository(CustomerOtp)
         private readonly repo: Repository<CustomerOtp>,
-    ) {}
+    ) { }
 
     /**
      * Get repository (supports transactions)
@@ -23,8 +23,7 @@ export class CustomerOtpRepository {
      * Find active OTP by mobile and OTP code
      */
     async findActiveOtp(
-        mobileCountryCode: number,
-        mobileNo: number,
+        identifier: string,
         otp: string,
         otpType: CustomerOtpType,
         manager?: EntityManager,
@@ -32,8 +31,7 @@ export class CustomerOtpRepository {
         const repo = this.getRepo(manager);
         return await repo.findOne({
             where: {
-                mobile_country_code: mobileCountryCode,
-                mobile_no: mobileNo,
+                identifier: identifier,
                 otp,
                 otp_type: otpType,
                 is_verified: false,
@@ -48,16 +46,14 @@ export class CustomerOtpRepository {
      * Find latest OTP for mobile (regardless of verification status)
      */
     async findLatestOtp(
-        mobileCountryCode: number,
-        mobileNo: number,
+        identifier: string,
         otpType: CustomerOtpType,
         manager?: EntityManager,
     ): Promise<CustomerOtp | null> {
         const repo = this.getRepo(manager);
         return await repo.findOne({
             where: {
-                mobile_country_code: mobileCountryCode,
-                mobile_no: mobileNo,
+                identifier,
                 otp_type: otpType,
             },
             order: {
@@ -128,16 +124,14 @@ export class CustomerOtpRepository {
      * Invalidate all previous OTPs for mobile
      */
     async invalidatePreviousOtps(
-        mobileCountryCode: number,
-        mobileNo: number,
+        identifier: string,
         otpType: CustomerOtpType,
         manager?: EntityManager,
     ): Promise<void> {
         const repo = this.getRepo(manager);
         await repo.update(
             {
-                mobile_country_code: mobileCountryCode,
-                mobile_no: mobileNo,
+                identifier,
                 otp_type: otpType,
                 is_verified: false,
             },
@@ -151,8 +145,7 @@ export class CustomerOtpRepository {
      * Count unverified OTPs for mobile (rate limiting)
      */
     async countUnverifiedOtps(
-        mobileCountryCode: number,
-        mobileNo: number,
+        identifier: string,
         otpType: CustomerOtpType,
         sinceMinutes: number,
         manager?: EntityManager,
@@ -163,8 +156,7 @@ export class CustomerOtpRepository {
 
         return await repo.count({
             where: {
-                mobile_country_code: mobileCountryCode,
-                mobile_no: mobileNo,
+                identifier,
                 otp_type: otpType,
                 is_verified: false,
                 created_at: LessThan(cutoffDate) as any,

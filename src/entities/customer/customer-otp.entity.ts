@@ -11,11 +11,8 @@ export class CustomerOtp {
     customer_id: number;
 
     // OTP Details
-    @Column({ name: 'mobile_country_code', type: 'smallint' })
-    mobile_country_code: number;
-
-    @Column({ name: 'mobile_no', type: 'bigint' })
-    mobile_no: number;
+    @Column({ name: 'identifier', type: 'varchar', length: 255 })
+    identifier: string;
 
     @Column({ name: 'otp', length: 6 })
     otp: string;

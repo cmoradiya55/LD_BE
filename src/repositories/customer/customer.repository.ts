@@ -1,7 +1,7 @@
 import { Customer } from '@entity/customer/customer.entity';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { EntityManager, Repository, FindOptionsWhere, LessThanOrEqual, IsNull, Or } from 'typeorm';
+import { EntityManager, Repository, FindOptionsWhere, LessThanOrEqual, IsNull, Or, Not } from 'typeorm';
 
 @Injectable()
 export class CustomerRepository {
@@ -117,6 +117,22 @@ export class CustomerRepository {
         });
     }
 
+    // Find customer by email excluding a specific customer ID
+    async findByEmailExcludingId(
+        email: string,
+        excludeId: number,
+        manager?: EntityManager,
+    ): Promise<Customer | null> {
+        const repo = await this.getRepo(manager);
+        return await repo.findOne({
+            where: this.mergeConditions({
+                email: email,
+                is_email_verified: true,
+                id: Not(excludeId),
+            }),
+        });
+    }
+
     /**
      * Find all customers with pagination
      */
@@ -180,7 +196,7 @@ export class CustomerRepository {
         data: Partial<Customer>,
         manager?: EntityManager,
     ): Promise<Customer | null> {
-        const repo = await this.getRepo(manager);
+        const repo = this.getRepo(manager);
         await repo.update(id, data);
         return await this.findById(id, manager);
     }

@@ -1,10 +1,17 @@
+import { CUSTOMER_OTP_LENGTH } from "@common/constants/app.constant";
+
 export class CommonHelper {
 
     // ============ OTP ============
-    static generateOtp(): string {
-        return process.env.NODE_ENV === 'development'
-            ? (123456).toString()
-            : Math.floor(100000 + Math.random() * 900000).toString();
+    static generateOtp(length: number = CUSTOMER_OTP_LENGTH): string {
+        if (process.env.NODE_ENV === 'development') {
+            return '1'.repeat(length);  // e.g., 111111 or 1111
+        }
+
+        const min = Math.pow(10, length - 1);
+        const max = Math.pow(10, length) - 1;
+
+        return Math.floor(min + Math.random() * (max - min + 1)).toString();
     }
 
     // ============ TEXT & STRING ============
