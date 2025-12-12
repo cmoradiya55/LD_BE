@@ -14,7 +14,7 @@ export class VerifyAndLoginResource extends BaseResource<any> {
             countryCode: CommonHelper.number(customer.mobile_country_code),
             mobileNo: CommonHelper.number(customer.mobile_no),
 
-            isBlocked: customer.is_blocked,
+            isBlocked: CommonHelper.bool(customer.is_blocked),
             blockedReason: CommonHelper.text(customer.blocked_reason),
             lockedUntil: customer.locked_until,
         };

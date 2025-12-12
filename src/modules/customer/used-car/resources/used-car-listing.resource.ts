@@ -1,20 +1,21 @@
 import { FuelTypeLabel, TransmissionTypeLabel } from '@common/enums/car-detail.enum';
+import { CommonHelper } from '@common/helpers/common.helper';
 import { BaseResource } from '@common/utils/resource.utils';
 
 export class UsedCarListingResource extends BaseResource<any> {
     toJSON() {
-        const tempImage = 'https://imgs.search.brave.com/gSButd9RGxlyxvi5LvHri38wFFgH-3FtwLzsjzZlGRc/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly93d3cu/YXV0b3Zpc3RhLmlu/L2Fzc2V0cy9wcm9k/dWN0X2ltYWdlcy9n/YWxsZXJ5L25ldy1i/YWxlbm8tZnJvbnQu/anBn';
         return {
-            id: this.data.id,
-            image: tempImage,
-            slug: this.data.slug,
-            displayName: `${this.data.registrationYear} ${this.data?.brandName} ${this.data?.modelName}`,
-            variantName: this.data?.variantName,
-            kmDriven: this.data.kmDriven,
-            fuelType: FuelTypeLabel[this.data.fuelType] || 'Other',
-            transmissionType: TransmissionTypeLabel[this.data.transmissionType] || 'Other',
-            price: this.data.finalPrice,
-            rto: this.data.rtoCode,
+            id: CommonHelper.number(this.data.id),
+            image: CommonHelper.buildImageUrl(this.data?.primaryImage),
+            slug: CommonHelper.text(this.data.slug),
+            displayName: CommonHelper.text(`${this.data.registrationYear} ${this.data?.brandName} ${this.data?.modelName}`),
+            variantName: CommonHelper.text(this.data?.variantName),
+            kmDriven: CommonHelper.number(this.data.kmDriven),
+            fuelType: CommonHelper.text(FuelTypeLabel[this.data.fuelType] || 'Other'),
+            transmissionType: CommonHelper.text(TransmissionTypeLabel[this.data.transmissionType] || 'Other'),
+            price: CommonHelper.currency(this.data.finalPrice),
+            rto: CommonHelper.text(this.data.rtoCode),
+            isWishlisted: CommonHelper.bool(this.data?.isWishlisted),
         };
     }
 }

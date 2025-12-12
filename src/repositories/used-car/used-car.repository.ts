@@ -13,6 +13,7 @@ import { VehicleHelper } from '@common/helpers/vehicle-helper';
 import { InspectionImageQueryHelper } from '@common/providers/inspection-image/helper/inspection-image.helper';
 import { InspectionImage } from '@entity/used-car/inspection-image.entity';
 import { SORT_ORDER } from '@common/constants/app.constant';
+import { PrimaryImageQueryHelper } from '@common/providers/inspection-image/helper/primary-image.hrlper';
 
 export interface UsedCarListResult {
     data: any[];
@@ -73,6 +74,7 @@ export class UsedCarRepository {
     }
 
     async findByIds(
+        customerId: number,
         ids: number[],
         page: number,
         limit: number,
@@ -88,7 +90,7 @@ export class UsedCarRepository {
             };
         }
         // Build query
-        const queryBuilder = this.createBaseListQuery()
+        const queryBuilder = this.createBaseListQuery(customerId)
             .addSelect('COUNT(*) OVER() as "totalCount"')
             .andWhere('uc.id IN (:...ids)', { ids });
 
@@ -131,12 +133,13 @@ export class UsedCarRepository {
      */
     async findUsedCars(
         dto: UsedCarListingDto,
+        customerId?: number,
     ): Promise<UsedCarListResult> {
         const { search, page, limit, safetyRating, sortBy } = dto;
         const skip = (page - 1) * limit;
 
         // Build query`
-        const queryBuilder = this.createBaseListQuery()
+        const queryBuilder = this.createBaseListQuery(customerId)
             .addSelect('COUNT(*) OVER() as "totalCount"');
 
         // Apply filters
@@ -262,11 +265,11 @@ export class UsedCarRepository {
 
     // ============ Private Methods ============
 
-    private createBaseListQuery(): SelectQueryBuilder<any> {
+    private createBaseListQuery(customerId: number | undefined): SelectQueryBuilder<any> {
         if (!BLACKLISTED_STATUS.length) throw new BadRequestException('Contact administrator: Internal configuration error');
 
         const repo = this.getRepo();
-        return repo
+        const qb = repo
             .createQueryBuilder(USED_CAR_TABLE_ALIASES.usedCar)
             .select(USED_CAR_LIST_SELECT_COLUMNS)
             .innerJoin(USED_CAR_TABLES.brand, USED_CAR_TABLE_ALIASES.brand, `${USED_CAR_TABLE_ALIASES.brand}.id = ${USED_CAR_TABLE_ALIASES.usedCar}.brand_id`)
@@ -275,11 +278,37 @@ export class UsedCarRepository {
             // .leftJoin(
             //     USED_CAR_TABLES.photo,
             //     USED_CAR_TABLE_ALIASES.photo,
-            //     `${USED_CAR_TABLE_ALIASES.photo}.used_car_id = ${USED_CAR_TABLE_ALIASES.usedCar}.id AND ${USED_CAR_TABLE_ALIASES.photo}.is_primary = true AND ${USED_CAR_TABLE_ALIASES.photo}.deleted_at IS NULL`,
+            //     `${ USED_CAR_TABLE_ALIASES.photo }.used_car_id = ${ USED_CAR_TABLE_ALIASES.usedCar }.id AND ${ USED_CAR_TABLE_ALIASES.photo }.is_primary = true AND ${ USED_CAR_TABLE_ALIASES.photo }.deleted_at IS NULL`,
             // )
             .where(`${USED_CAR_TABLE_ALIASES.usedCar}.deleted_at IS NULL`)
-            .andWhere(`${USED_CAR_TABLE_ALIASES.usedCar}.status NOT IN (:...blacklistedStatuses)`, {
+            .andWhere(`${USED_CAR_TABLE_ALIASES.usedCar}.status NOT IN(:...blacklistedStatuses)`, {
                 blacklistedStatuses: BLACKLISTED_STATUS,
             });
+
+        // Append primary image using helper
+        PrimaryImageQueryHelper.appendToQuery(qb, {
+            mainTableAlias: USED_CAR_TABLE_ALIASES.usedCar,
+        });
+
+        if (customerId) {
+            // User is logged in - check actual wishlist status
+            qb.leftJoin(
+                `${USED_CAR_TABLES.wishlist}`,
+                `${USED_CAR_TABLE_ALIASES.wishlist}`,
+                `${USED_CAR_TABLE_ALIASES.wishlist}.used_car_id = ${USED_CAR_TABLE_ALIASES.usedCar}.id 
+                    AND ${USED_CAR_TABLE_ALIASES.wishlist}.customer_id = :customerId`,
+                { customerId },
+            )
+                .addSelect(
+                    `CASE WHEN ${USED_CAR_TABLE_ALIASES.wishlist}.id IS NOT NULL THEN true ELSE false END`,
+                    'isWishlisted',
+                );
+        } else {
+            // User is not logged in - always return false
+            qb.addSelect('false', 'isWishlisted');
+        }
+
+        return qb;
+
     }
 }

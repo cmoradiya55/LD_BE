@@ -1,3 +1,4 @@
+import { CommonHelper } from '@common/helpers/common.helper';
 import { BaseResource } from '@common/utils/resource.utils';
 import { Pincode } from '@entity/general/pincode.entity';
 
@@ -10,13 +11,13 @@ export class PincodeCitySuggestionResource extends BaseResource<Pincode> {
 
     toJSON() {
         return {
-            formatted: `${this.data.pincode}, ${this.data.area_name}, ${this.toTitle(this.data.city.city_name)}, ${this.toTitle(this.data.city.state_name)}`,
-            is_active: this.data.city.is_active,
-            city_id: this.data.city.id,
-            city: this.toTitle(this.data.city.city_name),
-            pincode_id: this.data.id,
-            pincode: this.data.pincode,
-            area_name: this.data.area_name,
+            formatted: CommonHelper.text(`${this.data.pincode}, ${this.data.area_name}, ${this.toTitle(this.data.city.city_name)}, ${this.toTitle(this.data.city.state_name)}`),
+            is_active: CommonHelper.bool(this.data.city.is_active),
+            city_id: CommonHelper.number(this.data.city.id),
+            city: CommonHelper.text(this.toTitle(this.data.city.city_name)),
+            pincode_id: CommonHelper.number(this.data.id),
+            pincode: CommonHelper.number(this.data.pincode),
+            area_name: CommonHelper.text(this.data.area_name),
         };
     }
 }

@@ -46,3 +46,11 @@ export const IMAGE_TYPE_NAMES: Record<typeof InspectionImageType[keyof typeof In
     [InspectionImageType.FEATURES]: 'Features',
     [InspectionImageType.TEST_DRIVE]: 'Verification',
 };
+
+// Primary image configuration - change these to update which image is considered "primary"
+export const PRIMARY_IMAGE_CONFIG = {
+    IMAGE_TYPE: InspectionImageType.EXTERIOR,
+    IMAGE_SUBTYPE: InspectionImageSubtype.EXTERIOR_FRONT,
+    TABLE_NAME: 'inspection_images',
+    VEHICLE_FK_COLUMN: 'vehicle_id',
+} as const;

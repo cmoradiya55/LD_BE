@@ -14,18 +14,12 @@ export class UsedCarService {
     /**
      * Get used cars list with filters and pagination
      */
-    async findUsedCars(query: UsedCarListingDto) {
+    async findUsedCars(
+        query: UsedCarListingDto,
+        customerId?: number,
+    ) {
         return this.baseService.catch(async () => {
-            const result = await this.usedCarRepository.findUsedCars(query);
-
-            // // Prepend S3 base URL to photos
-            // const dataWithFullUrls = result.data.map((item) => ({
-            //     ...item,
-            //     primaryPhoto: this.getFullUrl(item.primaryPhoto),
-            //     brandLogo: this.getFullUrl(item.brandLogo),
-            // }));
-
-            console.log("Used car listing result in service:", result);
+            const result = await this.usedCarRepository.findUsedCars(query, customerId);
 
             return result;
         })

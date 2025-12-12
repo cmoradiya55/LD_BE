@@ -129,6 +129,7 @@ export const USED_CAR_TABLE_ALIASES = {
     variant: 'v',
     pincode: 'p',
     photo: 'ph',
+    wishlist: 'cw',
 } as const;
 
 /**
@@ -141,4 +142,5 @@ export const USED_CAR_TABLES = {
     variant: 'variants',
     pincode: 'pincodes',
     photo: 'used_car_customer_photos',
+    wishlist: 'customer_wishlists',
 } as const;
