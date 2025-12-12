@@ -31,7 +31,7 @@ export enum TransmissionType {
     AUTOMATIC = 2,
 }
 
-export const TransmissionTypeLabel: Record<number, string> = {
+export const TransmissionTypeLabel: Record<TransmissionType, string> = {
     [TransmissionType.MANUAL]: 'Manual',
     [TransmissionType.AUTOMATIC]: 'Automatic',
 };
@@ -68,6 +68,15 @@ export enum UsedCarListingStatus {
     REJECTED = 5,
     EXPIRED = 6,
 }
+
+export const UsedCarListingStatusLabel: Record<UsedCarListingStatus, string> = {
+    [UsedCarListingStatus.PENDING]: 'Pending',
+    [UsedCarListingStatus.VERIFIED]: 'Verified',
+    [UsedCarListingStatus.LISTED]: 'Listed',
+    [UsedCarListingStatus.SOLD]: 'Sold',
+    [UsedCarListingStatus.REJECTED]: 'Rejected',
+    [UsedCarListingStatus.EXPIRED]: 'Expired',
+};
 
 export enum SafetyRating {
     ONE = 1,

@@ -263,9 +263,43 @@ export class UsedCarRepository {
         };
     }
 
+    /**
+    * Find customer used cars details with it's images, fetaures, specifications etc.
+    */
+    async findUsedCarByCustomer(
+        customerId: number,
+        page: number,
+        limit: number,
+    ): Promise<UsedCarListResult> {
+        if (!BLACKLISTED_STATUS.length) throw new BadRequestException('Contact administrator: Internal configuration error');
+
+        // Build query
+        const queryBuilder = this.createBaseListQuery(customerId, false)
+            .addSelect('COUNT(*) OVER() as "totalCount"')
+            .addSelect(`${USED_CAR_TABLE_ALIASES.usedCar}.status as "status"`)
+            .andWhere(`${USED_CAR_TABLE_ALIASES.usedCar}.customer_id = :customerId`, { customerId });
+
+        const skip = (page - 1) * limit;
+        // Execute query
+        const data = await queryBuilder
+            .offset(skip)
+            .limit(limit)
+            .getRawMany();
+
+        // Extract total and clean data
+        const { cleanedData, total } = QBHelper.extractTotalAndCleanData(data);
+
+        return {
+            data: cleanedData,
+            total,
+            page,
+            limit,
+        };
+    }
+
     // ============ Private Methods ============
 
-    private createBaseListQuery(customerId: number | undefined): SelectQueryBuilder<any> {
+    private createBaseListQuery(customerId: number | undefined, isStatusFilter: boolean = true): SelectQueryBuilder<any> {
         if (!BLACKLISTED_STATUS.length) throw new BadRequestException('Contact administrator: Internal configuration error');
 
         const repo = this.getRepo();
@@ -275,15 +309,13 @@ export class UsedCarRepository {
             .innerJoin(USED_CAR_TABLES.brand, USED_CAR_TABLE_ALIASES.brand, `${USED_CAR_TABLE_ALIASES.brand}.id = ${USED_CAR_TABLE_ALIASES.usedCar}.brand_id`)
             .innerJoin(USED_CAR_TABLES.model, USED_CAR_TABLE_ALIASES.model, `${USED_CAR_TABLE_ALIASES.model}.id = ${USED_CAR_TABLE_ALIASES.usedCar}.model_id`)
             .innerJoin(USED_CAR_TABLES.variant, USED_CAR_TABLE_ALIASES.variant, `${USED_CAR_TABLE_ALIASES.variant}.id = ${USED_CAR_TABLE_ALIASES.usedCar}.variant_id`)
-            // .leftJoin(
-            //     USED_CAR_TABLES.photo,
-            //     USED_CAR_TABLE_ALIASES.photo,
-            //     `${ USED_CAR_TABLE_ALIASES.photo }.used_car_id = ${ USED_CAR_TABLE_ALIASES.usedCar }.id AND ${ USED_CAR_TABLE_ALIASES.photo }.is_primary = true AND ${ USED_CAR_TABLE_ALIASES.photo }.deleted_at IS NULL`,
-            // )
             .where(`${USED_CAR_TABLE_ALIASES.usedCar}.deleted_at IS NULL`)
-            .andWhere(`${USED_CAR_TABLE_ALIASES.usedCar}.status NOT IN(:...blacklistedStatuses)`, {
+
+        if (isStatusFilter) {
+            qb.andWhere(`${USED_CAR_TABLE_ALIASES.usedCar}.status NOT IN(:...blacklistedStatuses)`, {
                 blacklistedStatuses: BLACKLISTED_STATUS,
             });
+        }
 
         // Append primary image using helper
         PrimaryImageQueryHelper.appendToQuery(qb, {
@@ -296,7 +328,7 @@ export class UsedCarRepository {
                 `${USED_CAR_TABLES.wishlist}`,
                 `${USED_CAR_TABLE_ALIASES.wishlist}`,
                 `${USED_CAR_TABLE_ALIASES.wishlist}.used_car_id = ${USED_CAR_TABLE_ALIASES.usedCar}.id 
-                    AND ${USED_CAR_TABLE_ALIASES.wishlist}.customer_id = :customerId`,
+                        AND ${USED_CAR_TABLE_ALIASES.wishlist}.customer_id = :customerId`,
                 { customerId },
             )
                 .addSelect(

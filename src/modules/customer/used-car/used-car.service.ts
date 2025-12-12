@@ -3,6 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { UsedCarRepository } from '@repository/used-car/used-car.repository';
 import { UsedCarListingDto } from './dto/used-car-listing.dto';
 import { UsedCarDetailParamDto } from './dto/used-car-detail.dto';
+import { CustomerUsedCarListingDto } from './dto/customer-used-car-listing.dto';
 
 @Injectable()
 export class UsedCarService {
@@ -31,6 +32,20 @@ export class UsedCarService {
 
             const result = await this.usedCarRepository.getUsedCarDetailBySlug(slug);
 
+            return result;
+        })
+    }
+
+    /**
+    * Get customer used cars list with filters and pagination
+    */
+    async getCustomerUsedCars(
+        customerId: number,
+        query: CustomerUsedCarListingDto,
+    ) {
+        return this.baseService.catch(async () => {
+            const { page, limit } = query;
+            const result = await this.usedCarRepository.findUsedCarByCustomer(customerId, page, limit);
             return result;
         })
     }

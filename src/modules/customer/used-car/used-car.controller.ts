@@ -9,12 +9,16 @@ import { UsedCarDetailResource } from './resources/used-car-detail.resource';
 import { OptionalAuthGuard } from '../c-auth/guards/jwt-optional-c-auth.guard';
 import { Customer } from '@entity/customer/customer.entity';
 import { OptionalUser } from '@common/decorators/optional-user.decorator';
+import { CJwtAuthGuard } from '../c-auth/guards/jwt-c-auth.guard';
+import { CurrentUser } from '@common/decorators/current-user.decorator';
+import { CustomerUsedCarListingResource } from './resources/customer-used-car-listing.resource';
+import { CustomerUsedCarListingDto } from './dto/customer-used-car-listing.dto';
 
 @Controller(`${MODULE_PREFIX.CUSTOMER}/used-car`)
 export class UsedCarController {
   constructor(private readonly usedCarService: UsedCarService) { }
 
-  @Get()
+  @Get('list')
   @UseGuards(OptionalAuthGuard)
   async getUsedCars(
     @Query() query: UsedCarListingDto,
@@ -24,6 +28,22 @@ export class UsedCarController {
     return ApiResponseUtil.paginated(
       'Cars fetched successfully',
       UsedCarListingResource.collection(data),
+      page,
+      limit,
+      total,
+    );
+  }
+
+  @Get()
+  @UseGuards(CJwtAuthGuard)
+  async getCustomerUsedCars(
+    @CurrentUser('id') customer_id: number,
+    @Query() query: CustomerUsedCarListingDto,
+  ) {
+    const { data, page, total, limit } = await this.usedCarService.getCustomerUsedCars(customer_id, query);
+    return ApiResponseUtil.paginated(
+      'Cars fetched successfully',
+      CustomerUsedCarListingResource.collection(data),
       page,
       limit,
       total,
