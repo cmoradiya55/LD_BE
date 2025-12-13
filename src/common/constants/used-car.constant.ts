@@ -6,5 +6,9 @@ export const BLACKLISTED_STATUS = [
     UsedCarListingStatus.REJECTED,
 ] as const;
 
+export const WHITELISTED_STATUS_FOR_UPDATE_MY_USED_CAR_DETAIL: UsedCarListingStatus[] = [
+    UsedCarListingStatus.PENDING,
+] as const;
+
 export const USED_CAR_MIN_YEAR_FILTER = 2010;
 export const USED_CAR_MAX_YEAR_FILTER = new Date().getFullYear() - 1;

@@ -43,16 +43,25 @@ export class MyUsedCarDetailResource extends BaseResource<any> {
         const model = this.data?.model;
         const variant = this.data?.variant;
         const variantFeatures = variant?.variantFeatures || [];
+        const pincode = this.data?.pincode;
+        const city = pincode?.city;
+        console.log('data', data);
 
         return {
             id: CommonHelper.number(data.id),
             displayName: CommonHelper.text(`${data.registration_year} ${brand?.display_name} ${model?.display_name}`),
             variantName: CommonHelper.text(variant?.display_name),
             registrationYear: CommonHelper.number(data.registration_year),
+            kmDrivenRange: CommonHelper.number(data.km_driven_range),
             kmDriven: CommonHelper.number(data.km_driven),
-            registrationNumber: CommonHelper.maskRegistrationNumber(data.registration_number),
+            registrationNumber: CommonHelper.text(data.registration_number),
             ownerType: data.owner_type,
             rtoCode: CommonHelper.text(data.rto_code),
+            pincodeId: CommonHelper.number(pincode?.id),
+            pincode: CommonHelper.text(pincode?.pincode),
+            areaName: CommonHelper.text(pincode?.area_name),
+            cityId: CommonHelper.number(city?.id),
+            city: CommonHelper.text(city?.city_name),
 
             final_price: data.final_price,
 

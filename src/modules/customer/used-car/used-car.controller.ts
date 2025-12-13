@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Put, Query, UseGuards } from '@nestjs/common';
 import { UsedCarService } from './used-car.service';
 import { MODULE_PREFIX } from '@common/constants/app.constant';
 import { UsedCarListingDto } from './dto/used-car-listing.dto';
@@ -15,6 +15,7 @@ import { MyUsedCarListingResource } from './resources/my-used-car-listing.resour
 import { CustomerUsedCarListingDto } from './dto/customer-used-car-listing.dto';
 import { MyUsedCarDetailParamDto } from './dto/my-used-car-detail.dto';
 import { MyUsedCarDetailResource } from './resources/my-used-car-detail.resource copy';
+import { UpdateMyUsedCarDetailParamDto, UpdateMyUsedCarDto } from './dto/update-my-used-car.dto';
 
 @Controller(`${MODULE_PREFIX.CUSTOMER}/used-car`)
 export class UsedCarController {
@@ -74,4 +75,16 @@ export class UsedCarController {
     );
   }
 
+  @Patch(':id')
+  @UseGuards(CJwtAuthGuard)
+  async updateMyUsedCarById(
+    @CurrentUser() customer: Customer,
+    @Param() params: UpdateMyUsedCarDetailParamDto,
+    @Body() dto: UpdateMyUsedCarDto
+  ) {
+    await this.usedCarService.updateMyUsedCarById(customer, params, dto);
+    return ApiResponseUtil.updated(
+      'Car details updated successfully',
+    );
+  }
 }

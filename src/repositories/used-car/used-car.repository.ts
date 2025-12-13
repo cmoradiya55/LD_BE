@@ -128,6 +128,18 @@ export class UsedCarRepository {
         });
     }
 
+    async getBasicUsedCarDetailsWithPincodeByIdAndCustomer(
+        id: number,
+        customerId: number,
+        manager?: EntityManager,
+    ): Promise<UsedCar | null> {
+        const repo = this.getRepo(manager);
+        return await repo.findOne({
+            where: { id, customer_id: customerId },
+            relations: ['pincode'],
+        });
+    }
+
     /**
      * Find used cars with filters, search, and pagination
      */
@@ -317,6 +329,8 @@ export class UsedCarRepository {
             .leftJoin('variant.variantFeatures', 'variant_features')
             .leftJoin('variant_features.feature', 'feature')
             .leftJoin('used_car.photos', 'customer_images')
+            .leftJoin('used_car.pincode', 'pincode')
+            .leftJoin('pincode.city', 'city')
             .where('used_car.id = :usedCarId', { usedCarId })
             .andWhere('used_car.customer_id = :customerId', { customerId })
             .andWhere('used_car.deleted_at IS NULL')
@@ -329,6 +343,8 @@ export class UsedCarRepository {
                 'used_car.registration_number',
                 'used_car.final_price',
                 'used_car.rto_code',
+                'used_car.km_driven_range',
+                'used_car.pincode_id',
 
                 // Brand
                 'brand.display_name',
@@ -368,6 +384,13 @@ export class UsedCarRepository {
                 // Customer images
                 'customer_images.id',
                 'customer_images.url',
+
+                // Pincode & City
+                'pincode.id',
+                'pincode.pincode',
+                'pincode.area_name',
+                'city.id',
+                'city.city_name',
             ]);
 
         const usedCar = await usedCarQb.getOne();
@@ -394,8 +417,22 @@ export class UsedCarRepository {
             ...usedCar,
             images: rawImages,
         };
+    }
 
-
+    async updateMyUsedCarById(
+        customerId: number,
+        usedCarId: number,
+        updateData: Partial<UsedCar>,
+        manager?: EntityManager,
+    ): Promise<void> {
+        const repo = this.getRepo(manager);
+        await repo.update(
+            {
+                id: usedCarId,
+                customer_id: customerId,
+            },
+            updateData,
+        );
     }
 
     // ============ Private Methods ============

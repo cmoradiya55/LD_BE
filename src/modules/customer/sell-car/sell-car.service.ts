@@ -24,8 +24,8 @@ export class SellCarService {
 
     async getCitySuggestions(queryDto: CitySuggestionDto) {
         return this.baseService.catch(async () => {
-            const { q, page, limit } = queryDto;
-            return this.pincodeRepo.getPincodeAndCitySuggestion(q, page, limit);
+            const { cityId, q, page, limit } = queryDto;
+            return this.pincodeRepo.getPincodeAndCitySuggestion(q, page, limit, cityId);
         });
     }
 
