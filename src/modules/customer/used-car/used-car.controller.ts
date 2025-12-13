@@ -11,8 +11,10 @@ import { Customer } from '@entity/customer/customer.entity';
 import { OptionalUser } from '@common/decorators/optional-user.decorator';
 import { CJwtAuthGuard } from '../c-auth/guards/jwt-c-auth.guard';
 import { CurrentUser } from '@common/decorators/current-user.decorator';
-import { CustomerUsedCarListingResource } from './resources/customer-used-car-listing.resource';
+import { MyUsedCarListingResource } from './resources/my-used-car-listing.resource';
 import { CustomerUsedCarListingDto } from './dto/customer-used-car-listing.dto';
+import { MyUsedCarDetailParamDto } from './dto/my-used-car-detail.dto';
+import { MyUsedCarDetailResource } from './resources/my-used-car-detail.resource copy';
 
 @Controller(`${MODULE_PREFIX.CUSTOMER}/used-car`)
 export class UsedCarController {
@@ -34,6 +36,15 @@ export class UsedCarController {
     );
   }
 
+  @Get('detail/:slug')
+  async getUsedCarDetailBySlug(@Param() params: UsedCarDetailParamDto) {
+    const data = await this.usedCarService.getUsedCarDetailBySlug(params);
+    return ApiResponseUtil.success(
+      'Car details fetched successfully',
+      new UsedCarDetailResource(data),
+    );
+  }
+
   @Get()
   @UseGuards(CJwtAuthGuard)
   async getCustomerUsedCars(
@@ -43,19 +54,24 @@ export class UsedCarController {
     const { data, page, total, limit } = await this.usedCarService.getCustomerUsedCars(customer_id, query);
     return ApiResponseUtil.paginated(
       'Cars fetched successfully',
-      CustomerUsedCarListingResource.collection(data),
+      MyUsedCarListingResource.collection(data),
       page,
       limit,
       total,
     );
   }
 
-  @Get(':slug')
-  async getUsedCarDetailBySlug(@Param() params: UsedCarDetailParamDto) {
-    const data = await this.usedCarService.getUsedCarDetailBySlug(params);
+  @Get(':id')
+  @UseGuards(CJwtAuthGuard)
+  async myUsedCarDetailById(
+    @CurrentUser() customer: Customer,
+    @Param() params: MyUsedCarDetailParamDto
+  ) {
+    const data = await this.usedCarService.getMyUsedCarDetailById(customer, params);
     return ApiResponseUtil.success(
       'Car details fetched successfully',
-      new UsedCarDetailResource(data),
+      new MyUsedCarDetailResource(data),
     );
   }
+
 }

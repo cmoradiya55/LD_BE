@@ -297,6 +297,107 @@ export class UsedCarRepository {
         };
     }
 
+
+
+    /**
+     * Get used cars details with it's inspection images, customer images, fetaures, specifications etc.
+     */
+    async getUsedCarDetailByCustomer(
+        customerId: number,
+        usedCarId: number,
+    ): Promise<any> {
+        const repo = this.getRepo();
+
+        // First get the used car with basic relations
+        const usedCarQb = repo
+            .createQueryBuilder('used_car')
+            .leftJoin('used_car.brand', 'brand')
+            .leftJoin('used_car.model', 'model')
+            .leftJoin('used_car.variant', 'variant')
+            .leftJoin('variant.variantFeatures', 'variant_features')
+            .leftJoin('variant_features.feature', 'feature')
+            .leftJoin('used_car.photos', 'customer_images')
+            .where('used_car.id = :usedCarId', { usedCarId })
+            .andWhere('used_car.customer_id = :customerId', { customerId })
+            .andWhere('used_car.deleted_at IS NULL')
+            .select([
+                // Used car fields
+                'used_car.id',
+                'used_car.registration_year',
+                'used_car.owner_type',
+                'used_car.km_driven',
+                'used_car.registration_number',
+                'used_car.final_price',
+                'used_car.rto_code',
+
+                // Brand
+                'brand.display_name',
+
+                // Model
+                'model.display_name',
+
+                // Variant
+                'variant.display_name',
+                'variant.fuel_type',
+                'variant.transmission_type',
+                'variant.boot_space_liters',
+                'variant.seating_capacity',
+                'variant.ground_clearance_mm',
+
+                'variant.engine_displacement_cc',
+                'variant.cylinders',
+                'variant.max_power_ps',
+                'variant.max_power_rpm',
+                'variant.max_torque_nm',
+                'variant.max_torque_rpm',
+                'variant.fuel_tank_litres',
+                'variant.mileage_kmpl',
+                'variant.battery_capacity_kwh',
+                'variant.electric_range_km',
+                'variant.electric_motor_power_kw',
+                'variant.electric_motor_torque_nm',
+                'variant.num_gears',
+
+                // Variant features
+                'variant_features.feature_value',
+                'variant_features.feature_id',
+                'feature.name',
+                'feature.display_name',
+                'feature.value_type',
+
+                // Customer images
+                'customer_images.id',
+                'customer_images.url',
+            ]);
+
+        const usedCar = await usedCarQb.getOne();
+
+        if (!usedCar) {
+            return null;
+        }
+
+        // Get images using the helper
+        const imageQb = this.inspectionImageRepository
+            .createQueryBuilder('img')
+            .orderBy('img.image_type', SORT_ORDER.ASC)
+            .addOrderBy('img.sort_order', SORT_ORDER.ASC);
+
+        InspectionImageQueryHelper.applyFilters(imageQb, {
+            vehicleId: usedCar.id,
+            applyWhitelist: false,
+            activeOnly: true,
+        });
+
+        const rawImages = await imageQb.getMany();
+
+        return {
+            ...usedCar,
+            images: rawImages,
+        };
+
+
+    }
+
     // ============ Private Methods ============
 
     private createBaseListQuery(customerId: number | undefined, isStatusFilter: boolean = true): SelectQueryBuilder<any> {

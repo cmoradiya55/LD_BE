@@ -1,7 +1,8 @@
-import { IsInt, IsString, IsPositive, Length, IsOptional, Min, Max } from 'class-validator';
+import { IsInt, IsString, IsPositive, Length, IsOptional, Min, Max, IsEnum } from 'class-validator';
 import { Type } from 'class-transformer';
 import { IsOtp } from '@common/decorators/is-otp.decorator';
 import { IsDeviceId } from '@common/decorators/is-device-id.decorator';
+import { CustomerDeviceType } from '@common/enums/customer.enum';
 
 export class CAuthLoginDto {
     @IsInt()
@@ -22,9 +23,8 @@ export class CAuthLoginDto {
     device_id: string;
 
     @IsInt()
-    @Min(1)
-    @Max(3)
     @Type(() => Number)
+    @IsEnum(CustomerDeviceType)
     device_type: number;
 
     @IsString()

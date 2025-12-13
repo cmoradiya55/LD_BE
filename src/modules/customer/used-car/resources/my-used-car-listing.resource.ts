@@ -2,7 +2,7 @@ import { FuelTypeLabel, TransmissionTypeLabel, UsedCarListingStatusLabel } from 
 import { CommonHelper } from '@common/helpers/common.helper';
 import { BaseResource } from '@common/utils/resource.utils';
 
-export class CustomerUsedCarListingResource extends BaseResource<any> {
+export class MyUsedCarListingResource extends BaseResource<any> {
     toJSON() {
         return {
             id: CommonHelper.number(this.data.id),
