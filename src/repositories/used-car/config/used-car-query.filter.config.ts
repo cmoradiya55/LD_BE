@@ -22,7 +22,6 @@ export const USED_CAR_FILTER_CONFIG: FilterConfig[] = [
     // Array filters (IN)
     { field: 'brandId', column: 'uc.brand_id', operator: 'in' },
     { field: 'modelId', column: 'uc.model_id', operator: 'in' },
-    { field: 'modelYear', column: 'uc.registration_year', operator: 'in' },
     { field: 'fuelType', column: 'v.fuel_type', operator: 'in' },
     { field: 'bodyType', column: 'm.body_type', operator: 'in' },
     { field: 'transmissionType', column: 'v.transmission_type', operator: 'in' },
@@ -31,6 +30,9 @@ export const USED_CAR_FILTER_CONFIG: FilterConfig[] = [
 
     // Range filters
     { field: 'minKmDriven', column: 'uc.km_driven', operator: 'gte' },
+    { field: 'minModelYear', column: 'uc.registration_year', operator: 'gte' },
+    { field: 'maxModelYear', column: 'uc.registration_year', operator: 'lte' },
+
     { field: 'maxKmDriven', column: 'uc.km_driven', operator: 'lte' },
     { field: 'minPrice', column: 'uc.expected_price', operator: 'gte' },
     { field: 'maxPrice', column: 'uc.expected_price', operator: 'lte' },
