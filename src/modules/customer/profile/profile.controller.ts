@@ -13,6 +13,7 @@ import { RequestDeleteOtpDto } from './dto/request-delete-otp.dto';
 import { ConfirmDeleteDto } from './dto/confirm-delete.dto';
 import { UpdateCityDto } from './dto/update-city.dto';
 import { CityUpdateResource } from './resources/city-update.resource';
+import { UpdatedCustomerProfileResource } from './resources/updated-customer-profile.resource';
 
 @Controller(`${MODULE_PREFIX.CUSTOMER}/profile`)
 @UseGuards(CJwtAuthGuard)
@@ -24,9 +25,10 @@ export class ProfileController {
   */
   @Get()
   async getProfile(@CurrentUser() customer: Customer) {
+    const customerData = await this.profileService.getProfile(customer.id);
     return ApiResponseUtil.success(
       'Profile fetched successfully',
-      new CustomerProfileResource(customer),
+      new CustomerProfileResource(customerData),
     );
   }
 
@@ -54,7 +56,7 @@ export class ProfileController {
 
     return ApiResponseUtil.updated(
       'Profile updated successfully',
-      new CustomerProfileResource(data),
+      new UpdatedCustomerProfileResource(data),
     );
   }
 

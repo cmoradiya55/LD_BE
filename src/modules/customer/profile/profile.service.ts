@@ -37,7 +37,7 @@ export class ProfileService {
         */
     async getProfile(customerId: number) {
         return this.baseService.catch(async () => {
-            const customer = await this.customerRepo.findById(customerId);
+            const customer = await this.customerRepo.findByIdAndGetCityDetail(customerId);
 
             if (!customer) {
                 throw new NotFoundException('Customer not found');

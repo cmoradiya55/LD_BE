@@ -98,6 +98,17 @@ export class CustomerRepository {
     }
 
     /**
+     * Find customer by ID
+     */
+    async findByIdAndGetCityDetail(id: number, manager?: EntityManager): Promise<Customer | null> {
+        const repo = await this.getRepo(manager);
+        return await repo.findOne({
+            where: this.mergeConditions({ id }),
+            relations: ['city'],
+        });
+    }
+
+    /**
      * Find customer by ID (without default conditions)
      */
     async findByIdRaw(id: number, manager?: EntityManager): Promise<Customer | null> {

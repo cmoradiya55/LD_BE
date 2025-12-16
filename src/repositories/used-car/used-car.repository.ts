@@ -145,9 +145,11 @@ export class UsedCarRepository {
      */
     async findUsedCars(
         dto: UsedCarListingDto,
+        pincodeIds: number[],
         customerId?: number,
     ): Promise<UsedCarListResult> {
         const { search, page, limit, safetyRating, sortBy } = dto;
+        const { isCityIncluded } = dto;
         const skip = (page - 1) * limit;
 
         // Build query`
@@ -171,6 +173,16 @@ export class UsedCarRepository {
                 `${USED_CAR_TABLE_ALIASES.city}.city_name as "cityName"`,
             ]);
 
+        if (isCityIncluded) {
+            queryBuilder.andWhere(
+                `${USED_CAR_TABLE_ALIASES.usedCar}.pincode_id IN (:...pincodeIds)`, { pincodeIds: pincodeIds }
+            )
+        } else {
+            queryBuilder.andWhere(
+                `${USED_CAR_TABLE_ALIASES.usedCar}.pincode_id NOT IN (:...pincodeIds)`, { pincodeIds: pincodeIds }
+            );
+        }
+
         // Apply filters
         QBHelper.applyFilters(queryBuilder, dto, USED_CAR_FILTER_CONFIG);
         QBHelper.applySearch(queryBuilder, search, USED_CAR_SEARCH_COLUMNS);
@@ -184,6 +196,8 @@ export class UsedCarRepository {
         // Apply sorting
         const sortConfig = USED_CAR_SORT_CONFIG[sortBy];
         QBHelper.applySorting(queryBuilder, sortConfig);
+
+        // queryBuilder.
 
         // Execute query
         const data = await queryBuilder

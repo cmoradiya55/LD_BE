@@ -9,6 +9,7 @@ import { MyUsedCarDetailParamDto } from './dto/my-used-car-detail.dto';
 import { UpdateMyUsedCarDetailParamDto, UpdateMyUsedCarDto } from './dto/update-my-used-car.dto';
 import { PincodeRepository } from '@repository/general/pincode.repository';
 import { WHITELISTED_STATUS_FOR_UPDATE_MY_USED_CAR_DETAIL } from '@common/constants/used-car.constant';
+import { CityRepository } from '@repository/general/city.repository';
 
 @Injectable()
 export class UsedCarService {
@@ -16,6 +17,7 @@ export class UsedCarService {
         private readonly baseService: BaseService,
         private readonly usedCarRepository: UsedCarRepository,
         private readonly pincodeRepository: PincodeRepository,
+        private readonly cityRepository: CityRepository,
     ) { }
 
     /**
@@ -26,8 +28,12 @@ export class UsedCarService {
         customerId?: number,
     ) {
         return this.baseService.catch(async () => {
-            const result = await this.usedCarRepository.findUsedCars(query, customerId);
-
+            const { cityId } = query;
+            const pincodeIds = await this.cityRepository.getPincodeIdsByCityId(cityId);
+            if (pincodeIds.length === 0) {
+                throw new BadRequestException('No pincodes found for the selected city');
+            }
+            const result = await this.usedCarRepository.findUsedCars(query, pincodeIds, customerId);
             return result;
         })
     }

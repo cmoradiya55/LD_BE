@@ -53,4 +53,16 @@ export class CityRepository {
             },
         });
     }
+
+    async getPincodeIdsByCityId(cityId: number, manager?: EntityManager): Promise<number[]> {
+        const repository = await this.getRepo(manager);
+        const city = await repository.findOne({
+            where: {
+                id: cityId,
+                is_active: true,
+            },
+            relations: ['pincodes'],
+        });
+        return city ? city.pincodes.map(p => p.id) : [];
+    }
 }

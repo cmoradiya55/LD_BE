@@ -1,6 +1,7 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany, CreateDateColumn, UpdateDateColumn, DeleteDateColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany, CreateDateColumn, UpdateDateColumn, DeleteDateColumn, OneToOne, ManyToOne, JoinColumn } from 'typeorm';
 import { CustomerRefreshToken } from './customer-refresh-token.entity';
 import { CustomerFcmToken } from './customer-fcm-token.entity';
+import { City } from '@entity/general/city.entity';
 
 @Entity('customers')
 export class Customer {
@@ -90,4 +91,8 @@ export class Customer {
 
     @OneToMany(() => CustomerFcmToken, token => token.customer)
     fcmTokens: CustomerFcmToken[];
+
+    @ManyToOne(() => City, { nullable: true })
+    @JoinColumn({ name: 'city_id' })
+    city: City | null;
 }
