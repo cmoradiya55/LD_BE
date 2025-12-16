@@ -11,6 +11,7 @@ import { UsedCarCustomerPhotoRepository } from '@repository/used-car/used-car-cu
 import { UsedCarCustomerPhoto } from '@entity/used-car/used-car-customer-photo.entity';
 import { VehicleHelper } from '@common/helpers/vehicle-helper';
 import { SlugHelper } from '@common/helpers/slug.helper';
+import { Customer } from '@entity/customer/customer.entity';
 
 @Injectable()
 export class SellCarService {
@@ -29,7 +30,7 @@ export class SellCarService {
         });
     }
 
-    async submitCarForSale(user: any, dto: CreateSellCarDto) {
+    async submitCarForSale(customer: Customer, dto: CreateSellCarDto) {
         return this.baseService.catch(async (manager) => {
             const {
                 brandId,
@@ -67,7 +68,7 @@ export class SellCarService {
             if (!result) throw new BadRequestException('Some of the selected car details are invalid');
 
             const usedCar = this.usedCarRepo.create({
-                customer_id: user.id,
+                customer_id: customer.id,
                 brand_id: brandId,
                 registration_year: year,
                 model_id: modelId,

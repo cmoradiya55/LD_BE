@@ -38,8 +38,12 @@ export class UsedCarController {
   }
 
   @Get('detail/:slug')
-  async getUsedCarDetailBySlug(@Param() params: UsedCarDetailParamDto) {
-    const data = await this.usedCarService.getUsedCarDetailBySlug(params);
+  @UseGuards(OptionalAuthGuard)
+  async getUsedCarDetailBySlug(
+    @Param() params: UsedCarDetailParamDto,
+    @OptionalUser() customer: Customer | null,
+  ) {
+    const data = await this.usedCarService.getUsedCarDetailBySlug(params, customer?.id);
     return ApiResponseUtil.success(
       'Car details fetched successfully',
       new UsedCarDetailResource(data),

@@ -35,6 +35,8 @@ export class UsedCarDetailResource extends BaseResource<any> {
         const variant = this.data?.variant;
         const variantFeatures = variant?.variantFeatures || [];
 
+        console.log('data', data);
+
         return {
             id: CommonHelper.number(data.id),
             displayName: CommonHelper.text(`${data.registration_year} ${brand?.display_name} ${model?.display_name}`),
@@ -72,6 +74,7 @@ export class UsedCarDetailResource extends BaseResource<any> {
 
             numberOfGears: CommonHelper.number(variant.num_gears),
 
+            isWishlisted: CommonHelper.bool(this.data?.isWishlisted),
 
             // Features
             features: UsedCarFeatureResource.collection(variantFeatures),

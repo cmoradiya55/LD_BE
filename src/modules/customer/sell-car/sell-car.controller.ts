@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query, UseGuards } from '@nestjs/common';
 import { SellCarService } from './sell-car.service';
 import { ApiResponseUtil } from '@common/utils/api-response.utils';
 import { MODULE_PREFIX } from '@common/constants/app.constant';
@@ -6,6 +6,8 @@ import { CitySuggestionDto } from './dto/city-suggestion.dto';
 import { PincodeCitySuggestionResource } from './resources/pincode-city-suggestion.resource';
 import { CurrentUser } from '@common/decorators/current-user.decorator';
 import { CreateSellCarDto } from './dto/create-sell-car.dto';
+import { CJwtAuthGuard } from '../c-auth/guards/jwt-c-auth.guard';
+import { Customer } from '@entity/customer/customer.entity';
 
 @Controller(`${MODULE_PREFIX.CUSTOMER}/sell-car`)
 export class SellCarController {
@@ -25,8 +27,9 @@ export class SellCarController {
 
   // Final: Submit car for selling
   @Post()
-  async submitCarForSale(@CurrentUser() user: any, @Body() dto: CreateSellCarDto) {
-    await this.sellCarService.submitCarForSale(user, dto);
+  @UseGuards(CJwtAuthGuard)
+  async submitCarForSale(@CurrentUser() customer: Customer, @Body() dto: CreateSellCarDto) {
+    await this.sellCarService.submitCarForSale(customer, dto);
     return ApiResponseUtil.created(
       'Your request has been submitted successfully. Our team will contact you shortly.'
     );

@@ -32,11 +32,14 @@ export class UsedCarService {
         })
     }
 
-    async getUsedCarDetailBySlug(params: UsedCarDetailParamDto) {
+    async getUsedCarDetailBySlug(params: UsedCarDetailParamDto, customerId?: number) {
         return this.baseService.catch(async () => {
             const { slug } = params;
 
-            const result = await this.usedCarRepository.getUsedCarDetailBySlug(slug);
+            const result = await this.usedCarRepository.getUsedCarDetailBySlug(slug, customerId);
+            if (!result) {
+                throw new BadRequestException('Car details not found');
+            }
 
             return result;
         })
@@ -66,6 +69,9 @@ export class UsedCarService {
         return this.baseService.catch(async () => {
             const { id } = dto;
             const result = await this.usedCarRepository.getUsedCarDetailByCustomer(customer.id, id);
+            if (!result) {
+                throw new BadRequestException('Car not found');
+            }
             return result;
         })
     }

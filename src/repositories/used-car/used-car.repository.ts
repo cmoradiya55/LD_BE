@@ -190,6 +190,7 @@ export class UsedCarRepository {
      */
     async getUsedCarDetailBySlug(
         slug: string,
+        customerId?: number,
     ): Promise<any> {
         const repo = this.getRepo();
 
@@ -203,7 +204,7 @@ export class UsedCarRepository {
             .leftJoin('variant_features.feature', 'feature')
             .where('used_car.slug = :slug', { slug })
             .andWhere('used_car.deleted_at IS NULL')
-            .select([
+            .addSelect([
                 // Used car fields
                 'used_car.id',
                 'used_car.registration_year',
@@ -249,7 +250,32 @@ export class UsedCarRepository {
                 'feature.value_type',
             ]);
 
+        if (customerId) {
+            console.log('Customer ID present in getUsedCarDetailBySlug:', customerId);
+            // User is logged in - check actual wishlist status
+            usedCarQb.leftJoin(
+                `${USED_CAR_TABLES.wishlist}`,
+                `${USED_CAR_TABLE_ALIASES.wishlist}`,
+                `${USED_CAR_TABLE_ALIASES.wishlist}.used_car_id = used_car.id 
+                        AND ${USED_CAR_TABLE_ALIASES.wishlist}.customer_id = :customerId`,
+                { customerId },
+            )
+                .addSelect(
+                    `CASE WHEN ${USED_CAR_TABLE_ALIASES.wishlist}.id IS NOT NULL THEN true ELSE false END`,
+                    'isWishlisted',
+                );
+        } else {
+            console.log('No Customer ID in getUsedCarDetailBySlug');
+            // User is not logged in - always return false
+            usedCarQb.addSelect('false', 'isWishlisted');
+        }
+
+        console.log('Executing used car detail query for slug:', usedCarQb.getSql());
+        // const usedCar = await usedCarQb.getOne();
         const usedCar = await usedCarQb.getOne();
+        console.log('-------------------------');
+        console.log('usedCar', usedCar);
+        console.log('-------------------------');
 
         if (!usedCar) {
             return null;
