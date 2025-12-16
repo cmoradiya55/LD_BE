@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Ip, Post, Put, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Ip, Param, Patch, Post, Put, UseGuards } from '@nestjs/common';
 import { ProfileService } from './profile.service';
 import { MODULE_PREFIX } from '@common/constants/app.constant';
 import { CurrentUser } from '@common/decorators/current-user.decorator';
@@ -11,6 +11,8 @@ import { SendEmailVerificationOtpDto } from './dto/send-email-verification-otp.d
 import { VerifyEmailVerificationOtpDto } from './dto/verify-email-verification-otp.dto';
 import { RequestDeleteOtpDto } from './dto/request-delete-otp.dto';
 import { ConfirmDeleteDto } from './dto/confirm-delete.dto';
+import { UpdateCityDto } from './dto/update-city.dto';
+import { CityUpdateResource } from './resources/city-update.resource';
 
 @Controller(`${MODULE_PREFIX.CUSTOMER}/profile`)
 @UseGuards(CJwtAuthGuard)
@@ -27,9 +29,22 @@ export class ProfileController {
       new CustomerProfileResource(customer),
     );
   }
+
+  @Patch('city/:id')
+  async updateCity(
+    @CurrentUser() customer: Customer,
+    @Param() dto: UpdateCityDto,
+  ) {
+    const data = await this.profileService.updateCity(customer, dto);
+    return ApiResponseUtil.updated(
+      'Profile city updated successfully',
+      new CityUpdateResource(data),
+    );
+  }
+
   /**
-      * Update customer profile
-      */
+  * Update customer profile
+  */
   @Put()
   async updateProfile(
     @CurrentUser() customer: Customer,
@@ -37,7 +52,7 @@ export class ProfileController {
   ) {
     const data = await this.profileService.updateProfile(customer, dto);
 
-    return ApiResponseUtil.success(
+    return ApiResponseUtil.updated(
       'Profile updated successfully',
       new CustomerProfileResource(data),
     );

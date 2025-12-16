@@ -62,6 +62,9 @@ export class Customer {
     @Column({ name: 'is_blocked', type: 'boolean', default: false })
     is_blocked: boolean;
 
+    @Column({ name: 'city_id', type: 'int', nullable: true })
+    city_id: number | null;
+
     @Column({ name: 'blocked_reason', type: 'text', nullable: true })
     blocked_reason: string | null;
 

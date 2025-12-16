@@ -15,6 +15,9 @@ import { ConfirmDeleteDto } from './dto/confirm-delete.dto';
 import { CustomerFcmTokenRepository } from '@repository/customer/customer-fcm-token.repository';
 import { CustomerRefreshTokenRepository } from '@repository/customer/customer-refresh-token.repository';
 import { UsedCarRepository } from '@repository/used-car/used-car.repository';
+import { UpdateCityDto } from './dto/update-city.dto';
+import { CityRepository } from '@repository/general/city.repository';
+import { City } from '@entity/general/city.entity';
 
 @Injectable()
 export class ProfileService {
@@ -26,6 +29,7 @@ export class ProfileService {
         private readonly customerFcmTokenRepo: CustomerFcmTokenRepository,
         private readonly customerRefreshTokenRepo: CustomerRefreshTokenRepository,
         private readonly usedCarRepo: UsedCarRepository,
+        private readonly cityRepo: CityRepository,
     ) { }
 
     /**
@@ -40,6 +44,41 @@ export class ProfileService {
             }
 
             return customer;
+        });
+    }
+
+    /**
+     * Update customer's city profile
+    */
+    async updateCity(
+        customer: Customer,
+        dto: UpdateCityDto,
+    ): Promise<City> {
+        return this.baseService.catch(async () => {
+            const { id } = dto;
+
+            if (customer.city_id === id) {
+                const city = await this.cityRepo.getCityById(id);
+                if (!city) {
+                    throw new NotFoundException('City not found');
+                }
+                return city;
+            }
+
+            const isCityIdValid = await this.cityRepo.isCityIdValid(id);
+            if (!isCityIdValid) {
+                throw new NotFoundException('City not found');
+            }
+
+            const updatedCustomer = await this.customerRepo.update(customer.id, { city_id: Number(id) });
+            if (!updatedCustomer) {
+                throw new NotFoundException('Customer not found after update');
+            }
+            const city = await this.cityRepo.getCityById(updatedCustomer.city_id!);
+            if (!city) {
+                throw new NotFoundException('City not found');
+            }
+            return city;
         });
     }
 
