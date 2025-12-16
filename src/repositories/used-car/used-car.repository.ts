@@ -324,7 +324,23 @@ export class UsedCarRepository {
         const queryBuilder = this.createBaseListQuery(customerId, false)
             .addSelect('COUNT(*) OVER() as "totalCount"')
             .addSelect(`${USED_CAR_TABLE_ALIASES.usedCar}.status as "status"`)
-            .andWhere(`${USED_CAR_TABLE_ALIASES.usedCar}.customer_id = :customerId`, { customerId });
+            .andWhere(`${USED_CAR_TABLE_ALIASES.usedCar}.customer_id = :customerId`, { customerId })
+            .leftJoin(
+                `${USED_CAR_TABLE_ALIASES.usedCar}.pincode`,
+                USED_CAR_TABLE_ALIASES.pincode,
+            )
+
+            // Join city through pincode
+            .leftJoin(
+                `${USED_CAR_TABLE_ALIASES.pincode}.city`,
+                USED_CAR_TABLE_ALIASES.city,
+            )
+
+            // Select ONLY what you need
+            .addSelect([
+                `${USED_CAR_TABLE_ALIASES.pincode}.area_name as "areaName"`,
+                `${USED_CAR_TABLE_ALIASES.city}.city_name as "cityName"`,
+            ]);
 
         const skip = (page - 1) * limit;
         // Execute query
