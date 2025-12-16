@@ -9,6 +9,7 @@ export class UsedCarListingResource extends BaseResource<any> {
             image: CommonHelper.buildImageUrl(this.data?.primaryImage),
             slug: CommonHelper.text(this.data.slug),
             displayName: CommonHelper.text(`${this.data?.brandName} ${this.data?.modelName}`),
+            ownerType: CommonHelper.number(this.data.ownerType),
             areaName: CommonHelper.text(CommonHelper.capitalizeWords(this.data.areaName)),
             cityName: CommonHelper.text(CommonHelper.capitalizeWords(this.data.cityName)),
             registrationYear: CommonHelper.number(this.data.registrationYear),
