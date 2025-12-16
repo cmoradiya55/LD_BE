@@ -64,6 +64,19 @@ export class CommonHelper {
         return defaultValue;
     }
 
+    static capitalizeWords(input: string): string {
+        if (!input) return input;
+
+        return input
+            .toLowerCase()
+            .split(' ')
+            .filter(Boolean)
+            .map(
+                word => word.charAt(0).toUpperCase() + word.slice(1)
+            )
+            .join(' ');
+    }
+
     // ============ MASKING ============
     static maskMobileNumber(number: string): string {
         if (/^\d{10,}$/.test(number)) {

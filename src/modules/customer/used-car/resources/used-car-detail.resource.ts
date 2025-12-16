@@ -39,7 +39,7 @@ export class UsedCarDetailResource extends BaseResource<any> {
 
         return {
             id: CommonHelper.number(data.id),
-            displayName: CommonHelper.text(`${data.registration_year} ${brand?.display_name} ${model?.display_name}`),
+            displayName: CommonHelper.text(`${brand?.display_name} ${model?.display_name}`),
             variantName: CommonHelper.text(variant?.display_name),
             registrationYear: CommonHelper.number(data.registration_year),
             kmDriven: CommonHelper.number(data.km_driven),

@@ -152,7 +152,24 @@ export class UsedCarRepository {
 
         // Build query`
         const queryBuilder = this.createBaseListQuery(customerId)
-            .addSelect('COUNT(*) OVER() as "totalCount"');
+            .addSelect('COUNT(*) OVER() as "totalCount"')
+            // Join pincode (SQL only)
+            .leftJoin(
+                `${USED_CAR_TABLE_ALIASES.usedCar}.pincode`,
+                USED_CAR_TABLE_ALIASES.pincode,
+            )
+
+            // Join city through pincode
+            .leftJoin(
+                `${USED_CAR_TABLE_ALIASES.pincode}.city`,
+                USED_CAR_TABLE_ALIASES.city,
+            )
+
+            // Select ONLY what you need
+            .addSelect([
+                `${USED_CAR_TABLE_ALIASES.pincode}.area_name as "areaName"`,
+                `${USED_CAR_TABLE_ALIASES.city}.city_name as "cityName"`,
+            ]);
 
         // Apply filters
         QBHelper.applyFilters(queryBuilder, dto, USED_CAR_FILTER_CONFIG);
@@ -176,7 +193,7 @@ export class UsedCarRepository {
 
         // Extract total and clean data
         const { cleanedData, total } = QBHelper.extractTotalAndCleanData(data);
-
+        console.log('UsedCarRepository.findUsedCars - cleanedData:', cleanedData);
         return {
             data: cleanedData,
             total,
@@ -253,32 +270,24 @@ export class UsedCarRepository {
         if (customerId) {
             console.log('Customer ID present in getUsedCarDetailBySlug:', customerId);
             // User is logged in - check actual wishlist status
-            usedCarQb.leftJoin(
-                `${USED_CAR_TABLES.wishlist}`,
-                `${USED_CAR_TABLE_ALIASES.wishlist}`,
-                `${USED_CAR_TABLE_ALIASES.wishlist}.used_car_id = used_car.id 
-                        AND ${USED_CAR_TABLE_ALIASES.wishlist}.customer_id = :customerId`,
-                { customerId },
-            )
-                .addSelect(
-                    `CASE WHEN ${USED_CAR_TABLE_ALIASES.wishlist}.id IS NOT NULL THEN true ELSE false END`,
-                    'isWishlisted',
-                );
-        } else {
-            console.log('No Customer ID in getUsedCarDetailBySlug');
-            // User is not logged in - always return false
-            usedCarQb.addSelect('false', 'isWishlisted');
+            usedCarQb.leftJoinAndSelect('used_car.wishlists', 'cw',
+                'cw.customer_id = :customerId',
+                { customerId }
+            );
         }
 
-        console.log('Executing used car detail query for slug:', usedCarQb.getSql());
         // const usedCar = await usedCarQb.getOne();
         const usedCar = await usedCarQb.getOne();
-        console.log('-------------------------');
-        console.log('usedCar', usedCar);
-        console.log('-------------------------');
 
         if (!usedCar) {
             return null;
+        }
+
+        if (customerId) {
+            (usedCar as any).isWishlisted = !!(usedCar?.wishlists[0]?.id);
+        } else {
+            console.log('No customer ID provided, setting isWishlisted to false');
+            (usedCar as any).isWishlisted = false;
         }
 
         // Get images using the helper

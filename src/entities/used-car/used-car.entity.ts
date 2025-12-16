@@ -18,6 +18,7 @@ import { Pincode } from '@entity/general/pincode.entity';
 import { UsedCarCustomerPhoto } from './used-car-customer-photo.entity';
 import { KilometerDriven, OwnershipType, UsedCarListingStatus } from '@common/enums/car-detail.enum';
 import { InspectionImage } from './inspection-image.entity';
+import { CustomerWishlist } from '@entity/customer-ops/customer-wishlist.entity';
 
 @Entity('used_car')
 export class UsedCar {
@@ -122,4 +123,7 @@ export class UsedCar {
 
     @OneToMany(() => InspectionImage, image => image.used_car)
     inspectionImages: InspectionImage[];
+
+    @OneToMany(() => CustomerWishlist, w => w.usedCar)
+    wishlists: CustomerWishlist[];
 }
