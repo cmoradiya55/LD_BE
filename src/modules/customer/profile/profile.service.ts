@@ -87,7 +87,7 @@ export class ProfileService {
      */
     async updateProfile(customer: Customer, dto: UpdateProfileDto) {
         return this.baseService.catch(async () => {
-            const { email, full_name, profile_image } = dto;
+            const { email, fullName, profile_image } = dto;
 
             // Check if email is already taken by another customer
             const existingCustomer = await this.customerRepo.findByEmailExcludingId(email, customer.id);
@@ -97,7 +97,7 @@ export class ProfileService {
             const emailChanged = customer.email !== email;
             if (emailChanged) {
                 await this.customerRepo.update(customer.id, {
-                    full_name,
+                    full_name: fullName,
                     email,
                     is_email_verified: false,
                     profile_image,
@@ -105,7 +105,7 @@ export class ProfileService {
             } else {
                 // Update profile
                 await this.customerRepo.update(customer.id, {
-                    full_name,
+                    full_name: fullName,
                     profile_image,
                 });
             }
