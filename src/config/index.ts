@@ -1,3 +1,4 @@
+import { adminJwtConfig } from "./admin-jwt.config";
 import { appConfig } from "./app.config";
 import { awsConfig } from "./aws.config";
 import { dbConfig } from "./db.config";
@@ -11,5 +12,6 @@ export default [
     awsConfig,
     redisConfig,
     mailConfig,
-    customerJwtConfig
+    customerJwtConfig,
+    adminJwtConfig
 ];

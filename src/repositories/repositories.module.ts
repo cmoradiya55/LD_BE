@@ -28,6 +28,10 @@ import { CustomerRefreshTokenRepository } from './customer/customer-refresh-toke
 import { CustomerFcmTokenRepository } from './customer/customer-fcm-token.repository';
 import { CustomerWishlistRepository } from './customer-ops/customer-wishlist.repository';
 import { CustomerWishlist } from '@entity/customer-ops/customer-wishlist.entity';
+import { UserRepository } from './user/user.repository';
+import { UserRefreshTokenRepository } from './user/user-refresh-token.repository';
+import { User } from '@entity/user/user.entity';
+import { UserRefreshToken } from '@entity/user/user-refresh-token.entity';
 
 @Module({
   imports: [
@@ -52,6 +56,10 @@ import { CustomerWishlist } from '@entity/customer-ops/customer-wishlist.entity'
       CustomerFcmToken,
 
       CustomerWishlist,
+
+      // Admiinn User
+      User,
+      UserRefreshToken,
     ]),
   ],
   providers: [
@@ -69,6 +77,9 @@ import { CustomerWishlist } from '@entity/customer-ops/customer-wishlist.entity'
     CustomerFcmTokenRepository,
 
     CustomerWishlistRepository,
+
+    UserRepository,
+    UserRefreshTokenRepository,
   ],
   exports: [
     CarBrandRepository,
@@ -86,6 +97,9 @@ import { CustomerWishlist } from '@entity/customer-ops/customer-wishlist.entity'
     CustomerFcmTokenRepository,
 
     CustomerWishlistRepository,
+
+    UserRepository,
+    UserRefreshTokenRepository,
   ],
 })
 export class RepositoriesModule { }

@@ -10,12 +10,12 @@ import { OptionalAuthGuard } from '../c-auth/guards/jwt-optional-c-auth.guard';
 import { Customer } from '@entity/customer/customer.entity';
 import { OptionalUser } from '@common/decorators/optional-user.decorator';
 import { CJwtAuthGuard } from '../c-auth/guards/jwt-c-auth.guard';
-import { CurrentUser } from '@common/decorators/current-user.decorator';
 import { MyUsedCarListingResource } from './resources/my-used-car-listing.resource';
 import { CustomerUsedCarListingDto } from './dto/customer-used-car-listing.dto';
 import { MyUsedCarDetailParamDto } from './dto/my-used-car-detail.dto';
 import { MyUsedCarDetailResource } from './resources/my-used-car-detail.resource copy';
 import { UpdateMyUsedCarDetailParamDto, UpdateMyUsedCarDto } from './dto/update-my-used-car.dto';
+import { CurrentCustomer } from '@common/decorators/current-customer.decorator';
 
 @Controller(`${MODULE_PREFIX.CUSTOMER}/used-car`)
 export class UsedCarController {
@@ -53,7 +53,7 @@ export class UsedCarController {
   @Get()
   @UseGuards(CJwtAuthGuard)
   async getCustomerUsedCars(
-    @CurrentUser('id') customer_id: number,
+    @CurrentCustomer('id') customer_id: number,
     @Query() query: CustomerUsedCarListingDto,
   ) {
     const { data, page, total, limit } = await this.usedCarService.getCustomerUsedCars(customer_id, query);
@@ -69,7 +69,7 @@ export class UsedCarController {
   @Get(':id')
   @UseGuards(CJwtAuthGuard)
   async myUsedCarDetailById(
-    @CurrentUser() customer: Customer,
+    @CurrentCustomer() customer: Customer,
     @Param() params: MyUsedCarDetailParamDto
   ) {
     const data = await this.usedCarService.getMyUsedCarDetailById(customer, params);
@@ -82,7 +82,7 @@ export class UsedCarController {
   @Patch(':id')
   @UseGuards(CJwtAuthGuard)
   async updateMyUsedCarById(
-    @CurrentUser() customer: Customer,
+    @CurrentCustomer() customer: Customer,
     @Param() params: UpdateMyUsedCarDetailParamDto,
     @Body() dto: UpdateMyUsedCarDto
   ) {

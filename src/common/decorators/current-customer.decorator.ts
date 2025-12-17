@@ -5,7 +5,7 @@ const getCurrentUserByContext = (data: string | undefined, context: ExecutionCon
     return data ? user?.[data] : user;
 }
 
-export const CurrentUser = createParamDecorator(
+export const CurrentCustomer = createParamDecorator(
     (data: string | undefined, context: ExecutionContext): any => {
         return getCurrentUserByContext(data, context);
     }

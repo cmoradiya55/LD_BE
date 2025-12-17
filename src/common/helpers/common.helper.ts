@@ -1,4 +1,5 @@
-import { CUSTOMER_OTP_LENGTH } from "@common/constants/app.constant";
+import { ADMIN_OTP_LENGTH, CUSTOMER_OTP_LENGTH } from "@common/constants/app.constant";
+import { ROLES } from "@common/constants/user.constant";
 
 export class CommonHelper {
 
@@ -12,6 +13,28 @@ export class CommonHelper {
         const max = Math.pow(10, length) - 1;
 
         return Math.floor(min + Math.random() * (max - min + 1)).toString();
+    }
+
+    static generateAdminOtp(length: number = ADMIN_OTP_LENGTH): string {
+        if (process.env.NODE_ENV === 'development') {
+            return '2'.repeat(length);  // e.g., 111111 or 1111
+        }
+
+        const min = Math.pow(10, length - 1);
+        const max = Math.pow(10, length) - 1;
+
+        return Math.floor(min + Math.random() * (max - min + 1)).toString();
+    }
+
+    static getRoleName(roleId: number): string {
+        const roleNames: Record<number, string> = {
+            [ROLES.ADMIN]: 'Admin',
+            [ROLES.MANAGER]: 'Manager',
+            [ROLES.INSPECTOR]: 'Inspector',
+            [ROLES.STAFF]: 'Staff',
+        };
+
+        return roleNames[roleId] || 'Unknown';
     }
 
     // ============ TEXT & STRING ============

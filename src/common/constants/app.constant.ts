@@ -1,4 +1,5 @@
 export const CUSTOMER_OTP_LENGTH = 6;
+export const ADMIN_OTP_LENGTH = 6;
 
 export const MODULE_PREFIX = {
     ADMIN: 'admin',
@@ -37,12 +38,22 @@ export const OTP_EXPIRY_MS = {
     ACCOUNT_DELETE: 10 * 60 * 1000,
 } as const;
 
+export const ADMIN_PANEL_OTP_EXPIRY_MS = {
+    MOBILE: 10 * 60 * 1000,
+    EMAIL: 10 * 60 * 1000,
+    ACCOUNT_DELETE: 10 * 60 * 1000,
+} as const;
+
 export const JWT_TOKEN_TYPES = {
     ACCESS: 'access',
     REFRESH: 'refresh',
 } as const;
 
 export const COOKIE_NAMES = {
+    REFRESH_TOKEN: 'refresh_token',
+}
+
+export const ADMIN_COOKIE_NAMES = {
     REFRESH_TOKEN: 'refresh_token',
 }
 
@@ -54,3 +65,7 @@ export const JWT_UNITS = {
 
 export const JWT_ACCESS_EXPIRY_UNIT = JWT_UNITS.MINUTES;
 export const JWT_REFRESH_EXPIRY_UNIT = JWT_UNITS.DAYS; // if changed here then change in cookie maxAge calculation also
+
+
+export const ADMIN_JWT_ACCESS_EXPIRY_UNIT = JWT_UNITS.MINUTES;
+export const ADMIN_JWT_REFRESH_EXPIRY_UNIT = JWT_UNITS.DAYS; // if changed here then change in cookie maxAge calculation also

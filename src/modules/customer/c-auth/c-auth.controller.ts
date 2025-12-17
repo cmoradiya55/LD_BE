@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, Headers, Ip, Param, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { CAuthService } from './c-auth.service';
 import { COOKIE_NAMES, MODULE_PREFIX } from '@common/constants/app.constant';
-import { CurrentUser } from '@common/decorators/current-user.decorator';
+import { CurrentCustomer } from '@common/decorators/current-customer.decorator';
 import { Customer } from '@entity/customer/customer.entity';
 import { CAuthSendOtpDto } from './dto/c-auth-send-otp.dto';
 import { CAuthLoginDto } from './dto/c-auth.login.dto';
@@ -52,28 +52,28 @@ export class CAuthController {
 
   @UseGuards(CJwtAuthGuard)
   @Post('logout')
-  async logout(@CurrentUser() user: Customer, @Body() logoutDto: CAuthLogoutDto) {
+  async logout(@CurrentCustomer() user: Customer, @Body() logoutDto: CAuthLogoutDto) {
     await this.cAuthService.logout(user.id, logoutDto.deviceId);
     return ApiResponseUtil.success('Logged out successfully');
   }
 
   // @UseGuards(CJwtAuthGuard)
   // @Post('logout-all')
-  // async logoutAll(@CurrentUser() user: Customer) {
+  // async logoutAll(@CurrentCustomer() user: Customer) {
   //   await this.cAuthService.logoutAllDevices(user.id);
   //   return { message: 'Logged out from all devices' };
   // }
 
   // @UseGuards(CJwtAuthGuard)
   // @Get('devices')
-  // async getDevices(@CurrentUser() user: Customer) {
+  // async getDevices(@CurrentCustomer() user: Customer) {
   //   return this.cAuthService.getActiveDevices(user.id);
   // }
 
   // @UseGuards(CJwtAuthGuard)
   // @Delete('devices/:deviceId')
   // async removeDevice(
-  //   @CurrentUser() user: Customer,
+  //   @CurrentCustomer() user: Customer,
   //   @Param('deviceId') deviceId: string,
   // ) {
   //   await this.cAuthService.removeDevice(user.id, deviceId);

@@ -1,0 +1,195 @@
+import { BadRequestException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { UAuthLoginDto } from './dto/u-auth.login.dto';
+import { BaseService } from '@common/base/base.service';
+import { UAuthSendOtpOnMobileDto } from './dto/u-auth-send-otp.dto';
+import { UserOtpType } from '@common/enums/user.enum';
+import { UserRepository } from '@repository/user/user.repository';
+import { User } from '@entity/user/user.entity';
+import { CommonHelper } from '@common/helpers/common.helper';
+import { ADMIN_COOKIE_NAMES, ADMIN_PANEL_OTP_EXPIRY_MS } from '@common/constants/app.constant';
+import { UAuthEmailVerificationOtpDto } from './dto/u-auth-send-email-otp.dto';
+import { UserJwtTokenService } from './user-jwt-token.service';
+import { Request, Response } from 'express';
+import { UAuthVerifyEmailOtpDto } from './dto/u-auth.verify-email-otp.dto';
+
+@Injectable()
+export class UAuthService {
+    constructor(
+        private readonly baseService: BaseService,
+        private readonly userRepo: UserRepository,
+        private readonly userJwtTokenService: UserJwtTokenService,
+    ) { }
+
+
+    /**
+     * Send OTP
+     */
+    async sendOtpForLogin(
+        dto: UAuthSendOtpOnMobileDto,
+    ): Promise<void> {
+        return this.baseService.catch(async () => {
+            const { country_code, mobile_no } = dto;
+            const otpType = UserOtpType.REGISTRATION_OR_LOGIN;
+
+            let user = await this.userRepo.findByMobileRaw(country_code, mobile_no);
+            if (!user) throw new BadRequestException('User not found');
+
+            // if user exists, check status
+            if (user.deleted_at) {
+                throw new BadRequestException('Account has been deleted');
+            }
+            if (!user.is_active) {
+                throw new BadRequestException('User is inactive. Please contact support.');
+            }
+
+            // Generate OTP
+            const otp = CommonHelper.generateAdminOtp();
+            const expiresAt = new Date(Date.now() + ADMIN_PANEL_OTP_EXPIRY_MS.MOBILE);
+
+            // Invalidate previous OTPs
+            await this.userRepo.otpSaveOfActiveUser(user.id, otpType, otp, expiresAt);
+
+            // send sms and email(if email exist) via external service
+
+            return;
+        });
+    }
+
+    async userLogin(
+        dto: UAuthLoginDto,
+        res: Response
+    ) {
+        return this.baseService.catch(async (manager) => {
+            const {
+                countryCode,
+                mobileNo,
+                otp,
+                fcmToken,
+            } = dto;
+            const otpType = UserOtpType.REGISTRATION_OR_LOGIN;
+
+            // ✅ Verify OTP (OTP cleared inside this method)
+            const user = await this.userRepo.verifyMobileOtp(countryCode, mobileNo, otp, otpType, manager);
+            if (!user) {
+                throw new BadRequestException('Invalid OTP or OTP expired');
+            }
+
+            // 2. Single update for mobile verification + FCM token
+            const updates: Partial<User> = {};
+
+            if (!user.is_mobile_verified) {
+                updates.is_mobile_verified = true;
+                updates.mobile_verified_at = new Date();
+            }
+
+            if (fcmToken && user.fcm_token !== fcmToken) {
+                updates.fcm_token = fcmToken;
+            }
+
+            if (Object.keys(updates).length > 0) {
+                const updatedUser = await this.userRepo.updateActiveUserAndReturn(user.id, updates, manager);
+                if (!updatedUser) throw new NotFoundException('User not found after OTP verification');
+                return updatedUser;
+            }
+
+            // Step 4:Generate tokens
+            const {
+                accessToken,
+                expiresInMs,
+                refreshToken,
+                refreshTokenExpiryInMs
+            } = await this.userJwtTokenService.generateUserAccessAndRefreshTokens(user, manager);
+
+            await this.userJwtTokenService.storeTokenInCookie(refreshToken, ADMIN_COOKIE_NAMES.REFRESH_TOKEN, res, refreshTokenExpiryInMs);
+
+            return {
+                user,
+                accessToken,
+                expiresInMs,
+            }
+        }, true)
+    }
+
+    /**
+     * Refresh access token
+     */
+    async refreshAccessToken(
+        req: Request,
+    ): Promise<{ accessToken: string; expiresInMs: number }> {
+        return this.baseService.catch(async () => {
+            const refreshToken = req.cookies[ADMIN_COOKIE_NAMES.REFRESH_TOKEN];
+
+            if (!refreshToken) throw new UnauthorizedException('Refresh token expired');
+
+            // Verify JWT
+            const storedToken = await this.userJwtTokenService.verifyRefreshToken(refreshToken);
+
+            // Generate new access token
+            const { accessToken, accessTokenExpiryInMs } = await this.userJwtTokenService.generateAccessToken({
+                id: storedToken.user.id,
+                country_code: storedToken.user.country_code,
+                mobile_no: storedToken.user.mobile_number,
+                jwt_version: storedToken.user.jwt_version,
+            })
+
+            return {
+                accessToken,
+                expiresInMs: accessTokenExpiryInMs,
+            };
+        });
+    }
+    
+    /**
+     * Send OTP
+     */
+    async sendOtpForEmailVerification(
+        user: User,
+        dto: UAuthEmailVerificationOtpDto,
+    ): Promise<void> {
+        return this.baseService.catch(async (manager) => {
+            const { email } = dto;
+            const otpType = UserOtpType.EMAIL_VERIFY;
+
+            if (user.email === email && user.is_email_verified) {
+                throw new BadRequestException('Email already verified');
+            }
+
+            let isUserExist = await this.userRepo.existsVerifiedEmailForOther(email, user.id);
+            if (isUserExist) throw new BadRequestException('Email already verified or blocked');
+
+            // Generate OTP
+            const otp = CommonHelper.generateAdminOtp();
+            const expiresAt = new Date(Date.now() + ADMIN_PANEL_OTP_EXPIRY_MS.EMAIL);
+
+            // Invalidate previous OTPs
+            user.email = email;
+            await this.userRepo.save(user, manager);
+            await this.userRepo.otpSaveOfActiveUser(user.id, otpType, otp, expiresAt, manager);
+
+            // send email via external service
+
+            return;
+        }, true);
+    }
+
+    async verifyOtpForEmailVerification(
+        user: User,
+        dto: UAuthVerifyEmailOtpDto,
+    ): Promise<void> {
+        return this.baseService.catch(async (manager) => {
+            const { email, otp } = dto;
+            const otpType = UserOtpType.EMAIL_VERIFY;
+
+            // ✅ Verify OTP (OTP cleared inside this method)
+            const user = await this.userRepo.verifyEmailOtp(email, otp, otpType, manager);
+            console.log('verified user:', user);
+            if (!user) {
+                throw new BadRequestException('Invalid OTP or OTP expired');
+            }
+
+            user.is_email_verified = true;
+            user.email_verified_at = new Date();
+            await this.userRepo.save(user, manager);
+        }, true);
+    }
+}

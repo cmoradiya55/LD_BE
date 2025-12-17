@@ -1,7 +1,6 @@
 import { Body, Controller, Delete, Get, Ip, Param, Patch, Post, Put, UseGuards } from '@nestjs/common';
 import { ProfileService } from './profile.service';
 import { MODULE_PREFIX } from '@common/constants/app.constant';
-import { CurrentUser } from '@common/decorators/current-user.decorator';
 import { Customer } from '@entity/customer/customer.entity';
 import { CJwtAuthGuard } from '../c-auth/guards/jwt-c-auth.guard';
 import { ApiResponseUtil } from '@common/utils/api-response.utils';
@@ -14,6 +13,7 @@ import { ConfirmDeleteDto } from './dto/confirm-delete.dto';
 import { UpdateCityDto } from './dto/update-city.dto';
 import { CityUpdateResource } from './resources/city-update.resource';
 import { UpdatedCustomerProfileResource } from './resources/updated-customer-profile.resource';
+import { CurrentCustomer } from '@common/decorators/current-customer.decorator';
 
 @Controller(`${MODULE_PREFIX.CUSTOMER}/profile`)
 @UseGuards(CJwtAuthGuard)
@@ -24,7 +24,7 @@ export class ProfileController {
   * Get current customer profile
   */
   @Get()
-  async getProfile(@CurrentUser() customer: Customer) {
+  async getProfile(@CurrentCustomer() customer: Customer) {
     const customerData = await this.profileService.getProfile(customer.id);
     return ApiResponseUtil.success(
       'Profile fetched successfully',
@@ -34,7 +34,7 @@ export class ProfileController {
 
   @Patch('city/:id')
   async updateCity(
-    @CurrentUser() customer: Customer,
+    @CurrentCustomer() customer: Customer,
     @Param() dto: UpdateCityDto,
   ) {
     const data = await this.profileService.updateCity(customer, dto);
@@ -49,7 +49,7 @@ export class ProfileController {
   */
   @Put()
   async updateProfile(
-    @CurrentUser() customer: Customer,
+    @CurrentCustomer() customer: Customer,
     @Body() dto: UpdateProfileDto,
   ) {
     const data = await this.profileService.updateProfile(customer, dto);
@@ -62,7 +62,7 @@ export class ProfileController {
 
   @Post('email-otp/send')
   async sendEmailVerificationOtp(
-    @CurrentUser() customer: Customer,
+    @CurrentCustomer() customer: Customer,
     @Body() dto: SendEmailVerificationOtpDto,
     @Ip() ip: string
   ) {
@@ -75,7 +75,7 @@ export class ProfileController {
 
   @Post('email-otp/verify')
   async verifyEmailVerificationOtp(
-    @CurrentUser() customer: Customer,
+    @CurrentCustomer() customer: Customer,
     @Body() dto: VerifyEmailVerificationOtpDto,
   ) {
     await this.profileService.verifyEmailVerificationOtp(customer, dto);
@@ -87,7 +87,7 @@ export class ProfileController {
 
   @Post('delete/send-otp')
   async sendProfileDeleteOtp(
-    @CurrentUser() customer: Customer,
+    @CurrentCustomer() customer: Customer,
     @Body() dto: RequestDeleteOtpDto,
     @Ip() ip: string
   ) {
@@ -101,7 +101,7 @@ export class ProfileController {
 
   @Delete('delete')
   async confirmProfileDelete(
-    @CurrentUser() customer: Customer,
+    @CurrentCustomer() customer: Customer,
     @Body() dto: ConfirmDeleteDto,
   ) {
     await this.profileService.confirmProfileDelete(customer, dto);
