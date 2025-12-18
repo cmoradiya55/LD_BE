@@ -1,7 +1,23 @@
 import { ADMIN_OTP_LENGTH, CUSTOMER_OTP_LENGTH } from "@common/constants/app.constant";
-import { ROLES } from "@common/constants/user.constant";
+import { UserRole } from "@common/enums/user.enum";
 
 export class CommonHelper {
+    static dateTime(date: Date | string | null | undefined): string | null {
+        if (!date) return null;
+
+        const d = date instanceof Date ? date : new Date(date);
+
+        if (isNaN(d.getTime())) return null;
+
+        return d.toLocaleString('en-IN', {
+            day: '2-digit',
+            month: 'long',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: true,
+        });
+    }
 
     // ============ OTP ============
     static generateOtp(length: number = CUSTOMER_OTP_LENGTH): string {
@@ -28,10 +44,10 @@ export class CommonHelper {
 
     static getRoleName(roleId: number): string {
         const roleNames: Record<number, string> = {
-            [ROLES.ADMIN]: 'Admin',
-            [ROLES.MANAGER]: 'Manager',
-            [ROLES.INSPECTOR]: 'Inspector',
-            [ROLES.STAFF]: 'Staff',
+            [UserRole.ADMIN]: 'Admin',
+            [UserRole.MANAGER]: 'Manager',
+            [UserRole.INSPECTOR]: 'Inspector',
+            [UserRole.STAFF]: 'Staff',
         };
 
         return roleNames[roleId] || 'Unknown';

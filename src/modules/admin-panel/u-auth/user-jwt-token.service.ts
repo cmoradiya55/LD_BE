@@ -187,7 +187,7 @@ export class UserJwtTokenService {
             httpOnly: true,
             secure: true, // true in production (HTTPS only)
             sameSite: 'strict', // or 'Lax' depending on your needs
-            path: `/${prefix}/customer/auth/refresh`,
+            path: `/${prefix}/admin/auth/refresh`,
             maxAge: refreshTokenExpiryInMs,
         });
         return;

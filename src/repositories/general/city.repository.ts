@@ -35,13 +35,13 @@ export class CityRepository {
 
     async isCityIdValid(id: number, manager?: EntityManager): Promise<boolean> {
         const repository = await this.getRepo(manager);
-        const count = await repository.count({
+        const exists = await repository.exist({
             where: {
                 id: id,
                 is_active: true,
             },
         });
-        return count > 0;
+        return exists;
     }
 
     async getCityById(id: number, manager?: EntityManager): Promise<City | null> {

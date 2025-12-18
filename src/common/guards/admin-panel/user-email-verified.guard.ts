@@ -1,4 +1,4 @@
-import { USER_ALLOW_UNVERIFIED_EMAIL } from "@common/decorators/user-allowed-verified-email.decorator";
+import { USER_ALLOW_UNVERIFIED_EMAIL } from "../../../modules/admin-panel/u-auth/decorator/user-allowed-unverified-email.decorator";
 import { CanActivate, ExecutionContext, ForbiddenException, Injectable } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { Reflector } from "@nestjs/core";

@@ -9,7 +9,7 @@ import { WinstonModule } from 'nest-winston';
 import { LoggerConfigService } from './common/utils/logger.utils';
 import { RepositoriesModule } from './repositories/repositories.module';
 import { CustomerModule } from './modules/customer/customer.module';
-import { AdminModule } from './modules/admin/admin.module';
+import { AdminPanelModule } from './modules/admin-panel/admin-panel.module';
 import { BaseModule } from '@common/base/base.module';
 import { StorageModule } from './common/providers/storage/storage.module';
 import { CommonModule } from './modules/common/common.module';
@@ -41,7 +41,7 @@ import { CustomerOtpModule } from './common/providers/customer-otp/customer-otp.
 
     // Feature modules
     CustomerModule,
-    AdminModule,
+    AdminPanelModule,
     StorageModule,
     CommonModule,
     InspectionImageModule,

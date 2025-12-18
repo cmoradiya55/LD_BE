@@ -1,4 +1,3 @@
-import { ROLE_NAMES } from '@common/constants/user.constant';
 import { CommonHelper } from '@common/helpers/common.helper';
 import { BaseResource } from '@common/utils/resource.utils';
 

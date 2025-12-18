@@ -1,8 +1,8 @@
-import { BadRequestException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { UAuthLoginDto } from './dto/u-auth.login.dto';
 import { BaseService } from '@common/base/base.service';
 import { UAuthSendOtpOnMobileDto } from './dto/u-auth-send-otp.dto';
-import { UserOtpType } from '@common/enums/user.enum';
+import { UserDocumentVerificationStatus, UserOtpType } from '@common/enums/user.enum';
 import { UserRepository } from '@repository/user/user.repository';
 import { User } from '@entity/user/user.entity';
 import { CommonHelper } from '@common/helpers/common.helper';
@@ -11,6 +11,7 @@ import { UAuthEmailVerificationOtpDto } from './dto/u-auth-send-email-otp.dto';
 import { UserJwtTokenService } from './user-jwt-token.service';
 import { Request, Response } from 'express';
 import { UAuthVerifyEmailOtpDto } from './dto/u-auth.verify-email-otp.dto';
+import { UploadUserDocumentsDto } from './dto/upload-verification-document.dto';
 
 @Injectable()
 export class UAuthService {
@@ -204,6 +205,70 @@ export class UAuthService {
             userAfterVerification.is_email_verified = true;
             userAfterVerification.email_verified_at = new Date();
             await this.userRepo.save(userAfterVerification, manager);
+        }, true);
+    }
+
+    /**
+     * Submit documents for verification
+     */
+    async submitDocumentsForVerification(
+        user: User,
+        dto: UploadUserDocumentsDto,
+    ): Promise<void> {
+        return this.baseService.catch(async (manager) => {
+            const {
+                selfieImage,
+                aadharCardNo,
+                aadharCardFrontImage,
+                aadharCardBackImage,
+                panCardNo,
+                panCardImage
+            } = dto;
+
+            // ✅ Parallel duplicate checks (run simultaneously)
+            const [otherUserWithAadhar, otherUserWithPan] = await Promise.all([
+                this.userRepo.existsByAadharExcludingUser(aadharCardNo, user.id, manager),
+                this.userRepo.existsByPanExcludingUser(panCardNo, user.id, manager),
+            ]);
+
+            if (otherUserWithAadhar) {
+                throw new ConflictException('Aadhar card number already registered with another user');
+            }
+
+            if (otherUserWithPan) {
+                throw new ConflictException('PAN card number already registered with another user');
+            }
+
+            // ✅ Validate status
+            const blockedStatuses = [
+                UserDocumentVerificationStatus.VERIFIED,
+                UserDocumentVerificationStatus.REQUEST_RAISE,
+            ];
+
+            if (blockedStatuses.includes(user.document_status)) {
+                const messages = {
+                    [UserDocumentVerificationStatus.VERIFIED]:
+                        'Documents already verified. Cannot resubmit.',
+                    [UserDocumentVerificationStatus.REQUEST_RAISE]:
+                        'Document verification request is already pending.',
+                };
+                throw new BadRequestException(messages[user.document_status]);
+            }
+
+            // ✅ Map DTO to DB fields
+            const documentData: Partial<User> = {
+                selfie_image: selfieImage,
+                aadhar_number: aadharCardNo,
+                aadhar_front_image: aadharCardFrontImage,
+                aadhar_back_image: aadharCardBackImage,
+                pan_number: panCardNo,
+                pan_image: panCardImage,
+                document_status: UserDocumentVerificationStatus.REQUEST_RAISE,
+                updated_by: user.id,
+            };
+
+            // ✅ Single update query
+            await this.userRepo.update(user.id, documentData, manager);
         }, true);
     }
 }

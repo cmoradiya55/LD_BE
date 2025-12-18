@@ -1,3 +1,4 @@
+import { SORT_ORDER } from '@common/constants/app.constant';
 import { UserOtpType } from '@common/enums/user.enum';
 import { Customer } from '@entity/customer/customer.entity';
 import { User } from '@entity/user/user.entity';
@@ -47,7 +48,23 @@ export class UserRepository {
 
     async save(entity: User, manager?: EntityManager): Promise<User> {
         const repo = this.getRepo(manager);
+        entity.updated_at = new Date();
         return await repo.save(entity);
+    }
+
+    async createAndSave(data: User, manager?: EntityManager): Promise<User> {
+        const repo = this.getRepo(manager);
+        const user = repo.create(data);
+        await repo.save(user);
+        return user;
+    }
+
+    async update(id: number, data: Partial<User>, manager?: EntityManager): Promise<void> {
+        const repo = this.getRepo(manager);
+        await repo.update(id, {
+            ...data,
+            updated_at: new Date(),
+        });
     }
 
     /**
@@ -89,6 +106,9 @@ export class UserRepository {
         });
     }
 
+    /**
+     * Find active user by mobile number
+     */
     async findActiveByMobile(
         mobileCountryCode: number,
         mobileNo: number,
@@ -121,6 +141,7 @@ export class UserRepository {
         return updatedUser;
     }
 
+    // =========== OTP OPERATIONS ============
     async verifyMobileOtp(
         country_code: number,
         mobile_no: number,
@@ -197,5 +218,68 @@ export class UserRepository {
                 otp: otp,
                 otp_expires_at: otpExpiry,
             });
+    }
+
+    async getAllUsers(query: any, page: number, limit: number, manager?: EntityManager) {
+        const repo = this.getRepo(manager);
+        const skip = (page - 1) * limit;
+        const [data, total] = await repo.findAndCount({
+            relations: ['city', 'manager', 'createdByUser', 'updatedByUser'],
+            take: limit,
+            skip: skip,
+            order: {
+                id: SORT_ORDER.DESC,
+            },
+        });
+        return { data, total, page, limit };
+    }
+
+    async findById(id: number, manager?: EntityManager): Promise<User | null> {
+        const repo = this.getRepo(manager);
+        return await repo.findOne({
+            where: {
+                id,
+            },
+        });
+    }
+
+    /**
+     * Check if Aadhar number exists (excluding specific user)
+     */
+    async existsByAadharExcludingUser(
+        aadharNumber: string,
+        excludeUserId: number,
+        manager?: EntityManager,
+    ): Promise<boolean> {
+        const repo = this.getRepo(manager);
+
+        const exist = await repo.exists({
+            where: {
+                aadhar_number: aadharNumber,
+                id: Not(excludeUserId),
+            },
+        });
+
+        return exist;
+    }
+
+    /**
+     * Check if PAN number exists (excluding specific user)
+     */
+    async existsByPanExcludingUser(
+        panNumber: string,
+        excludeUserId: number,
+        manager?: EntityManager,
+    ): Promise<boolean> {
+        const repo = this.getRepo(manager);
+
+        const exist = await repo.exists({
+            where: {
+                pan_number: panNumber,
+                id: Not(excludeUserId),
+            },
+        });
+
+        return exist;
     }
 }

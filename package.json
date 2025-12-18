@@ -18,7 +18,11 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "g:admin": "node -e \"const m=process.argv[1]; require('child_process').execSync(`nest g resource modules/admin/${m} --no-spec`, {stdio:'inherit'})\"",
+    "g:admin-panel": "node -e \"const m=process.argv[1]; require('child_process').execSync(`nest g resource modules/admin-panel/${m} --no-spec`, {stdio:'inherit'})\"",
+    "g:admin": "node -e \"const m=process.argv[1]; require('child_process').execSync(`nest g resource modules/admin-panel/admin/${m} --no-spec`, {stdio:'inherit'})\"",
+    "g:staff": "node -e \"const m=process.argv[1]; require('child_process').execSync(`nest g resource modules/admin-panel/staff/${m} --no-spec`, {stdio:'inherit'})\"",
+    "g:inspector": "node -e \"const m=process.argv[1]; require('child_process').execSync(`nest g resource modules/admin-panel/inspector/${m} --no-spec`, {stdio:'inherit'})\"",
+    "g:manager": "node -e \"const m=process.argv[1]; require('child_process').execSync(`nest g resource modules/admin-panel/manager/${m} --no-spec`, {stdio:'inherit'})\"",
     "g:common": "node -e \"const m=process.argv[1]; require('child_process').execSync(`nest g resource modules/common/${m} --no-spec`, {stdio:'inherit'})\"",
     "g:customer": "node -e \"const m=process.argv[1]; require('child_process').execSync(`nest g resource modules/customer/${m} --no-spec`, {stdio:'inherit'})\""
   },

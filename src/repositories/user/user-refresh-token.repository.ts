@@ -30,7 +30,7 @@ export class UserRefreshTokenRepository {
                 refresh_token_hash: tokenHash,
                 is_revoked: false,
             },
-            relations: ['customer'],
+            relations: ['user'],
         });
     }
 

@@ -90,11 +90,39 @@ export class User {
     @Column({ type: 'timestamptz', nullable: true })
     email_verified_at: Date | null;
 
+    @Column({ type: 'varchar', length: 255, nullable: true })
+    selfie_image: string | null;
+
+    @Column({ type: 'varchar', length: 20, nullable: true })
+    aadhar_number: string | null;
+
+    @Column({ type: 'text', nullable: true })
+    aadhar_front_image: string | null;
+
+    @Column({ type: 'text', nullable: true })
+    aadhar_back_image: string | null;
+
+    @Column({ type: 'varchar', length: 20, nullable: true })
+    pan_number: string | null;
+
+    @Column({ type: 'text', nullable: true })
+    pan_image: string | null;
+
+    @Column({ type: 'smallint', default: 1 })
+    document_status: number;
+
+    @Column({ type: 'text', nullable: true })
+    reject_reason: string | null;
+
     @CreateDateColumn({ type: 'timestamptz' })
     created_at: Date;
 
     @Column({ type: 'int' })
     created_by: number;
+
+    @ManyToOne(() => User, { onDelete: 'SET NULL' })
+    @JoinColumn({ name: 'created_by' })
+    createdByUser: User;
 
     @UpdateDateColumn({ name: 'updated_at', type: 'timestamptz', nullable: true })
     updated_at: Date;
@@ -102,11 +130,19 @@ export class User {
     @Column({ type: 'int', nullable: true })
     updated_by: number | null;
 
+    @ManyToOne(() => User, { onDelete: 'SET NULL' })
+    @JoinColumn({ name: 'updated_by' })
+    updatedByUser: User;
+
     @Column({ type: 'timestamptz', nullable: true })
     deleted_at: Date | null;
 
     @Column({ type: 'int', nullable: true })
     deleted_by: number | null;
+
+    @ManyToOne(() => User, { onDelete: 'SET NULL' })
+    @JoinColumn({ name: 'deleted_by' })
+    deletedByUser: User;
 
     // Relations
     @OneToMany(() => UserRefreshToken, token => token.user)
