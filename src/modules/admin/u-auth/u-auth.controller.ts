@@ -12,18 +12,23 @@ import { UJwtAuthGuard } from './guards/jwt-u-auth.guard';
 import { CurrentUser } from '@common/decorators/current-user.decorator';
 import { User } from '@entity/user/user.entity';
 import { UAuthVerifyEmailOtpDto } from './dto/u-auth.verify-email-otp.dto';
+import { UserAllowUnverifiedEmail } from '@common/decorators/user-allowed-verified-email.decorator';
+import { UPublic } from '@common/decorators/user-public.decorator';
 
 @Controller(`${MODULE_PREFIX.ADMIN}/auth`)
 export class UAuthController {
   constructor(private readonly uAuthService: UAuthService) { }
 
-
+  @UPublic()
+  @UserAllowUnverifiedEmail()
   @Post('mobile/send-otp')
   async sendOtp(@Body() sendOtpDto: UAuthSendOtpOnMobileDto) {
     await this.uAuthService.sendOtpForLogin(sendOtpDto);
     return ApiResponseUtil.success('OTP sent successfully')
   }
 
+  @UPublic()
+  @UserAllowUnverifiedEmail()
   @Post('mobile/verify-otp')
   async userLogin(
     @Body() dto: UAuthLoginDto,
@@ -36,7 +41,7 @@ export class UAuthController {
     );
   }
 
-  @UseGuards(UJwtAuthGuard)
+  @UserAllowUnverifiedEmail()
   @Post('email/send-otp')
   async sendOtpOnEmail(
     @CurrentUser() user: User,
@@ -46,7 +51,7 @@ export class UAuthController {
     return ApiResponseUtil.success('OTP sent successfully')
   }
 
-  @UseGuards(UJwtAuthGuard)
+  @UserAllowUnverifiedEmail()
   @Post('email/verify-otp')
   async verifyOtpOnEmail(
     @CurrentUser() user: User,
@@ -56,7 +61,8 @@ export class UAuthController {
     return ApiResponseUtil.success('OTP verified successfully')
   }
 
-
+  @UPublic()
+  @UserAllowUnverifiedEmail()
   @Post('refresh')
   async refresh(
     @Req() req: Request,

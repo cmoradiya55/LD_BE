@@ -73,7 +73,7 @@ export class UserRepository {
      * Find user by mobile number (without default conditions)
      * Use this when you need to find inactive/blocked/deleted users
     */
-    async existsVerifiedEmailForOther(
+    async findVerifiedEmailForOtherUser(
         email: string,
         userId: number,
         manager?: EntityManager,
@@ -154,6 +154,7 @@ export class UserRepository {
     }
 
     async verifyEmailOtp(
+        userId: number,
         email: string,
         otp: string,
         otpType: UserOtpType,
@@ -163,6 +164,7 @@ export class UserRepository {
         // Find user with OTP
         const user = await repo.findOne({
             where: {
+                id: userId,
                 email: email,
                 otp: otp,
                 otp_type: otpType,

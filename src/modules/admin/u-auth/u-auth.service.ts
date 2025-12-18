@@ -86,10 +86,11 @@ export class UAuthService {
                 updates.fcm_token = fcmToken;
             }
 
+            let finaluser: User | null = user;
+            // 3. Update user if needed
             if (Object.keys(updates).length > 0) {
-                const updatedUser = await this.userRepo.updateActiveUserAndReturn(user.id, updates, manager);
-                if (!updatedUser) throw new NotFoundException('User not found after OTP verification');
-                return updatedUser;
+                finaluser = await this.userRepo.updateActiveUserAndReturn(user.id, updates, manager);
+                if (!finaluser) throw new NotFoundException('User not found after OTP verification');
             }
 
             // Step 4:Generate tokens
@@ -98,12 +99,19 @@ export class UAuthService {
                 expiresInMs,
                 refreshToken,
                 refreshTokenExpiryInMs
-            } = await this.userJwtTokenService.generateUserAccessAndRefreshTokens(user, manager);
+            } = await this.userJwtTokenService.generateUserAccessAndRefreshTokens(
+                finaluser,
+                manager
+            );
 
-            await this.userJwtTokenService.storeTokenInCookie(refreshToken, ADMIN_COOKIE_NAMES.REFRESH_TOKEN, res, refreshTokenExpiryInMs);
-
+            await this.userJwtTokenService.storeTokenInCookie(
+                refreshToken,
+                ADMIN_COOKIE_NAMES.REFRESH_TOKEN,
+                res,
+                refreshTokenExpiryInMs
+            );
             return {
-                user,
+                user: finaluser,
                 accessToken,
                 expiresInMs,
             }
@@ -138,7 +146,7 @@ export class UAuthService {
             };
         });
     }
-    
+
     /**
      * Send OTP
      */
@@ -150,12 +158,12 @@ export class UAuthService {
             const { email } = dto;
             const otpType = UserOtpType.EMAIL_VERIFY;
 
-            if (user.email === email && user.is_email_verified) {
+            if (user.is_email_verified) {
                 throw new BadRequestException('Email already verified');
             }
 
-            let isUserExist = await this.userRepo.existsVerifiedEmailForOther(email, user.id);
-            if (isUserExist) throw new BadRequestException('Email already verified or blocked');
+            let isUserExist = await this.userRepo.findVerifiedEmailForOtherUser(email, user.id, manager);
+            if (isUserExist) throw new BadRequestException('Email already in use');
 
             // Generate OTP
             const otp = CommonHelper.generateAdminOtp();
@@ -180,16 +188,22 @@ export class UAuthService {
             const { email, otp } = dto;
             const otpType = UserOtpType.EMAIL_VERIFY;
 
+            if (user.is_email_verified) {
+                throw new BadRequestException('Email already verified');
+            }
+
+            let existingUser = await this.userRepo.findVerifiedEmailForOtherUser(email, user.id, manager);
+            if (existingUser) throw new BadRequestException('Email already in use');
+
             // ✅ Verify OTP (OTP cleared inside this method)
-            const user = await this.userRepo.verifyEmailOtp(email, otp, otpType, manager);
-            console.log('verified user:', user);
-            if (!user) {
+            const userAfterVerification = await this.userRepo.verifyEmailOtp(user.id, email, otp, otpType, manager);
+            if (!userAfterVerification) {
                 throw new BadRequestException('Invalid OTP or OTP expired');
             }
 
-            user.is_email_verified = true;
-            user.email_verified_at = new Date();
-            await this.userRepo.save(user, manager);
+            userAfterVerification.is_email_verified = true;
+            userAfterVerification.email_verified_at = new Date();
+            await this.userRepo.save(userAfterVerification, manager);
         }, true);
     }
 }
