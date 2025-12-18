@@ -7,11 +7,13 @@ import { UserEmailVerifiedGuard } from '@common/guards/admin-panel/user-email-ve
 import { UserManagementModule } from './admin/user-management/user-management.module';
 import { RolesGuard } from '@common/guards/admin-panel/user-role.guard';
 import { UserDocumentVerifiedGuard } from '@common/guards/admin-panel/user-document-verified.guard';
+import { InspectionCentreModule } from './admin/inspection-centre/inspection-centre.module';
 
 @Module({
     imports: [
         UAuthModule,
         UserManagementModule,
+        InspectionCentreModule,
     ],
     providers: [
         {

@@ -1,4 +1,3 @@
-// src/repositories/car.repository.ts
 import { SORT_ORDER } from '@common/constants/app.constant';
 import { City } from '@entity/general/city.entity';
 import { Injectable } from '@nestjs/common';
@@ -13,7 +12,7 @@ export class CityRepository {
         private readonly repo: Repository<City>,
     ) { }
 
-    private async getRepo(manager?: EntityManager): Promise<Repository<City>> {
+    private getRepo(manager?: EntityManager): Repository<City> {
         return manager ? manager.getRepository(City) : this.repo;
     }
 
@@ -36,7 +35,7 @@ export class CityRepository {
 
     async isCityIdValid(id: number, manager?: EntityManager): Promise<boolean> {
         const repository = await this.getRepo(manager);
-        const exists = await repository.exist({
+        const exists = await repository.exists({
             where: {
                 id: id,
                 is_active: true,
@@ -92,4 +91,26 @@ export class CityRepository {
 
         return { data, total, page, limit };
     }
+    async validatePincodeInCity(
+        cityId: number,
+        pincodeId: number,
+        manager?: EntityManager,
+    ): Promise<boolean> {
+        const repo = this.getRepo(manager);
+
+        const count = await repo
+            .createQueryBuilder('city')
+            .innerJoin(
+                'pincodes',
+                'pincode',
+                'pincode.city_id = city.id AND pincode.id = :pincodeId',
+                { pincodeId },
+            )
+            .where('city.id = :cityId', { cityId })
+            .andWhere('city.is_active = true')
+            .getCount();
+
+        return count > 0;
+    }
+
 }
