@@ -37,6 +37,12 @@ export class InspectionCentreRepository {
         return inspectionCentre;
     }
 
+    async updateById(id: number, data: Partial<InspectionCentre>, manager?: EntityManager): Promise<void> {
+        const repo = this.getRepo(manager);
+        data.updated_at = new Date();
+        await repo.update({ id }, data);
+    }
+
     async findByPincodeAndCity(pincodeId: number, cityId: number, manager?: EntityManager): Promise<InspectionCentre | null> {
         const repo = this.getRepo(manager);
         return await repo.findOne({
@@ -65,6 +71,14 @@ export class InspectionCentreRepository {
             order: {
                 id: SORT_ORDER.DESC,
             },
+        });
+    }
+
+    async findById(id: number, manager?: EntityManager): Promise<InspectionCentre | null> {
+        const repo = this.getRepo(manager);
+        return await repo.findOne({
+            where: { id },
+            relations: ['createdByUser', 'updatedByUser', 'city', 'pincode'],
         });
     }
 }
