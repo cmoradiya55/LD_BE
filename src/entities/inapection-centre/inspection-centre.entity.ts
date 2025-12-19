@@ -7,6 +7,7 @@ import {
     CreateDateColumn,
     UpdateDateColumn,
     DeleteDateColumn,
+    OneToMany,
 } from 'typeorm';
 import { User } from '@entity/user/user.entity';
 import { Pincode } from '@entity/general/pincode.entity';
@@ -72,4 +73,7 @@ export class InspectionCentre {
     @ManyToOne(() => User)
     @JoinColumn({ name: 'deleted_by' })
     deletedByUser: User;
+
+    @OneToMany(() => User, user => user.inspectionCentre)
+    users: User[];
 }

@@ -47,4 +47,11 @@ export class InspectionCentreService {
             return data;
         });
     }
+
+    async getAllInspectionCentreDetails() {
+        return this.baseService.catch(async () => {
+            const data = await this.cityRepo.getAllInspectionCentreDetails();
+            return data;
+        });
+    }
 }

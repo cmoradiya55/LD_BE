@@ -7,6 +7,7 @@ import {
     OneToMany,
 } from 'typeorm';
 import { Pincode } from './pincode.entity';
+import { InspectionCentre } from '@entity/inapection-centre/inspection-centre.entity';
 
 @Entity('cities')
 export class City {
@@ -30,4 +31,7 @@ export class City {
 
     @OneToMany(() => Pincode, p => p.city)
     pincodes: Pincode[];
+
+    @OneToMany(() => InspectionCentre, ic => ic.city)
+    inspectionCentres: InspectionCentre[];
 }

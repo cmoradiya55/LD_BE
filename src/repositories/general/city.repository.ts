@@ -4,6 +4,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { EntityManager, ILike, Repository } from 'typeorm';
 import { GetAllCityDto } from '../../modules/common/city/dto/get-all-city.dto';
+import { UserRole } from '@common/enums/user.enum';
 
 @Injectable()
 export class CityRepository {
@@ -113,4 +114,39 @@ export class CityRepository {
         return count > 0;
     }
 
+    async getAllInspectionCentreDetails(manager?: EntityManager) {
+        const repo = this.getRepo();
+        return await repo
+            .createQueryBuilder('city')
+
+            // 1️⃣ only active cities
+            .where('city.is_active = true')
+
+            // 2️⃣ join active inspection centres
+            .innerJoinAndSelect(
+                'city.inspectionCentres',
+                'ic',
+                'ic.is_active = true AND ic.deleted_at IS NULL',
+            )
+
+            // 3️⃣ join manager
+            .leftJoinAndSelect(
+                'ic.users',
+                'manager',
+                `
+                manager.role = :managerRole
+                AND manager.is_active = true
+                AND manager.deleted_at IS NULL
+                `,
+                { managerRole: UserRole.MANAGER },
+            )
+
+            // optional but realistic
+            .leftJoinAndSelect('ic.pincode', 'pincode')
+
+            .orderBy('city.city_name', 'ASC')
+            .addOrderBy('ic.created_at', 'DESC')
+
+            .getMany();
+    }
 }
