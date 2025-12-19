@@ -6,10 +6,10 @@ export class UAuthSendOtpOnMobileDto {
     @Min(1)
     @Max(999)
     @Type(() => Number)
-    country_code: number;
+    countryCode: number;
 
     @IsInt()
     @IsPositive()
     @Type(() => Number)
-    mobile_no: number;
+    mobileNo: number;
 }

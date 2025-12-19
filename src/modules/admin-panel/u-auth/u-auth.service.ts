@@ -29,10 +29,10 @@ export class UAuthService {
         dto: UAuthSendOtpOnMobileDto,
     ): Promise<void> {
         return this.baseService.catch(async () => {
-            const { country_code, mobile_no } = dto;
+            const { countryCode, mobileNo } = dto;
             const otpType = UserOtpType.REGISTRATION_OR_LOGIN;
 
-            let user = await this.userRepo.findByMobileRaw(country_code, mobile_no);
+            let user = await this.userRepo.findByMobileRaw(countryCode, mobileNo);
             if (!user) throw new BadRequestException('User not found');
 
             // if user exists, check status
