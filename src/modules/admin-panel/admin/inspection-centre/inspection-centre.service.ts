@@ -34,6 +34,7 @@ export class InspectionCentreService {
                 landmark,
                 city_id: cityId,
                 pincode_id: pincodeId,
+                is_active: true,
                 created_by: adminUser.id,
                 updated_by: adminUser.id,
             } as InspectionCentre);
