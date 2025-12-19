@@ -13,6 +13,7 @@ import {
     UpdateDateColumn,
 } from 'typeorm';
 import { UserRefreshToken } from './user-refresh-token.entity';
+import { InspectionCentre } from '@entity/inapection-centre/inspection-centre.entity';
 
 @Entity('users')
 @Check('chk_country_code', 'country_code > 0')
@@ -21,7 +22,6 @@ import { UserRefreshToken } from './user-refresh-token.entity';
 @Index('idx_users_mobile_unique', ['country_code', 'mobile_number'], { unique: true, where: 'deleted_at IS NULL' })
 @Index('idx_users_role', ['role'], { where: 'deleted_at IS NULL' })
 @Index('idx_users_manager_id', ['manager_id'], { where: 'deleted_at IS NULL' })
-@Index('idx_users_city_id', ['city_id'], { where: 'deleted_at IS NULL' })
 @Index('idx_users_is_active', ['is_active'], { where: 'deleted_at IS NULL' })
 @Index('idx_users_created_at', ['created_at'])
 @Index('idx_users_role_active', ['role', 'is_active'], { where: 'deleted_at IS NULL' })
@@ -47,7 +47,7 @@ export class User {
     email: string;
 
     @Column({ type: 'int', nullable: true })
-    city_id: number | null;
+    inspection_centre_id: number | null;
 
     @Column({ type: 'varchar', length: 6, nullable: true })
     otp: string | null;
@@ -58,9 +58,9 @@ export class User {
     @Column({ type: 'timestamptz', nullable: true })
     otp_expires_at: Date | null;
 
-    @ManyToOne(() => City, { onDelete: 'SET NULL' })
-    @JoinColumn({ name: 'city_id' })
-    city: City;
+    @ManyToOne(() => InspectionCentre)
+    @JoinColumn({ name: 'inspection_centre_id' })
+    inspectionCentre: InspectionCentre;
 
     @Column({ type: 'text', nullable: true })
     fcm_token: string | null;

@@ -34,7 +34,6 @@ export class UserManagementController {
     const { data, page, limit, total } = await this.userManagementService.getAllUsers(query);
     return ApiResponseUtil.paginated(
       'Users fetched successfully',
-      // data,
       GetAllUsersResource.collection(data),
       page,
       limit,

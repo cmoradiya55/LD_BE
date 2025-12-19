@@ -1,8 +1,8 @@
 import { SORT_ORDER } from '@common/constants/app.constant';
-import { UserOtpType } from '@common/enums/user.enum';
-import { Customer } from '@entity/customer/customer.entity';
+import { UserOtpType, UserRole } from '@common/enums/user.enum';
 import { User } from '@entity/user/user.entity';
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { EntityManager, Repository, FindOptionsWhere, LessThanOrEqual, IsNull, Or, Not, MoreThan } from 'typeorm';
 
@@ -11,6 +11,7 @@ export class UserRepository {
     constructor(
         @InjectRepository(User)
         private readonly repo: Repository<User>,
+        private readonly configService: ConfigService,
     ) { }
 
     private getRepo(manager?: EntityManager): Repository<User> {
@@ -224,7 +225,7 @@ export class UserRepository {
         const repo = this.getRepo(manager);
         const skip = (page - 1) * limit;
         const [data, total] = await repo.findAndCount({
-            relations: ['city', 'manager', 'createdByUser', 'updatedByUser'],
+            relations: ['manager', 'createdByUser', 'updatedByUser'],
             take: limit,
             skip: skip,
             order: {
@@ -281,5 +282,21 @@ export class UserRepository {
         });
 
         return exist;
+    }
+
+    async isManagerLimitExceededInInspectionCentre(
+        inspectionCentreId: number,
+        manager?: EntityManager,
+    ): Promise<boolean> {
+        const repo = this.getRepo(manager);
+        const maxManagers = this.configService.getOrThrow<number>('inspectionCentre.maxManagers');
+        const count = await repo.count({
+            where: {
+                role: UserRole.MANAGER,
+                inspection_centre_id: inspectionCentreId,
+                is_active: true,
+            },
+        });
+        return count >= maxManagers;
     }
 }

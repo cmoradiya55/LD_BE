@@ -8,13 +8,14 @@ import { UserRole } from '@common/enums/user.enum';
 import { EntityManager } from 'typeorm';
 import { GetAllUsersDto } from './dto/get-all-users.dto';
 import { ToggleUserStatusDto } from './dto/toggle-user-status.dto';
+import { InspectionCentreRepository } from '@repository/inspection-centre/inspection-centre.repository';
 
 @Injectable()
 export class UserManagementService {
     constructor(
         private readonly baseService: BaseService,
         private readonly userRepo: UserRepository,
-        private readonly cityRepo: CityRepository,
+        private readonly inspectionCentreRepo: InspectionCentreRepository,
     ) { }
 
     async createUser(adminUser: User, createUserDto: AdminCreateUserDto): Promise<void> {
@@ -24,17 +25,17 @@ export class UserManagementService {
                 name,
                 countryCode,
                 mobileNo,
-                cityId,
+                inspectionCentreId,
                 managerId,
             } = createUserDto;
 
             // ✅ Parallel validation queries (run simultaneously)
-            const [existingUser, cityValid, managerUser] = await Promise.all([
+            const [existingUser, inspectionCentreValid, managerUser] = await Promise.all([
                 // 1. Check duplicate mobile
                 this.userRepo.findByMobileRaw(countryCode, mobileNo, manager),
 
-                // 2. Validate city (only if provided - DTO ensures it's required for non-admin)
-                this.shouldValidateCity(roleId, cityId, manager),
+                // 2. Validate inspection centre (only if provided - DTO ensures it's required for non-admin)
+                this.shouldValidateInspectionCentre(roleId, inspectionCentreId, manager),
 
                 // 3. Validate manager (only if inspector or staff)
                 managerId
@@ -47,14 +48,22 @@ export class UserManagementService {
                 throw new ConflictException('User with same mobile number already exists');
             }
 
-            if (cityId && !cityValid) {
-                throw new BadRequestException('We do not operate in the selected city at the moment.');
+            if (inspectionCentreId && !inspectionCentreValid) {
+                throw new BadRequestException('We do not operate in the selected inspection centre at the moment.');
+            }
+
+            // check that is new manager entry valid according to contraint defined(eg. one inspection centre have only one manager )
+            if (roleId === UserRole.MANAGER) {
+                const isManagerLimitExceeded = await this.userRepo.isManagerLimitExceededInInspectionCentre(inspectionCentreId, manager);
+                if (isManagerLimitExceeded) {
+                    throw new BadRequestException(`Inspection Centre can have maximum allowed managers. Cannot add more managers to this inspection centre.`);
+                }
             }
 
             // Validate manager based on role
             if (roleId === UserRole.INSPECTOR) {
-                if (!managerUser || managerUser.role !== UserRole.MANAGER || managerUser.city_id !== cityId) {
-                    throw new BadRequestException('Inspector must be assigned to a Manager in the same city');
+                if (!managerUser || managerUser.role !== UserRole.MANAGER || managerUser.inspection_centre_id !== inspectionCentreId) {
+                    throw new BadRequestException('Inspector must be assigned to a Manager in the same inspection centre');
                 }
             } else if (roleId === UserRole.STAFF) {
                 if (!managerUser || managerUser.role !== UserRole.ADMIN) {
@@ -68,8 +77,8 @@ export class UserManagementService {
                 name,
                 country_code: countryCode,
                 mobile_number: mobileNo,
-                city_id: roleId !== UserRole.ADMIN ? cityId : null,
-                manager_id: managerUser?.id || null,
+                inspection_centre_id: roleId !== UserRole.ADMIN ? inspectionCentreId : null,
+                manager_id: (roleId !== UserRole.ADMIN && roleId !== UserRole.MANAGER) ? managerUser?.id || null : null,
                 is_active: true,
                 is_email_verified: false,
                 is_mobile_verified: false,
@@ -108,9 +117,9 @@ export class UserManagementService {
         });
     }
 
-    private async shouldValidateCity(
+    private async shouldValidateInspectionCentre(
         roleId: UserRole,
-        cityId: number | undefined,
+        inspectionCentreId: number | undefined,
         manager?: EntityManager,
     ): Promise<boolean> {
         // Admin doesn't need city
@@ -118,12 +127,12 @@ export class UserManagementService {
             return Promise.resolve(true);
         }
 
-        // Non-admin roles must have valid city
-        if (!cityId) {
-            return Promise.resolve(false); // ❌ Missing city
+        // Non-admin roles must have valid inspection centre
+        if (!inspectionCentreId) {
+            return Promise.resolve(false); // ❌ Missing inspection centre
         }
 
-        // Validate city exists and is active
-        return await this.cityRepo.isCityIdValid(cityId, manager);
+        // Validate inspection centre exists and is active
+        return await this.inspectionCentreRepo.isInspectionCentreIdValid(inspectionCentreId, manager);
     }
 }

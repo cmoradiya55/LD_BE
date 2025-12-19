@@ -39,4 +39,11 @@ export class InspectionCentreService {
             } as InspectionCentre);
         })
     }
+
+    async getInspectionCentres(): Promise<InspectionCentre[]> {
+        return this.baseService.catch(async () => {
+            const data = await this.inspectionCentreRepo.getAll();
+            return data;
+        });
+    }
 }

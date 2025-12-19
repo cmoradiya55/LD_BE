@@ -4,11 +4,8 @@ import {
     IsEnum,
     IsInt,
     IsNotEmpty,
-    IsNumber,
-    IsOptional,
     IsPositive,
     IsString,
-    Matches,
     Max,
     Min,
     ValidateIf,
@@ -33,13 +30,13 @@ export class AdminCreateUserDto {
     @Type(() => Number)
     mobileNo: number;
 
-    // city is required if role !== ADMIN
-    @ValidateIf(dto => dto.roleId !== UserRole.ADMIN)
-    @IsNotEmpty({ message: 'City is required for this role' })
+    // Inspection Centre is required if role !== ADMIN or MANAGER
+    @ValidateIf(dto => dto.roleId === UserRole.MANAGER)
+    @IsNotEmpty({ message: 'Inspection Centre is required for this role' })
     @IsInt()
     @IsPositive()
     @IsNotEmpty()
-    cityId: number;
+    inspectionCentreId: number;
 
     // managerId required if role is INSPECTOR or STAFF
     @ValidateIf(dto =>

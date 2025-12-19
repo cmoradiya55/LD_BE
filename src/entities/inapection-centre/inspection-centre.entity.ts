@@ -63,13 +63,13 @@ export class InspectionCentre {
 
     @ManyToOne(() => User)
     @JoinColumn({ name: 'created_by' })
-    created_by_user: User;
+    createdByUser: User;
 
     @ManyToOne(() => User)
     @JoinColumn({ name: 'updated_by' })
-    updated_by_user: User;
+    updatedByUser: User;
 
     @ManyToOne(() => User)
     @JoinColumn({ name: 'deleted_by' })
-    deleted_by_user: User;
+    deletedByUser: User;
 }

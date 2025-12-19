@@ -1,8 +1,8 @@
-import { City } from '@entity/general/city.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { EntityManager, ILike, Repository } from 'typeorm';
 import { InspectionCentre } from '@entity/inapection-centre/inspection-centre.entity';
+import { SORT_ORDER } from '@common/constants/app.constant';
 
 @Injectable()
 export class InspectionCentreRepository {
@@ -32,6 +32,7 @@ export class InspectionCentreRepository {
     async createAndSave(data: InspectionCentre, manager?: EntityManager): Promise<InspectionCentre> {
         const repo = this.getRepo(manager);
         const inspectionCentre = repo.create(data);
+        inspectionCentre.updated_at = new Date();
         await repo.save(inspectionCentre);
         return inspectionCentre;
     }
@@ -43,6 +44,27 @@ export class InspectionCentreRepository {
                 pincode_id: pincodeId,
                 city_id: cityId,
             }
+        });
+    }
+
+    async isInspectionCentreIdValid(inspectionCentreId: number, manager?: EntityManager): Promise<boolean> {
+        const repo = this.getRepo(manager);
+        const count = await repo.count({
+            where: {
+                id: inspectionCentreId,
+                is_active: true,
+            }
+        });
+        return count > 0;
+    }
+
+    async getAll(manager?: EntityManager): Promise<InspectionCentre[]> {
+        const repo = this.getRepo(manager);
+        return await repo.find({
+            relations: ['createdByUser', 'updatedByUser', 'city', 'pincode'],
+            order: {
+                id: SORT_ORDER.DESC,
+            },
         });
     }
 }

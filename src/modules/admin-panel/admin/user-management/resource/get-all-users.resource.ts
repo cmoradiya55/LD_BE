@@ -12,10 +12,6 @@ export class GetAllUsersResource extends BaseResource<any> {
             mobileNo: CommonHelper.number(this.data.mobile_number),
             email: CommonHelper.text(this.data.email),
 
-            cityId: CommonHelper.number(this.data.city_id),
-            cityName: CommonHelper.text(CommonHelper.capitalizeWords(this.data.city?.city_name)),
-            stateName: CommonHelper.text(CommonHelper.capitalizeWords(this.data.city?.state_name)),
-
             roleId: CommonHelper.number(this.data.role),
             role: CommonHelper.text(CommonHelper.getRoleName(this.data.role)),
 
