@@ -28,7 +28,7 @@ export class UserManagementController {
   }
 
   @Get('users')
-  async testEndpoint(
+  async getAllUsers(
     @Query() query: GetAllUsersDto,
   ) {
     const { data, page, limit, total } = await this.userManagementService.getAllUsers(query);

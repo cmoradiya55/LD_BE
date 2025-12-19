@@ -62,8 +62,8 @@ export class UserManagementService {
 
             // Validate manager based on role
             if (roleId === UserRole.INSPECTOR) {
-                if (!managerUser || managerUser.role !== UserRole.MANAGER || managerUser.inspection_centre_id !== inspectionCentreId) {
-                    throw new BadRequestException('Inspector must be assigned to a Manager in the same inspection centre');
+                if (!managerUser || managerUser.role !== UserRole.MANAGER) {
+                    throw new BadRequestException('Inspector must be assigned to a Manager');
                 }
             } else if (roleId === UserRole.STAFF) {
                 if (!managerUser || managerUser.role !== UserRole.ADMIN) {
