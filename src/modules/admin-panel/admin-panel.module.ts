@@ -16,22 +16,22 @@ import { InspectionCentreModule } from './admin/inspection-centre/inspection-cen
         InspectionCentreModule,
     ],
     providers: [
-        {
-            provide: APP_GUARD,
-            useClass: UJwtAuthGuard,
-        },
-        {
-            provide: APP_GUARD,
-            useClass: UserEmailVerifiedGuard,
-        },
-        {
-            provide: APP_GUARD,
-            useClass: UserDocumentVerifiedGuard,
-        },
-        {
-            provide: APP_GUARD,
-            useClass: RolesGuard,
-        },
+        // {
+        //     provide: APP_GUARD,
+        //     useClass: UJwtAuthGuard,
+        // },
+        // {
+        //     provide: APP_GUARD,
+        //     useClass: UserEmailVerifiedGuard,
+        // },
+        // {
+        //     provide: APP_GUARD,
+        //     useClass: UserDocumentVerifiedGuard,
+        // },
+        // {
+        //     provide: APP_GUARD,
+        //     useClass: RolesGuard,
+        // },
     ],
     exports: [],
 })

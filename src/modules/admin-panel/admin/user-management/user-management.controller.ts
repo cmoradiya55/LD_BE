@@ -10,8 +10,10 @@ import { ApiResponseUtil } from '@common/utils/api-response.utils';
 import { GetAllUsersDto } from './dto/get-all-users.dto';
 import { GetAllUsersResource } from './resource/get-all-users.resource';
 import { ToggleUserStatusDto } from './dto/toggle-user-status.dto';
+import { AdminAuth } from '@common/decorators/admin-panel/admin-auth.decorator';
 
 @Controller(`${MODULE_PREFIX.ADMIN}/user-management`)
+@AdminAuth()
 @Roles(UserRole.ADMIN)
 export class UserManagementController {
   constructor(private readonly userManagementService: UserManagementService) { }

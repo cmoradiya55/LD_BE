@@ -14,8 +14,10 @@ import { UAuthVerifyEmailOtpDto } from './dto/u-auth.verify-email-otp.dto';
 import { UploadUserDocumentsDto } from './dto/upload-verification-document.dto';
 import { UserAuthPublic } from './decorator/user-auth-public.decorator';
 import { AllowUnverifiedEmailAndDocument } from './decorator/allow-unverified-email-document.decorator';
+import { AdminAuth } from '@common/decorators/admin-panel/admin-auth.decorator';
 
 @Controller(`${MODULE_PREFIX.ADMIN}/auth`)
+@AdminAuth()
 export class UAuthController {
   constructor(private readonly uAuthService: UAuthService) { }
 

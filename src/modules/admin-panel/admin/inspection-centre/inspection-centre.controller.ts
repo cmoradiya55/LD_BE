@@ -12,12 +12,13 @@ import { GetInspectionCentreDetailResource } from './resource/get-inspection-cen
 import { UpdateInspectionCenterParamDto, UpdateInspectionCentreDto } from './dto/update-inspection-centre.dto';
 import { AdminPincodeCitySuggestionResource } from './resource/admin-pincode-city-suggestion.resource';
 import { AdminCitySuggestionDto } from './dto/admin-city-suggestion.dto';
+import { AdminAuth } from '@common/decorators/admin-panel/admin-auth.decorator';
 
 @Controller(`${MODULE_PREFIX.ADMIN}/inspection-centre`)
+@AdminAuth()
 @Roles(UserRole.ADMIN)
 export class InspectionCentreController {
   constructor(private readonly inspectionCentreService: InspectionCentreService) { }
-
 
   @Get()
   async inspectionCentreDetails() {
