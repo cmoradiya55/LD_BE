@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, Query } from '@nestjs/common';
 import { InspectionCentreService } from './inspection-centre.service';
 import { ApiResponseUtil } from '@common/utils/api-response.utils';
 import { CurrentUser } from '@common/decorators/admin-panel/current-user.decorator';
@@ -10,6 +10,8 @@ import { MODULE_PREFIX } from '@common/constants/app.constant';
 import { GetAllInspectionCentresResource } from './resource/get-all-inspection-centres.resource';
 import { GetInspectionCentreDetailResource } from './resource/get-inspection-centre-detail.resource';
 import { UpdateInspectionCenterParamDto, UpdateInspectionCentreDto } from './dto/update-inspection-centre.dto';
+import { AdminPincodeCitySuggestionResource } from './resource/admin-pincode-city-suggestion.resource';
+import { AdminCitySuggestionDto } from './dto/admin-city-suggestion.dto';
 
 @Controller(`${MODULE_PREFIX.ADMIN}/inspection-centre`)
 @Roles(UserRole.ADMIN)
@@ -23,6 +25,19 @@ export class InspectionCentreController {
     return ApiResponseUtil.success(
       'Inspection centres fetched successfully',
       GetInspectionCentreDetailResource.collection(data)
+    );
+  }
+
+  
+  @Get('city-suggestions')
+  async getCitySuggestions(@Query() queryDto: AdminCitySuggestionDto) {
+    const { data, total, page, limit } = await this.inspectionCentreService.getCitySuggestions(queryDto);
+    return ApiResponseUtil.paginated(
+      'City suggestions fetched successfully',
+      AdminPincodeCitySuggestionResource.collection(data),
+      page,
+      limit,
+      total,
     );
   }
 

@@ -6,6 +6,8 @@ import { InspectionCentreRepository } from '@repository/inspection-centre/inspec
 import { InspectionCentre } from '@entity/inapection-centre/inspection-centre.entity';
 import { UpdateInspectionCenterParamDto, UpdateInspectionCentreDto } from './dto/update-inspection-centre.dto';
 import { User } from '@entity/user/user.entity';
+import { PincodeRepository } from '@repository/general/pincode.repository';
+import { AdminCitySuggestionDto } from './dto/admin-city-suggestion.dto';
 
 @Injectable()
 export class InspectionCentreService {
@@ -13,6 +15,7 @@ export class InspectionCentreService {
         private readonly baseService: BaseService,
         private readonly cityRepo: CityRepository,
         private readonly inspectionCentreRepo: InspectionCentreRepository,
+        private readonly pincodeRepo: PincodeRepository,
     ) { }
 
     async createInspectionCentre(adminUser: any, dto: CreateInspectionCentreDto): Promise<void> {
@@ -61,7 +64,7 @@ export class InspectionCentreService {
         return this.baseService.catch(async () => {
             const { address, landmark, cityId, pincodeId } = dto;
             const { id } = param;
-            
+
             const inspectionCentre = await this.inspectionCentreRepo.findById(id);
             if (!inspectionCentre) {
                 throw new BadRequestException('Inspection centre not found');
@@ -94,6 +97,13 @@ export class InspectionCentreService {
                 pincode_id: finalPincodeId,
                 updated_by: adminUser.id,
             });
+        });
+    }
+
+    async getCitySuggestions(queryDto: AdminCitySuggestionDto) {
+        return this.baseService.catch(async () => {
+            const { cityId, q, page, limit } = queryDto;
+            return this.pincodeRepo.getPincodeAndCitySuggestion(q, page, limit, cityId);
         });
     }
 }
