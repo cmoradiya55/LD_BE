@@ -22,7 +22,7 @@ async function bootstrap() {
 
   // Enable CORS
   app.enableCors({
-    origin: config.getOrThrow<string>('app.corsOrigin'),
+    origin: config.getOrThrow<Array<string>>('app.corsOrigin'),
     credentials: true
   });
   // enable cookie parser
