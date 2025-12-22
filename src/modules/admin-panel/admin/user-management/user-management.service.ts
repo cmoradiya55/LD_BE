@@ -3,12 +3,12 @@ import { BadRequestException, ConflictException, Injectable } from '@nestjs/comm
 import { AdminCreateUserDto } from './dto/create-user.dto';
 import { BaseService } from '@common/base/base.service';
 import { UserRepository } from '@repository/user/user.repository';
-import { CityRepository } from '@repository/general/city.repository';
 import { UserRole } from '@common/enums/user.enum';
 import { EntityManager } from 'typeorm';
 import { GetAllUsersDto } from './dto/get-all-users.dto';
 import { ToggleUserStatusDto } from './dto/toggle-user-status.dto';
 import { InspectionCentreRepository } from '@repository/inspection-centre/inspection-centre.repository';
+import { GetInspectorByManagerDto, GetInspectorByManagerQueryDto } from './dto/get-inspector.dto';
 
 @Injectable()
 export class UserManagementService {
@@ -86,6 +86,19 @@ export class UserManagementService {
             } as User, manager);
 
         }, true);
+    }
+
+    async getInspectorsByManagerId(param: GetInspectorByManagerDto, query: GetInspectorByManagerQueryDto) {
+        return this.baseService.catch(async () => {
+            const { managerId } = param;
+            const { page, limit } = query;
+            const isManager = await this.userRepo.isManagerExists(managerId);
+            if (!isManager) {
+                throw new BadRequestException('Manager not found');
+            }
+            const result = await this.userRepo.getInspectorsByManagerId(managerId, page, limit);
+            return result;
+        });
     }
 
     /* Get all users with pagination and filters */

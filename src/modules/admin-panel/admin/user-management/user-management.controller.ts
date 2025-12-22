@@ -11,6 +11,8 @@ import { GetAllUsersDto } from './dto/get-all-users.dto';
 import { GetAllUsersResource } from './resource/get-all-users.resource';
 import { ToggleUserStatusDto } from './dto/toggle-user-status.dto';
 import { AdminAuth } from '@common/decorators/admin-panel/admin-auth.decorator';
+import { GetInspectorByManagerDto, GetInspectorByManagerQueryDto } from './dto/get-inspector.dto';
+import { GetAllInspectorResource } from './resource/get-all-inspector.resource';
 
 @Controller(`${MODULE_PREFIX.ADMIN}/user-management`)
 @AdminAuth()
@@ -26,6 +28,21 @@ export class UserManagementController {
     await this.userManagementService.createUser(user, body);
     return ApiResponseUtil.created(
       'User created successfully',
+    );
+  }
+
+  @Get('inspectors/:managerId')
+  async getInspectorsByManager(
+    @Param() param: GetInspectorByManagerDto,
+    @Query() query: GetInspectorByManagerQueryDto,
+  ) {
+    const { data, page, limit, total } = await this.userManagementService.getInspectorsByManagerId(param, query);
+    return ApiResponseUtil.paginated(
+      'Users fetched successfully',
+      GetAllInspectorResource.collection(data),
+      page,
+      limit,
+      total,
     );
   }
 

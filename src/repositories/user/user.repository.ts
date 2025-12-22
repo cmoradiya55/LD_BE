@@ -18,6 +18,18 @@ export class UserRepository {
         return manager ? manager.getRepository(User) : this.repo;
     }
 
+    async isManagerExists(id: number, manager?: EntityManager): Promise<boolean> {
+        const repo = this.getRepo(manager);
+        const exist = await repo.exists({
+            where: {
+                id: id,
+                role: UserRole.MANAGER,
+                is_active: true,
+            },
+        });
+        return exist;
+    }
+
     async findActiveUserById(id: number, manager?: EntityManager): Promise<User | null> {
         const repo = this.getRepo(manager);
         return await repo.findOne({
@@ -225,6 +237,25 @@ export class UserRepository {
         const repo = this.getRepo(manager);
         const skip = (page - 1) * limit;
         const [data, total] = await repo.findAndCount({
+            relations: ['manager', 'createdByUser', 'updatedByUser'],
+            take: limit,
+            skip: skip,
+            order: {
+                id: SORT_ORDER.DESC,
+            },
+        });
+        return { data, total, page, limit };
+    }
+
+    async getInspectorsByManagerId(managerId: number, page: number, limit: number, manager?: EntityManager) {
+        const repo = this.getRepo(manager);
+        const skip = (page - 1) * limit;
+
+        const [data, total] = await repo.findAndCount({
+            where: {
+                role: UserRole.INSPECTOR,
+                manager_id: managerId,
+            },
             relations: ['manager', 'createdByUser', 'updatedByUser'],
             take: limit,
             skip: skip,
