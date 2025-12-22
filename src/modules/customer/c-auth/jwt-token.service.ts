@@ -186,8 +186,8 @@ export class JwtTokenService {
         const prefix = this.configService.getOrThrow<string>('app.apiPrefix');
         res.cookie(tokenName, token, {
             httpOnly: true,
-            secure: true, // true in production (HTTPS only)
-            sameSite: 'strict', // or 'Lax' depending on your needs
+            secure: this.configService.getOrThrow<string>('app.env') === 'production', // true in production (HTTPS only)
+            sameSite: 'none', // or 'Lax' depending on your needs
             path: `/${prefix}/customer/auth/refresh`,
             maxAge: refreshTokenExpiryInMs,
         });
