@@ -20,9 +20,10 @@ async function bootstrap() {
   app.use(helmet()); // Secure your app by setting various HTTP headers
   app.use(compression()); // Enable gzip compression
 
+  const corsOrigin = config.getOrThrow<string>('app.corsOrigin').split(',');
   // Enable CORS
   app.enableCors({
-    origin: config.getOrThrow<Array<string>>('app.corsOrigin'),
+    origin: corsOrigin,
     credentials: true
   });
   // enable cookie parser
