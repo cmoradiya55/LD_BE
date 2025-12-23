@@ -16,12 +16,12 @@ export class InspectionService {
             const inspectorId = user.id;
             const { vehicleId } = dto;
 
-            if (!user.isInspector() || !user.isManager()) {
-                throw new BadRequestException('User is not authorized to start inspection');
+            if (!user.isInspector() && !user.isManager()) {
+                throw new BadRequestException('You are not authorized to start inspection');
             }
 
             // check that car is assigned to inspector
-            const isInspectionAssigned = await this.usedCarRepo.checkInspectionAssigned(inspectorId, vehicleId);
+            const isInspectionAssigned = await this.usedCarRepo.checkInspectionAssigned(vehicleId, inspectorId);
             if (!isInspectionAssigned) throw new BadRequestException('Inspection not found for the vehicle');
 
             await this.usedCarRepo.startInspection(vehicleId, inspectorId);
