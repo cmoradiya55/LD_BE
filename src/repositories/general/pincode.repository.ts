@@ -40,7 +40,7 @@ export class PincodeRepository {
         }
 
         if (isNumber) {
-            qb.andWhere('p.pincode = :pin', { pin: query })
+            qb.andWhere('p.pincode ILIKE :pin', { pin: `%${query}%` })
         } else {
             qb.andWhere(
                 new Brackets(qb => {
