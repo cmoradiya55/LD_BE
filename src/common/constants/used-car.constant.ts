@@ -1,9 +1,13 @@
 import { UsedCarListingStatus } from "@common/enums/car-detail.enum";
 
-// Statuses to be excluded while cars are is not being listed (e.g., pending approval , inspection not done yet etc.)
-export const BLACKLISTED_STATUS = [
-    // UsedCarListingStatus.PENDING,
-    UsedCarListingStatus.REJECTED,
+export const DUPLICATE_REGISTRATION_STATUS_CHECK = [
+    UsedCarListingStatus.PENDING,
+    UsedCarListingStatus.INSPECTION_STARTED,
+    UsedCarListingStatus.INSPECTION_COMPLETED,
+    UsedCarListingStatus.DETAILS_UPDATED_BY_STAFF,
+    UsedCarListingStatus.APPROVED_BY_MANAGER,
+    UsedCarListingStatus.APPROVED_BY_ADMIN,
+    UsedCarListingStatus.LISTED
 ] as const;
 
 export const WHITELISTED_STATUS_FOR_UPDATE_MY_USED_CAR_DETAIL: UsedCarListingStatus[] = [

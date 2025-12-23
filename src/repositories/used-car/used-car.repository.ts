@@ -1,5 +1,5 @@
 // src/repositories/car.repository.ts
-import { BLACKLISTED_STATUS } from '@common/constants/used-car.constant';
+import { DUPLICATE_REGISTRATION_STATUS_CHECK } from '@common/constants/used-car.constant';
 import { UsedCar } from '@entity/used-car/used-car.entity';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -40,7 +40,7 @@ export class UsedCarRepository {
         registrationNumber: string,
         manager?: EntityManager,
     ): Promise<void> {
-        if (!BLACKLISTED_STATUS.length) throw new BadRequestException('Contact administrator: Internal configuration error');
+        if (!DUPLICATE_REGISTRATION_STATUS_CHECK.length) throw new BadRequestException('Contact administrator: Internal configuration error');
 
         const repo = this.getRepo(manager);
         const { clean, rtoCode } = VehicleHelper.normalizeRegistration(registrationNumber);
@@ -52,7 +52,7 @@ export class UsedCarRepository {
             .andWhere('uc.registration_number_clean = :clean', { clean })
             .andWhere('uc.deleted_at IS NULL')
             .andWhere('uc.status NOT IN (:...blacklistedStatuses)', {
-                blacklistedStatuses: BLACKLISTED_STATUS,
+                blacklistedStatuses: DUPLICATE_REGISTRATION_STATUS_CHECK,
             });
 
         const existingListing = await queryBuilder.getRawOne();
@@ -80,8 +80,6 @@ export class UsedCarRepository {
         page: number,
         limit: number,
     ): Promise<UsedCarListResult> {
-        if (!BLACKLISTED_STATUS.length) throw new BadRequestException('Contact administrator: Internal configuration error');
-
         if (!ids.length) {
             return {
                 data: [],
@@ -153,12 +151,10 @@ export class UsedCarRepository {
         manager?: EntityManager,
     ): Promise<UsedCar | null> {
         const repo = this.getRepo(manager);
-        if (!BLACKLISTED_STATUS.length) throw new BadRequestException('Contact administrator: Internal configuration error');
-
         return await repo.findOne({
             where: {
                 id,
-                status: Not(In(BLACKLISTED_STATUS))
+                status: UsedCarListingStatus.LISTED,
             },
         });
     }
@@ -367,8 +363,6 @@ export class UsedCarRepository {
         page: number,
         limit: number,
     ): Promise<UsedCarListResult> {
-        if (!BLACKLISTED_STATUS.length) throw new BadRequestException('Contact administrator: Internal configuration error');
-
         // Build query
         const queryBuilder = this.createBaseListQuery(customerId, false)
             .addSelect('COUNT(*) OVER() as "totalCount"')
@@ -538,8 +532,6 @@ export class UsedCarRepository {
     // ============ Private Methods ============
 
     private createBaseListQuery(customerId: number | undefined, isStatusFilter: boolean = true): SelectQueryBuilder<any> {
-        if (!BLACKLISTED_STATUS.length) throw new BadRequestException('Contact administrator: Internal configuration error');
-
         const repo = this.getRepo();
         const qb = repo
             .createQueryBuilder(USED_CAR_TABLE_ALIASES.usedCar)
@@ -550,8 +542,8 @@ export class UsedCarRepository {
             .where(`${USED_CAR_TABLE_ALIASES.usedCar}.deleted_at IS NULL`)
 
         if (isStatusFilter) {
-            qb.andWhere(`${USED_CAR_TABLE_ALIASES.usedCar}.status NOT IN(:...blacklistedStatuses)`, {
-                blacklistedStatuses: BLACKLISTED_STATUS,
+            qb.andWhere(`${USED_CAR_TABLE_ALIASES.usedCar}.status  = :listed)`, {
+                listed: UsedCarListingStatus.LISTED,
             });
         }
 
