@@ -3,6 +3,9 @@ export const ADMIN_OTP_LENGTH = 6;
 
 export const MODULE_PREFIX = {
     ADMIN: 'admin',
+    MANAGER: 'manager',
+    INSPECTOR: 'inspector',
+    STAFF: 'staff',
     CUSTOMER: 'customer',
 } as const;
 

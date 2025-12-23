@@ -1,4 +1,4 @@
-import { FuelTypeLabel, TransmissionTypeLabel, UsedCarListingStatusLabel } from '@common/enums/car-detail.enum';
+import { FuelTypeLabel, TransmissionTypeLabel } from '@common/enums/car-detail.enum';
 import { CommonHelper } from '@common/helpers/common.helper';
 import { BaseResource } from '@common/utils/resource.utils';
 
@@ -20,7 +20,7 @@ export class MyUsedCarListingResource extends BaseResource<any> {
             price: CommonHelper.currency(this.data.finalPrice),
             isWishlisted: CommonHelper.bool(this.data?.isWishlisted),
             status: CommonHelper.number(this.data.status),
-            statusLabel: CommonHelper.text(UsedCarListingStatusLabel[this.data.status] || 'Other'),
+            statusLabel: CommonHelper.text(CommonHelper.getCarListingsStatusName(this.data.status)),
         };
     }
 }

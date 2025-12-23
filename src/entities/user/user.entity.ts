@@ -14,6 +14,7 @@ import {
 } from 'typeorm';
 import { UserRefreshToken } from './user-refresh-token.entity';
 import { InspectionCentre } from '@entity/inapection-centre/inspection-centre.entity';
+import { UserRole } from '@common/enums/user.enum';
 
 @Entity('users')
 @Check('chk_country_code', 'country_code > 0')
@@ -150,19 +151,19 @@ export class User {
 
     // Helper methods
     isAdmin(): boolean {
-        return this.role === 1;
+        return this.role === UserRole.ADMIN;
     }
 
     isManager(): boolean {
-        return this.role === 2;
+        return this.role === UserRole.MANAGER;
     }
 
     isInspector(): boolean {
-        return this.role === 3;
+        return this.role === UserRole.INSPECTOR;
     }
 
     isStaff(): boolean {
-        return this.role === 4;
+        return this.role === UserRole.STAFF;
     }
 
     isDeleted(): boolean {

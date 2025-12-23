@@ -19,6 +19,7 @@ import { UsedCarCustomerPhoto } from './used-car-customer-photo.entity';
 import { KilometerDriven, OwnershipType, UsedCarListingStatus } from '@common/enums/car-detail.enum';
 import { InspectionImage } from './inspection-image.entity';
 import { CustomerWishlist } from '@entity/customer-ops/customer-wishlist.entity';
+import { User } from '@entity/user/user.entity';
 
 @Entity('used_car')
 export class UsedCar {
@@ -92,6 +93,9 @@ export class UsedCar {
     @Column({ name: 'verified_by', type: 'int', nullable: true })
     verified_by: number | null;
 
+    @Column({ name: 'inspection_assigned_to', type: 'int', nullable: true })
+    inspection_assigned_to: number | null;
+
     // Timestamps
     @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
     created_at: Date;
@@ -105,6 +109,10 @@ export class UsedCar {
     @ManyToOne(() => CarBrand)
     @JoinColumn({ name: 'brand_id' })
     brand: CarBrand;
+
+    @ManyToOne(() => User)
+    @JoinColumn({ name: 'inspection_assigned_to' })
+    inspector: User;
 
     @ManyToOne(() => CarModel)
     @JoinColumn({ name: 'model_id' })

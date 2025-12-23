@@ -1,4 +1,5 @@
 import { ADMIN_OTP_LENGTH, CUSTOMER_OTP_LENGTH } from "@common/constants/app.constant";
+import { UsedCarListingStatus } from "@common/enums/car-detail.enum";
 import { UserRole } from "@common/enums/user.enum";
 
 export class CommonHelper {
@@ -51,6 +52,26 @@ export class CommonHelper {
         };
 
         return roleNames[roleId] || 'Unknown';
+    }
+
+    static getCarListingsStatusName(statusId: UsedCarListingStatus): string {
+        const statusNames: Record<UsedCarListingStatus, string> = {
+            [UsedCarListingStatus.PENDING]: 'Pending',
+            [UsedCarListingStatus.INSPECTION_STARTED]: 'Inspection Started',
+            [UsedCarListingStatus.INSPECTION_COMPLETED]: 'Inspection Completed',
+            [UsedCarListingStatus.DETAILS_UPDATED_BY_STAFF]: 'Details Updated by Staff',
+            [UsedCarListingStatus.APPROVED_BY_MANAGER]: 'Approved by Manager',
+            [UsedCarListingStatus.APPROVED_BY_ADMIN]: 'Approved by Admin',
+            [UsedCarListingStatus.LISTED]: 'Listed',
+            [UsedCarListingStatus.SOLD]: 'Sold',
+            [UsedCarListingStatus.REJECTED_BY_MANAGER]: 'Rejected by Manager',
+            [UsedCarListingStatus.REJECTED_BY_ADMIN]: 'Rejected by Admin',
+            [UsedCarListingStatus.REJECTED_BY_CUSTOMER]: 'Rejected by Customer',
+            [UsedCarListingStatus.EXPIRED]: 'Expired',
+            [UsedCarListingStatus.CANCELLED]: 'Cancelled',
+        }
+
+        return statusNames[statusId] || 'Unknown';
     }
 
     // ============ TEXT & STRING ============

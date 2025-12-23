@@ -14,6 +14,7 @@ import { InspectionImageQueryHelper } from '@common/providers/inspection-image/h
 import { InspectionImage } from '@entity/used-car/inspection-image.entity';
 import { SORT_ORDER } from '@common/constants/app.constant';
 import { PrimaryImageQueryHelper } from '@common/providers/inspection-image/helper/primary-image.hrlper';
+import { UsedCarListingStatus } from '@common/enums/car-detail.enum';
 
 export interface UsedCarListResult {
     data: any[];
@@ -111,6 +112,40 @@ export class UsedCarRepository {
             page,
             limit,
         };
+    }
+
+    async checkInspectionAssigned(
+        vehicleId: number,
+        inspectorId: number,
+        manager?: EntityManager,
+    ): Promise<boolean> {
+        const repo = this.getRepo(manager);
+        const isExist = await repo.exists({
+            where: {
+                status: UsedCarListingStatus.PENDING,
+                id: vehicleId,
+                inspection_assigned_to: inspectorId,
+            },
+        });
+        return !!isExist;
+    }
+
+    async startInspection(
+        vehicleId: number,
+        inspectorId: number,
+        manager?: EntityManager,
+    ): Promise<void> {
+        const repo = this.getRepo(manager);
+        await repo.update(
+            {
+                id: vehicleId,
+                inspection_assigned_to: inspectorId,
+                status: UsedCarListingStatus.PENDING,
+            },
+            {
+                status: UsedCarListingStatus.INSPECTION_STARTED,
+            },
+        );
     }
 
     async findById(

@@ -62,21 +62,19 @@ export enum KilometerDriven {
 
 export enum UsedCarListingStatus {
     PENDING = 1,
-    VERIFIED = 2,
-    LISTED = 3,
-    SOLD = 4,
-    REJECTED = 5,
-    EXPIRED = 6,
+    INSPECTION_STARTED = 3,
+    INSPECTION_COMPLETED = 4,
+    DETAILS_UPDATED_BY_STAFF = 5,
+    APPROVED_BY_MANAGER = 6,
+    APPROVED_BY_ADMIN = 7,
+    LISTED = 8,
+    SOLD = 9,
+    REJECTED_BY_MANAGER = 10,
+    REJECTED_BY_ADMIN = 11,
+    REJECTED_BY_CUSTOMER = 12,
+    EXPIRED = 13,
+    CANCELLED = 14,
 }
-
-export const UsedCarListingStatusLabel: Record<UsedCarListingStatus, string> = {
-    [UsedCarListingStatus.PENDING]: 'Pending',
-    [UsedCarListingStatus.VERIFIED]: 'Verified',
-    [UsedCarListingStatus.LISTED]: 'Listed',
-    [UsedCarListingStatus.SOLD]: 'Sold',
-    [UsedCarListingStatus.REJECTED]: 'Rejected',
-    [UsedCarListingStatus.EXPIRED]: 'Expired',
-};
 
 export enum SafetyRating {
     ONE = 1,

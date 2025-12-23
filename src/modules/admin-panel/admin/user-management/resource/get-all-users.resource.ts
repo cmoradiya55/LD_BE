@@ -1,7 +1,5 @@
-import { FuelTypeLabel, TransmissionTypeLabel, UsedCarListingStatusLabel } from '@common/enums/car-detail.enum';
 import { CommonHelper } from '@common/helpers/common.helper';
 import { BaseResource } from '@common/utils/resource.utils';
-import { create } from 'domain';
 
 export class GetAllUsersResource extends BaseResource<any> {
     toJSON() {

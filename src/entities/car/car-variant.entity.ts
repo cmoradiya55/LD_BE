@@ -50,8 +50,8 @@ export class CarVariant {
   @Column({ type: 'numeric', precision: 6, scale: 2, nullable: true })
   max_torque_nm: number | null;
 
-  @Column({ type: 'int', nullable: true })
-  max_torque_rpm: number | null;
+  @Column({ type: 'varchar', length: 70, nullable: true })
+  max_torque_rpm: string | null;
 
   @Column({ type: 'numeric', precision: 5, scale: 2, nullable: true })
   fuel_tank_litres: number | null;
@@ -86,8 +86,11 @@ export class CarVariant {
   @Column({ type: 'smallint' })
   ground_clearance_mm: number;
 
-  @Column({ type: 'smallint', nullable: true })
-  kerb_weight_kg: number | null;
+  @Column({ type: 'varchar', length: 70, nullable: true })
+  kerb_weight_kg: string | null;
+
+  @Column({ type: 'varchar', length: 70, nullable: true })
+  gross_weight_kg: string | null;
 
   @Column({ type: 'varchar', length: 50 })
   front_tyre_size: string;
