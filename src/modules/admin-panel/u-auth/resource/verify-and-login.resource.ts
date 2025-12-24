@@ -15,6 +15,9 @@ export class UserVerifyAndLoginResource extends BaseResource<any> {
             isEmailVerified: CommonHelper.bool(user.is_email_verified),
             roleId: CommonHelper.number(user.role),
             role: CommonHelper.text(CommonHelper.getRoleName(user.role)),
+            documentStatus: CommonHelper.number(user.document_status),
+            documentStatusName: CommonHelper.text(CommonHelper.getUserDocumentStatusName(user.document_status)),
+            remarks: CommonHelper.text(user.reject_reason),
         };
     }
 }
