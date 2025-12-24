@@ -136,12 +136,21 @@ export class UserManagementService {
         dto: VerifyUserDocumentsDto,
     ): Promise<void> {
         return this.baseService.catch(async () => {
-            const { userId } = dto;
+            const {
+                userId,
+                remarks,
+                status,
+            } = dto;
             if (user.id === userId) {
                 throw new BadRequestException('You cannot verify your own documents');
             }
 
-            const updated = await this.userRepo.verifyUserDocuments(userId, user.id);
+            const updated = await this.userRepo.verifyOrRejectUserDocuments(
+                userId,
+                status,
+                remarks,
+                user.id
+            );
             if (!updated.affected) {
                 throw new BadRequestException(
                     'User not found or no pending documents to verify',

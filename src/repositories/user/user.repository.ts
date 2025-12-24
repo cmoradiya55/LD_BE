@@ -285,7 +285,12 @@ export class UserRepository {
     }
 
     // find active user whose document verification is pending
-    async verifyUserDocuments(id: number, adminId: number, manager?: EntityManager): Promise<UpdateResult> {
+    async verifyOrRejectUserDocuments(
+        id: number,
+        status: UserDocumentVerificationStatus.VERIFIED | UserDocumentVerificationStatus.REJECTED,
+        remarks: string,
+        adminId: number, manager?: EntityManager
+    ): Promise<UpdateResult> {
         const repo = this.getRepo(manager);
         return await repo.update(
             {
@@ -294,7 +299,8 @@ export class UserRepository {
                 is_active: true,
             },
             {
-                document_status: UserDocumentVerificationStatus.VERIFIED,
+                document_status: status,
+                reject_reason: status === UserDocumentVerificationStatus.REJECTED ? remarks : null,
                 updated_by: adminId,
                 updated_at: new Date(),
             },
