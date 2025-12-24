@@ -13,6 +13,7 @@ import { ToggleUserStatusDto } from './dto/toggle-user-status.dto';
 import { AdminAuth } from '@common/decorators/admin-panel/admin-auth.decorator';
 import { GetInspectorByManagerDto, GetInspectorByManagerQueryDto } from './dto/get-inspector.dto';
 import { GetAllInspectorResource } from './resource/get-all-inspector.resource';
+import { VerifyUserDocumentsDto } from './dto/verify-user-document.dto';
 
 @Controller(`${MODULE_PREFIX.ADMIN}/user-management`)
 @AdminAuth()
@@ -29,6 +30,15 @@ export class UserManagementController {
     return ApiResponseUtil.created(
       'User created successfully',
     );
+  }
+
+  @Post('verify-documents')
+  async verifyUserDocuments(
+    @CurrentUser() user: User,
+    @Body() body: VerifyUserDocumentsDto
+  ) {
+    await this.userManagementService.verifyUserDocuments(user, body);
+    return ApiResponseUtil.success('Documents verified successfully');
   }
 
   @Get('inspectors/:managerId')

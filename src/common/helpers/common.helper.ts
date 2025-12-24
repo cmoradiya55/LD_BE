@@ -1,6 +1,6 @@
 import { ADMIN_OTP_LENGTH, CUSTOMER_OTP_LENGTH } from "@common/constants/app.constant";
 import { UsedCarListingStatus } from "@common/enums/car-detail.enum";
-import { UserRole } from "@common/enums/user.enum";
+import { UserDocumentVerificationStatus, UserRole } from "@common/enums/user.enum";
 
 export class CommonHelper {
     static dateTime(date: Date | string | null | undefined): string | null {
@@ -69,6 +69,17 @@ export class CommonHelper {
             [UsedCarListingStatus.REJECTED_BY_CUSTOMER]: 'Rejected by Customer',
             [UsedCarListingStatus.EXPIRED]: 'Expired',
             [UsedCarListingStatus.CANCELLED]: 'Cancelled',
+        }
+
+        return statusNames[statusId] || 'Unknown';
+    }
+
+    static getUserDocumentStatusName(statusId: UserDocumentVerificationStatus): string {
+        const statusNames: Record<UserDocumentVerificationStatus, string> = {
+            [UserDocumentVerificationStatus.PENDING]: 'Pending',
+            [UserDocumentVerificationStatus.REQUEST_RAISE]: 'Request Raised',
+            [UserDocumentVerificationStatus.VERIFIED]: 'Verified',
+            [UserDocumentVerificationStatus.REJECTED]: 'Rejected',
         }
 
         return statusNames[statusId] || 'Unknown';

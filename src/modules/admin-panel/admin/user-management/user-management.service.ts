@@ -9,6 +9,7 @@ import { GetAllUsersDto } from './dto/get-all-users.dto';
 import { ToggleUserStatusDto } from './dto/toggle-user-status.dto';
 import { InspectionCentreRepository } from '@repository/inspection-centre/inspection-centre.repository';
 import { GetInspectorByManagerDto, GetInspectorByManagerQueryDto } from './dto/get-inspector.dto';
+import { VerifyUserDocumentsDto } from './dto/verify-user-document.dto';
 
 @Injectable()
 export class UserManagementService {
@@ -127,6 +128,25 @@ export class UserManagementService {
             user.updated_by = userId;
             user.updated_at = new Date();
             await this.userRepo.save(user, manager);
+        });
+    }
+
+    async verifyUserDocuments(
+        user: User,
+        dto: VerifyUserDocumentsDto,
+    ): Promise<void> {
+        return this.baseService.catch(async () => {
+            const { userId } = dto;
+            if (user.id === userId) {
+                throw new BadRequestException('You cannot verify your own documents');
+            }
+
+            const updated = await this.userRepo.verifyUserDocuments(userId, user.id);
+            if (!updated.affected) {
+                throw new BadRequestException(
+                    'User not found or no pending documents to verify',
+                );
+            }
         });
     }
 

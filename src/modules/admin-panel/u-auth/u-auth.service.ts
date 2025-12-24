@@ -250,7 +250,7 @@ export class UAuthService {
                     [UserDocumentVerificationStatus.VERIFIED]:
                         'Documents already verified. Cannot resubmit.',
                     [UserDocumentVerificationStatus.REQUEST_RAISE]:
-                        'Document verification request is already pending.',
+                        'Document verification request is already raised.',
                 };
                 throw new BadRequestException(messages[user.document_status]);
             }

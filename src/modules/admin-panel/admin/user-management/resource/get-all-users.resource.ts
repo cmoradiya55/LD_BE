@@ -19,6 +19,8 @@ export class GetAllUsersResource extends BaseResource<any> {
             isActive: CommonHelper.bool(this.data.is_active),
             isMobileVerified: CommonHelper.bool(this.data.is_mobile_verified),
             isEmailVerified: CommonHelper.bool(this.data.is_email_verified),
+            documentStatus: CommonHelper.number(this.data.document_status),
+            documentStatusName: CommonHelper.text(CommonHelper.getUserDocumentStatusName(this.data.document_status)),
             createdAt: CommonHelper.dateTime(this.data.created_at),
             createdBy: CommonHelper.number(this.data.created_by),
             createdByName: CommonHelper.text(this.data.createdByUser?.name),

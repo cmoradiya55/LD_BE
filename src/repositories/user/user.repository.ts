@@ -1,10 +1,11 @@
 import { SORT_ORDER } from '@common/constants/app.constant';
-import { UserOtpType, UserRole } from '@common/enums/user.enum';
+import { UserDocumentVerificationStatus, UserOtpType, UserRole } from '@common/enums/user.enum';
 import { User } from '@entity/user/user.entity';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
-import { EntityManager, Repository, FindOptionsWhere, LessThanOrEqual, IsNull, Or, Not, MoreThan } from 'typeorm';
+import { EntityManager, Repository, FindOptionsWhere, LessThanOrEqual, IsNull, Or, Not, MoreThan, In, UpdateResult } from 'typeorm';
+import { GetAllUsersDto } from '../../modules/admin-panel/admin/user-management/dto/get-all-users.dto';
 
 @Injectable()
 export class UserRepository {
@@ -233,10 +234,18 @@ export class UserRepository {
             });
     }
 
-    async getAllUsers(query: any, page: number, limit: number, manager?: EntityManager) {
+    async getAllUsers(query: GetAllUsersDto, page: number, limit: number, manager?: EntityManager) {
         const repo = this.getRepo(manager);
+        const { documentStatus } = query;
+        const whereConditions: FindOptionsWhere<User> = {};
+
+        if (documentStatus) {
+            whereConditions.document_status = documentStatus;
+        }
+
         const skip = (page - 1) * limit;
         const [data, total] = await repo.findAndCount({
+            where: whereConditions,
             relations: ['manager', 'createdByUser', 'updatedByUser'],
             take: limit,
             skip: skip,
@@ -275,6 +284,23 @@ export class UserRepository {
         });
     }
 
+    // find active user whose document verification is pending
+    async verifyUserDocuments(id: number, adminId: number, manager?: EntityManager): Promise<UpdateResult> {
+        const repo = this.getRepo(manager);
+        return await repo.update(
+            {
+                id: id,
+                document_status: UserDocumentVerificationStatus.REQUEST_RAISE,
+                is_active: true,
+            },
+            {
+                document_status: UserDocumentVerificationStatus.VERIFIED,
+                updated_by: adminId,
+                updated_at: new Date(),
+            },
+        );
+    }
+
     /**
      * Check if Aadhar number exists (excluding specific user)
      */
@@ -289,6 +315,7 @@ export class UserRepository {
             where: {
                 aadhar_number: aadharNumber,
                 id: Not(excludeUserId),
+                document_status: UserDocumentVerificationStatus.VERIFIED,
             },
         });
 
@@ -309,6 +336,7 @@ export class UserRepository {
             where: {
                 pan_number: panNumber,
                 id: Not(excludeUserId),
+                document_status: UserDocumentVerificationStatus.VERIFIED,
             },
         });
 
