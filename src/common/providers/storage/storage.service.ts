@@ -24,24 +24,30 @@ export class StorageService {
 
             // 3. Process Files in Parallel
             const urlPromises = files.map(async (file) => {
+                const { name, type } = file;
 
                 // A. VALIDATION LAYER (Replaces your giant if/else block)
-                this.validateFileType(file.name, file.type);
+                this.validateFileType(name, type);
 
                 // B. SANITIZATION LAYER
-                const cleanName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
+                const cleanName = name.replace(/[^a-zA-Z0-9.-]/g, '_');
 
-                // C. PATH BUILDER LAYER
-                const key = `${zone}/${category}/${entityId}/${Date.now()}_${cleanName}`;
+                const parts: any = [zone, category];
+
+                if (entityId.trim().length > 0) {
+                    parts.push(entityId);
+                }
+
+                const key = `${parts.join("/")}/${Date.now()}_${cleanName}`;
 
                 // D. INFRASTRUCTURE LAYER
-                const presigned = await this.s3Service.signUrl(key, file.type);
+                const presigned = await this.s3Service.signUrl(key, type);
 
                 return {
-                    originalName: file.name,
+                    originalName: name,
                     uploadUrl: presigned.url,
                     key: presigned.key,
-                    contentType: file.type,
+                    contentType: type,
                 };
             });
 

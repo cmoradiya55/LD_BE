@@ -1,20 +1,24 @@
 // src/media/dto/generate-grouped-url.dto.ts
-import { IsEnum, IsString, IsArray, ValidateNested, Matches, ArrayMaxSize, ArrayMinSize } from 'class-validator';
+import { IsEnum, IsString, IsArray, ValidateNested, Matches, ArrayMaxSize, ArrayMinSize, IsNotEmpty, ValidateIf } from 'class-validator';
 import { Type } from 'class-transformer';
 import { MediaCategory } from '@common/enums/storage.enum';
 import { MAX_FILE_UPLOAD_ALLOWED, MIN_FILE_UPLOAD_REQUIRED } from '@common/constants/app.constant';
 
 class FileRequestDto {
+    @IsNotEmpty()
     @IsString()
     @Matches(/^[a-zA-Z0-9.-]+$/, { message: 'Invalid filename' })
     name: string;
 
 
+    @IsNotEmpty()
     @IsString()
     type: string;
 }
 
 export class GroupedUploadUrlDto {
+    @ValidateIf((o) => Array.isArray(o.files) && o.files.length > 1)
+    @IsNotEmpty()
     @IsString()
     entityId: string; // The Car UUID
 
