@@ -34,8 +34,8 @@ export class StorageService {
 
                 const parts: any = [zone, category];
 
-                if (entityId.trim().length > 0) {
-                    parts.push(entityId);
+                if (typeof entityId === 'string' && entityId.trim().length > 0) {
+                    parts.push(entityId.trim());
                 }
 
                 const key = `${parts.join("/")}/${Date.now()}_${cleanName}`;
