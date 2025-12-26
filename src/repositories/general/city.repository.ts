@@ -140,7 +140,17 @@ export class CityRepository {
                 `,
                 { managerRole: UserRole.MANAGER },
             )
-
+            // 4️⃣ add inspector count per manager
+            .loadRelationCountAndMap(
+                'manager.inspectorCount', // property to map count into
+                'manager.managedInspectors', // relation from manager to inspectors
+                'inspector',
+                qb => qb
+                    .where('inspector.role = :inspectorRole', { inspectorRole: 3 })
+                    .andWhere('inspector.is_active = true')
+                    .andWhere('inspector.deleted_at IS NULL')
+            )
+            
             // optional but realistic
             .leftJoinAndSelect('ic.pincode', 'pincode')
 

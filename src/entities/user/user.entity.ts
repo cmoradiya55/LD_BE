@@ -149,6 +149,9 @@ export class User {
     @OneToMany(() => UserRefreshToken, token => token.user)
     refreshTokens: UserRefreshToken[];
 
+    @OneToMany(() => User, user => user.manager)
+    managedInspectors: User[];
+
     // Helper methods
     isAdmin(): boolean {
         return this.role === UserRole.ADMIN;

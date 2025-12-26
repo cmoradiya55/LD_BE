@@ -13,6 +13,16 @@ export class InspectionCentreManagerResource extends BaseResource<any> {
             mobileNumber: CommonHelper.number(manager.mobile_number),
             email: CommonHelper.text(manager.email),
             isActive: CommonHelper.bool(manager.is_active),
+            documentStatus: CommonHelper.text(manager.document_status),
+            documentStatusName: CommonHelper.getUserDocumentStatusName(manager.document_status),
+            remarks: CommonHelper.text(manager.remarks),
+            selfieImage: CommonHelper.buildImageUrl(manager.selfie_image),
+            aadharFrontImage: CommonHelper.buildImageUrl(manager.aadhar_front_image),
+            aadharBackImage: CommonHelper.buildImageUrl(manager.aadhar_back_image),
+            panImage: CommonHelper.buildImageUrl(manager.pan_image),
+            aadharNumber: CommonHelper.text(manager.aadhar_number),
+            panNumber: CommonHelper.text(manager.pan_number),
+            inspectorCount: CommonHelper.number(manager.inspectorCount),
         };
     }
 }
