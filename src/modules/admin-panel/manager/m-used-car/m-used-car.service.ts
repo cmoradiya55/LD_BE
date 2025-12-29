@@ -39,7 +39,7 @@ export class MUsedCarService {
                 throw new Error('No pincodes found for the city assigned to the manager');
             }
 
-            const result = await this.usedCarRepo.findUsedCarsForAdminPanel(pincodeIds, page, limit);
+            const result = await this.usedCarRepo.findUsedCarsForAdminPanel(pincodeIds, query, page, limit);
             return result;
         });
     }

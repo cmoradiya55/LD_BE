@@ -15,6 +15,7 @@ import { InspectionImage } from '@entity/used-car/inspection-image.entity';
 import { SORT_ORDER } from '@common/constants/app.constant';
 import { PrimaryImageQueryHelper } from '@common/providers/inspection-image/helper/primary-image.hrlper';
 import { UsedCarListingStatus } from '@common/enums/car-detail.enum';
+import { GetUsedCarQueryDto } from '../../modules/admin-panel/manager/m-used-car/dto/get-inspector.dto';
 
 export interface UsedCarListResult {
     data: any[];
@@ -252,13 +253,19 @@ export class UsedCarRepository {
  */
     async findUsedCarsForAdminPanel(
         pincodeIds: number[],
+        filter: GetUsedCarQueryDto,
         page: number,
         limit: number,
     ): Promise<UsedCarListResult> {
         const skip = (page - 1) * limit;
+        const { status } = filter;
 
         // Build query
-        const queryBuilder = this.createAdminBaseListQuery(pincodeIds)
+        const queryBuilder = this.createAdminBaseListQuery(pincodeIds);
+        // Apply filters
+        if (status) {
+            queryBuilder.andWhere(`${USED_CAR_TABLE_ALIASES.usedCar}.status = :status`, { status });
+        }
 
         const [data, total] = await Promise.all([
             queryBuilder
