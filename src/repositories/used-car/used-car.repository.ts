@@ -3,7 +3,7 @@ import { DUPLICATE_REGISTRATION_STATUS_CHECK } from '@common/constants/used-car.
 import { UsedCar } from '@entity/used-car/used-car.entity';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { EntityManager, In, Not, Repository } from 'typeorm';
+import { EntityManager, In, LessThan, Not, Repository, UpdateResult } from 'typeorm';
 import { UsedCarListingDto } from '../../modules/customer/used-car/dto/used-car-listing.dto';
 import { QBHelper } from '@common/helpers/query-builder.helper';
 import { USED_CAR_FILTER_CONFIG, USED_CAR_LIST_SELECT_COLUMNS, USED_CAR_SEARCH_COLUMNS, USED_CAR_TABLE_ALIASES, USED_CAR_TABLES } from './config/used-car-query.filter.config';
@@ -563,6 +563,24 @@ export class UsedCarRepository {
         await repo.softDelete({
             customer_id: customerId,
         });
+    }
+
+    async assignInspectorToUsedCar(
+        usedCarId: number,
+        inspectorId: number,
+        manager?: EntityManager,
+    ): Promise<UpdateResult> {
+        const repo = this.getRepo(manager);
+        return await repo.update(
+            {
+                id: usedCarId,
+                status: LessThan(UsedCarListingStatus.INSPECTION_STARTED),
+            },
+            {
+                inspection_assigned_to: inspectorId,
+                updated_at: new Date(),
+            },
+        );
     }
 
     // ============ Private Methods ============

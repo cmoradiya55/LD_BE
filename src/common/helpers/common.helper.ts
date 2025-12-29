@@ -57,6 +57,7 @@ export class CommonHelper {
     static getCarListingsStatusName(statusId: UsedCarListingStatus): string {
         const statusNames: Record<UsedCarListingStatus, string> = {
             [UsedCarListingStatus.PENDING]: 'Pending',
+            [UsedCarListingStatus.INSPECTOR_ASSIGNED]: 'Inspector Assigned',
             [UsedCarListingStatus.INSPECTION_STARTED]: 'Inspection Started',
             [UsedCarListingStatus.INSPECTION_COMPLETED]: 'Inspection Completed',
             [UsedCarListingStatus.DETAILS_UPDATED_BY_STAFF]: 'Details Updated by Staff',
