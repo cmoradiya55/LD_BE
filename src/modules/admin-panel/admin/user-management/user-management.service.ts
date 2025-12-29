@@ -93,8 +93,8 @@ export class UserManagementService {
         return this.baseService.catch(async () => {
             const { managerId } = param;
             const { page, limit } = query;
-            const isManager = await this.userRepo.isManagerExists(managerId);
-            if (!isManager) {
+            const managerExists = await this.userRepo.isManagerExists(managerId);
+            if (!managerExists) {
                 throw new BadRequestException('Manager not found');
             }
             const result = await this.userRepo.getInspectorsByManagerId(managerId, page, limit);

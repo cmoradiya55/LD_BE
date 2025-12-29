@@ -265,7 +265,7 @@ export class UserRepository {
                 role: UserRole.INSPECTOR,
                 manager_id: managerId,
             },
-            relations: ['manager', 'createdByUser', 'updatedByUser'],
+            relations: ['manager', 'manager.inspectionCentre', 'manager.inspectionCentre.city','createdByUser', 'updatedByUser'],
             take: limit,
             skip: skip,
             order: {

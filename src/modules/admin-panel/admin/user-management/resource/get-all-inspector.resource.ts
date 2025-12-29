@@ -11,6 +11,11 @@ export class GetAllInspectorResource extends BaseResource<any> {
             mobileNo: CommonHelper.number(this.data.mobile_number),
             email: CommonHelper.text(this.data.email),
 
+            managerId: CommonHelper.number(this.data.manager?.id),
+            managerName: CommonHelper.text(this.data.manager?.name),
+
+            cityId: CommonHelper.number(this.data.manager?.inspectionCentre?.city_id),
+            city: CommonHelper.capitalizeWords(this.data.manager?.inspectionCentre?.city?.city_name),
 
             documentStatus: CommonHelper.text(this.data.document_status),
             documentStatusName: CommonHelper.getUserDocumentStatusName(this.data.document_status),
@@ -25,7 +30,7 @@ export class GetAllInspectorResource extends BaseResource<any> {
             roleId: CommonHelper.number(this.data.role),
             role: CommonHelper.text(CommonHelper.getRoleName(this.data.role)),
 
-            managerId: CommonHelper.number(this.data.manager_id),
+            // managerId: CommonHelper.number(this.data.manager?.id),
             manager: CommonHelper.text(CommonHelper.capitalizeWords(this.data.manager?.name)),
 
             isActive: CommonHelper.bool(this.data.is_active),
