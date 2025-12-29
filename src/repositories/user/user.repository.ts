@@ -284,6 +284,17 @@ export class UserRepository {
         });
     }
 
+    async checkInspectorExistsUnderManager(inspectorId: number, managerId: number, manager?: EntityManager): Promise<User | null> {
+        const repo = this.getRepo(manager);
+        return await repo.findOne({
+            where: {
+                id: inspectorId,
+                manager_id: managerId,
+                role: UserRole.INSPECTOR,
+            },
+        });
+    }
+
     // find active user whose document verification is pending
     async verifyOrRejectUserDocuments(
         id: number,
