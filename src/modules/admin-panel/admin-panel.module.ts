@@ -4,6 +4,7 @@ import { UserManagementModule } from './admin/user-management/user-management.mo
 import { InspectionCentreModule } from './admin/inspection-centre/inspection-centre.module';
 import { InspectionModule } from './inspector/inspection/inspection.module';
 import { MUserManagementModule } from './manager/user-management/user-management.module';
+import { MUsedCarModule } from './manager/m-used-car/m-used-car.module';
 
 @Module({
     imports: [
@@ -12,6 +13,7 @@ import { MUserManagementModule } from './manager/user-management/user-management
         InspectionCentreModule,
         InspectionModule,
         MUserManagementModule,
+        MUsedCarModule,
     ],
     providers: [],
     exports: [],

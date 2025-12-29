@@ -1,0 +1,34 @@
+import { Controller, Get, Query } from '@nestjs/common';
+import { MUsedCarService } from './m-used-car.service';
+import { MODULE_PREFIX } from '@common/constants/app.constant';
+import { ApiResponseUtil } from '@common/utils/api-response.utils';
+import { CurrentUser } from '@common/decorators/admin-panel/current-user.decorator';
+import { User } from '@entity/user/user.entity';
+import { GetUsedCarQueryDto } from './dto/get-inspector.dto';
+import { AdminAuth } from '@common/decorators/admin-panel/admin-auth.decorator';
+import { Roles } from '../../u-auth/decorator/user-roles.decorator';
+import { UserRole } from '@common/enums/user.enum';
+import { ManagerUsedCarListingResource } from './resource/manager-used-car-listing.resource';
+
+@Controller(`${MODULE_PREFIX.MANAGER}/used-car`)
+@AdminAuth()
+@Roles(UserRole.MANAGER)
+export class MUsedCarController {
+  constructor(private readonly mUsedCarService: MUsedCarService) { }
+
+  @Get()
+  async getUsedCars(
+    @CurrentUser() user: User,
+    @Query() query: GetUsedCarQueryDto,
+  ) {
+    const { data, page, limit, total } = await this.mUsedCarService.getUsedCars(user, query);
+    return ApiResponseUtil.paginated(
+      'Users fetched successfully',
+      // data,
+      ManagerUsedCarListingResource.collection(data),
+      page,
+      limit,
+      total,
+    );
+  }
+}

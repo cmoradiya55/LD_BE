@@ -1,5 +1,3 @@
-// entities/user.entity.ts
-import { City } from '@entity/general/city.entity';
 import {
     Entity,
     PrimaryGeneratedColumn,

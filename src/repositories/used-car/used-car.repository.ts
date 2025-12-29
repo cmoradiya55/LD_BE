@@ -248,6 +248,35 @@ export class UsedCarRepository {
     }
 
     /**
+ * Find used cars with filters, search, and pagination
+ */
+    async findUsedCarsForAdminPanel(
+        pincodeIds: number[],
+        page: number,
+        limit: number,
+    ): Promise<UsedCarListResult> {
+        const skip = (page - 1) * limit;
+
+        // Build query
+        const queryBuilder = this.createAdminBaseListQuery(pincodeIds)
+
+        const [data, total] = await Promise.all([
+            queryBuilder
+                .skip(skip)
+                .take(limit)  // ✅ Use .take() not .limit()
+                .getMany(),
+            queryBuilder.getCount(),
+        ])
+
+        return {
+            data: data,
+            total,
+            page,
+            limit,
+        };
+    }
+
+    /**
      * Find used cars details with it's images, fetaures, specifications etc.
      */
     async getUsedCarDetailBySlug(
@@ -529,6 +558,13 @@ export class UsedCarRepository {
         );
     }
 
+    async softDeleteByCustomerId(customerId: number, manager?: EntityManager): Promise<void> {
+        const repo = this.getRepo(manager);
+        await repo.softDelete({
+            customer_id: customerId,
+        });
+    }
+
     // ============ Private Methods ============
 
     private createBaseListQuery(customerId: number | undefined, isStatusFilter: boolean = true): SelectQueryBuilder<any> {
@@ -542,7 +578,7 @@ export class UsedCarRepository {
             .where(`${USED_CAR_TABLE_ALIASES.usedCar}.deleted_at IS NULL`)
 
         if (isStatusFilter) {
-            qb.andWhere(`${USED_CAR_TABLE_ALIASES.usedCar}.status  = :listed)`, {
+            qb.andWhere(`${USED_CAR_TABLE_ALIASES.usedCar}.status  = :listed`, {
                 listed: UsedCarListingStatus.LISTED,
             });
         }
@@ -574,10 +610,33 @@ export class UsedCarRepository {
 
     }
 
-    async softDeleteByCustomerId(customerId: number, manager?: EntityManager): Promise<void> {
-        const repo = this.getRepo(manager);
-        await repo.softDelete({
-            customer_id: customerId,
-        });
+
+    private createAdminBaseListQuery(pincodeIds: number[]): SelectQueryBuilder<any> {
+        const repo = this.getRepo();
+
+        const qb = repo
+            .createQueryBuilder(USED_CAR_TABLE_ALIASES.usedCar)
+
+            // Load relations
+            .leftJoinAndSelect(`${USED_CAR_TABLE_ALIASES.usedCar}.brand`, 'brand')
+            .leftJoinAndSelect(`${USED_CAR_TABLE_ALIASES.usedCar}.model`, 'model')
+            .leftJoinAndSelect(`${USED_CAR_TABLE_ALIASES.usedCar}.variant`, 'variant')
+            .leftJoinAndSelect(`${USED_CAR_TABLE_ALIASES.usedCar}.pincode`, 'pincode')
+            .leftJoinAndSelect('pincode.city', 'city')
+            .leftJoinAndSelect(`${USED_CAR_TABLE_ALIASES.usedCar}.inspector`, 'inspector')
+            .leftJoinAndSelect(`${USED_CAR_TABLE_ALIASES.usedCar}.photos`, 'customerPhotos')
+            .leftJoinAndSelect(`${USED_CAR_TABLE_ALIASES.usedCar}.inspectionImages`, 'inspectionImages')
+
+            // Filters
+            .where(`${USED_CAR_TABLE_ALIASES.usedCar}.deleted_at IS NULL`)
+            .andWhere(`${USED_CAR_TABLE_ALIASES.usedCar}.pincode_id = ANY(:pincodeIds)`, { pincodeIds })
+            .andWhere(`${USED_CAR_TABLE_ALIASES.usedCar}.status < :statusLimit`, {
+                statusLimit: UsedCarListingStatus.LISTED
+            })
+
+            // ✅ FIX: Use proper column reference for sorting
+            .orderBy(`${USED_CAR_TABLE_ALIASES.usedCar}.created_at`, 'DESC')
+
+        return qb;
     }
 }
