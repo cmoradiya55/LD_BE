@@ -59,11 +59,12 @@ export class ManagerUsedCarListingResource extends BaseResource<any> {
             registrationYear: CommonHelper.number(this.data.registration_year),
             registrationNumber: CommonHelper.text(this.data.registration_number),
 
-
-            kmDriven: CommonHelper.number(this.data.km_driven),
+            kmDriven: CommonHelper.number(this.data.km_driven_range),
+            inspectedKmDriven: CommonHelper.number(this.data.km_driven),
             fuelType: CommonHelper.text(FuelTypeLabel[variant.fuel_type] || 'Other'),
             transmissionType: CommonHelper.text(TransmissionTypeLabel[variant.transmission_type] || 'Other'),
-            price: CommonHelper.currency(this.data.final_price),
+            customerExpectedPrice: CommonHelper.currency(this.data.expected_price),
+            linkDrivePrice: CommonHelper.currency(this.data.final_price),
             status: CommonHelper.number(this.data.status),
             statusLabel: CommonHelper.getCarListingsStatusName(this.data.status),
             inspector: this.data.status >= UsedCarListingStatus.INSPECTOR_ASSIGNED ? {
