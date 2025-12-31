@@ -96,6 +96,9 @@ export class UsedCar {
     @Column({ name: 'inspection_assigned_to', type: 'int', nullable: true })
     inspection_assigned_to: number | null;
 
+    @Column({ name: 'assigned_by', type: 'int', nullable: true })
+    assigned_by: number | null;
+
     // Timestamps
     @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
     created_at: Date;

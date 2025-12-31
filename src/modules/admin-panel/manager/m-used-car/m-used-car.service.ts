@@ -29,7 +29,7 @@ export class MUsedCarService {
                 throw new Error('Manager is not assigned to any inspection centre');
             }
 
-            const inspectionCentre = await this.inspectionCentreRepo.findById(user.inspection_centre_id!);
+            const inspectionCentre = await this.inspectionCentreRepo.findById(user.inspection_centre_id);
             if (!inspectionCentre || inspectionCentre.is_active === false) {
                 throw new Error('Inspection centre not found or inactive');
             }
@@ -39,7 +39,7 @@ export class MUsedCarService {
                 throw new Error('No pincodes found for the city assigned to the manager');
             }
 
-            const result = await this.usedCarRepo.findUsedCarsForAdminPanel(pincodeIds, query, page, limit);
+            const result = await this.usedCarRepo.findUsedCarsForAdminPanel(user, pincodeIds, query, page, limit);
             return result;
         });
     }
@@ -55,7 +55,8 @@ export class MUsedCarService {
                 // assign directly
                 const result = await this.usedCarRepo.assignInspectorToUsedCar(
                     usedCarId,
-                    inspectorId,
+                    user.id,
+                    user.id
                 );
                 if (result.affected === 0) {
                     throw new BadRequestException('Failed to assign inspector. Please check the Car ID.');
@@ -71,6 +72,7 @@ export class MUsedCarService {
                 const result = await this.usedCarRepo.assignInspectorToUsedCar(
                     usedCarId,
                     inspectorId,
+                    user.id
                 );
                 if (result.affected === 0) {
                     throw new Error('Failed to assign inspector. Please check the Car ID.');
