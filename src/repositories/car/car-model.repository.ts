@@ -19,6 +19,10 @@ export class CarModelRepository {
     // find models by brand id and year
     async findByBrandIdAndYear(brandId: number, year: number, search?: string, manager?: EntityManager): Promise<CarModel[]> {
         const repo = await this.getRepo(manager);
+
+        const yearStart = new Date(Date.UTC(year, 0, 1));
+        const yearEnd = new Date(Date.UTC(year, 11, 31));
+
         return repo.find({
             where: [
                 // Case 1: production_end_year IS NULL
@@ -26,7 +30,7 @@ export class CarModelRepository {
                     brand_id: brandId,
                     is_active: true,
                     name: search ? ILike(`%${search}%`) : undefined,
-                    production_start_year: LessThanOrEqual(year),
+                    production_start_year: LessThanOrEqual(yearEnd),
                     production_end_year: IsNull(),
                 },
 
@@ -35,8 +39,8 @@ export class CarModelRepository {
                     brand_id: brandId,
                     is_active: true,
                     name: search ? ILike(`%${search}%`) : undefined,
-                    production_start_year: LessThanOrEqual(year),
-                    production_end_year: MoreThanOrEqual(year),
+                    production_start_year: LessThanOrEqual(yearEnd),
+                    production_end_year: MoreThanOrEqual(yearStart),
                 }
             ],
             select: ['id', 'name', 'display_name'],

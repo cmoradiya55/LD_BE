@@ -31,12 +31,12 @@ export class CarModel {
     @Column({ type: 'smallint' })
     body_type: number;
 
-    @Column({ type: 'smallint' })
-    production_start_year: number;
+    @Column({ type: 'date' })
+    production_start_year: Date;
 
-    @Column({ type: 'smallint', nullable: true })
-    production_end_year: number | null;
-
+    @Column({ type: 'date', nullable: true })
+    production_end_year: Date | null;
+     
     @Column({ type: 'numeric', precision: 2, scale: 1, nullable: true })
     global_ncap_rating: number | null;
 

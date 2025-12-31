@@ -29,7 +29,7 @@ export class CarVariantRepository {
         manager?: EntityManager
     ): Promise<CarVariant[]> {
         const repo = await this.getRepo(manager);
-
+        const yearDate = new Date(`${year}-01-01`);
         const query = repo
             .createQueryBuilder('variant')
             .select([
@@ -47,7 +47,7 @@ export class CarVariantRepository {
                 new Brackets((qb) => {
                     qb.where('variant.discontinued_date IS NULL')
                         .orWhere('variant.discontinued_date >= :discontinuedDate', {
-                            discontinuedDate: new Date(`${year}-01-01`),
+                            discontinuedDate: yearDate,
                         });
                 }),
             )
