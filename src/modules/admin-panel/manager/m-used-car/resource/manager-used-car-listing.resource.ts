@@ -1,4 +1,4 @@
-import { FuelTypeLabel, TransmissionTypeLabel } from '@common/enums/car-detail.enum';
+import { FuelTypeLabel, TransmissionTypeLabel, UsedCarListingStatus } from '@common/enums/car-detail.enum';
 import { CommonHelper } from '@common/helpers/common.helper';
 import { BaseResource } from '@common/utils/resource.utils';
 
@@ -66,12 +66,13 @@ export class ManagerUsedCarListingResource extends BaseResource<any> {
             price: CommonHelper.currency(this.data.final_price),
             status: CommonHelper.number(this.data.status),
             statusLabel: CommonHelper.getCarListingsStatusName(this.data.status),
-
-            inspectorId: CommonHelper.number(inspector?.id),
-            inspectorName: CommonHelper.text(inspector?.name),
-            inspectorMobileNumber: CommonHelper.text(inspector?.mobile_number),
-            inspectorRole: CommonHelper.text(inspector?.role),
-            inspectorRoleLabel: CommonHelper.getRoleName(inspector?.role),
+            inspector: this.data.status >= UsedCarListingStatus.INSPECTOR_ASSIGNED ? {
+                id: CommonHelper.number(inspector?.id),
+                name: CommonHelper.text(inspector?.name),
+                mobileNumber: CommonHelper.text(inspector?.mobile_number),
+                role: CommonHelper.text(inspector?.role),
+                roleLabel: CommonHelper.getRoleName(inspector?.role),
+            } : null,
             customerPhotos: CustomerPhotosResource.collection(customerPhotos || []),
             inspectionImages: InspectionImagesResource.collection(inspectionImages || []),
         };
