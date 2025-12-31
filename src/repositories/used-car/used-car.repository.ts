@@ -589,7 +589,7 @@ export class UsedCarRepository {
         return await repo.update(
             {
                 id: usedCarId,
-                status: LessThan(UsedCarListingStatus.INSPECTOR_ASSIGNED),
+                status: LessThan(UsedCarListingStatus.INSPECTION_STARTED),
             },
             {
                 inspection_assigned_to: inspectorId,
