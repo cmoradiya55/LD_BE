@@ -17,6 +17,7 @@ import { PrimaryImageQueryHelper } from '@common/providers/inspection-image/help
 import { UsedCarListingStatus } from '@common/enums/car-detail.enum';
 import { GetUsedCarQueryDto } from '../../modules/admin-panel/manager/m-used-car/dto/get-inspector.dto';
 import { User } from '@entity/user/user.entity';
+import { GetAssignedCarQueryDto } from '../../modules/admin-panel/inspector/inspection/dto/get-assigned-car.dto';
 
 export interface UsedCarListResult {
     data: any[];
@@ -446,7 +447,55 @@ export class UsedCarRepository {
         };
     }
 
+    async getInspectorAssignedCarListQuery(
+        inspectorId: number,
+        filter: GetAssignedCarQueryDto,
+        page: number,
+        limit: number,
+    ): Promise<UsedCarListResult> {
+        const repo = this.getRepo();
 
+        const skip = (page - 1) * limit;
+        const { status } = filter;
+
+        const qb = repo
+            .createQueryBuilder(USED_CAR_TABLE_ALIASES.usedCar)
+
+            // Load relations
+            .leftJoinAndSelect(`${USED_CAR_TABLE_ALIASES.usedCar}.brand`, 'brand')
+            .leftJoinAndSelect(`${USED_CAR_TABLE_ALIASES.usedCar}.model`, 'model')
+            .leftJoinAndSelect(`${USED_CAR_TABLE_ALIASES.usedCar}.variant`, 'variant')
+            .leftJoinAndSelect(`${USED_CAR_TABLE_ALIASES.usedCar}.pincode`, 'pincode')
+            .leftJoinAndSelect('pincode.city', 'city')
+            // .leftJoinAndSelect(`${USED_CAR_TABLE_ALIASES.usedCar}.inspector`, 'inspector')
+            .leftJoinAndSelect(`${USED_CAR_TABLE_ALIASES.usedCar}.photos`, 'customerPhotos')
+            .leftJoinAndSelect(`${USED_CAR_TABLE_ALIASES.usedCar}.inspectionImages`, 'inspectionImages')
+
+            // Filters
+            .where(`${USED_CAR_TABLE_ALIASES.usedCar}.deleted_at IS NULL`)
+            .andWhere(`${USED_CAR_TABLE_ALIASES.usedCar}.inspection_assigned_to = :inspectorId`, { inspectorId })
+            .orderBy(`${USED_CAR_TABLE_ALIASES.usedCar}.created_at`, 'DESC')
+
+        if (status) {
+            qb.andWhere(`${USED_CAR_TABLE_ALIASES.usedCar}.status = :statusLimit`, {
+                statusLimit: status
+            })
+        }
+
+        const [data, total] = await Promise.all([
+            qb.skip(skip)
+                .take(limit)  // ✅ Use .take() not .limit()
+                .getMany(),
+            qb.getCount(),
+        ])
+
+        return {
+            data: data,
+            total,
+            page,
+            limit,
+        };
+    }
 
     /**
      * Get used cars details with it's inspection images, customer images, fetaures, specifications etc.

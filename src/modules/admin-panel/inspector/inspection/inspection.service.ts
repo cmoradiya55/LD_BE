@@ -3,6 +3,7 @@ import { User } from '@entity/user/user.entity';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { StartInspectionDto } from './dto/start-inspection.dto';
 import { UsedCarRepository } from '@repository/used-car/used-car.repository';
+import { GetAssignedCarQueryDto } from './dto/get-assigned-car.dto';
 
 @Injectable()
 export class InspectionService {
@@ -33,5 +34,23 @@ export class InspectionService {
             // Implementation for saving inspection progress
         
         }, true);
+    }
+
+    async getAssignedCars(
+        user: User,
+        query: GetAssignedCarQueryDto
+    ) {
+        return this.baseService.catch(async () => {
+            // show car belongs to city of manager only
+            const { page, limit } = query;
+
+            const result = await this.usedCarRepo.getInspectorAssignedCarListQuery(
+                user.id,
+                query,
+                page,
+                limit
+            );
+            return result;
+        });
     }
 }

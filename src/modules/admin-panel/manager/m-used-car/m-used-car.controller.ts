@@ -24,7 +24,7 @@ export class MUsedCarController {
   ) {
     const { data, page, limit, total } = await this.mUsedCarService.getUsedCars(user, query);
     return ApiResponseUtil.paginated(
-      'Users fetched successfully',
+      'Cars fetched successfully',
       // data,
       ManagerUsedCarListingResource.collection(data),
       page,
