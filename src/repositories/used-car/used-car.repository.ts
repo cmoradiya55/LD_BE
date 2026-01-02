@@ -115,20 +115,20 @@ export class UsedCarRepository {
         };
     }
 
-    async checkInspectionAssigned(
+    async getDetailsByInspectionAssignedTo(
         vehicleId: number,
         inspectorId: number,
         manager?: EntityManager,
-    ): Promise<boolean> {
+    ): Promise<UsedCar | null> {
         const repo = this.getRepo(manager);
-        const isExist = await repo.exists({
+        const data = await repo.findOne({
             where: {
-                status: UsedCarListingStatus.INSPECTOR_ASSIGNED,
+                // status: UsedCarListingStatus.INSPECTOR_ASSIGNED,
                 id: vehicleId,
                 inspection_assigned_to: inspectorId,
             },
         });
-        return !!isExist;
+        return data;
     }
 
     async validateInspectorAccess(

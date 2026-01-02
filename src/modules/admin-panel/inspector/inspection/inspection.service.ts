@@ -1,6 +1,6 @@
 import { BaseService } from '@common/base/base.service';
 import { User } from '@entity/user/user.entity';
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, HttpStatus, Injectable } from '@nestjs/common';
 import { StartInspectionDto } from './dto/start-inspection.dto';
 import { UsedCarRepository } from '@repository/used-car/used-car.repository';
 import { GetAssignedCarQueryDto } from './dto/get-assigned-car.dto';
@@ -34,23 +34,36 @@ export class InspectionService {
         private readonly inspectionImageRepo: InspectionImageRepository,
     ) { }
 
-    async startInspection(user: User, dto: StartInspectionDto): Promise<void> {
+    async startInspection(user: User, dto: StartInspectionDto): Promise<{ code: number; message: string }> {
         return this.baseService.catch(async () => {
             const inspectorId = user.id;
             const { vehicleId } = dto;
+            let message = 'Inspection started successfully';
+            let code = HttpStatus.OK;
 
             if (!user.isInspector() && !user.isManager()) {
                 throw new BadRequestException('You are not authorized to start inspection');
             }
 
             // check that car is assigned to inspector
-            const isInspectionAssigned = await this.usedCarRepo.checkInspectionAssigned(vehicleId, inspectorId);
+            const isInspectionAssigned = await this.usedCarRepo.getDetailsByInspectionAssignedTo(vehicleId, inspectorId);
             if (!isInspectionAssigned) throw new BadRequestException('Inspection not found for the vehicle');
+
+            if (isInspectionAssigned.status === UsedCarListingStatus.INSPECTION_STARTED) {
+                message = 'Inspection already started';
+                return { code: HttpStatus.ALREADY_REPORTED, message };
+            }
+
+            if (isInspectionAssigned.status !== UsedCarListingStatus.INSPECTOR_ASSIGNED) {
+                throw new BadRequestException('Inspection cannot be started. Invalid inspection status.');
+            }
 
             const updateResult = await this.usedCarRepo.startInspection(vehicleId, inspectorId);
             if (updateResult.affected === 0) {
                 throw new BadRequestException('Failed to start inspection. Please try again.');
             }
+
+            return { code, message };
         });
     }
 

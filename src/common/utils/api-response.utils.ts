@@ -75,6 +75,15 @@ export class ApiResponseUtil {
         }
     }
 
+    // 208 - Already Reported
+    static alreadyReported(message = 'Already Reported'): ApiResponse<null> {
+        return {
+            code: HttpStatus.ALREADY_REPORTED,
+            type: ResponseType.ALREADY_REPORTED,
+            message,
+        }
+    }
+
     // 200 - Paginated Response
     static paginated<T>(
         message = 'Success',

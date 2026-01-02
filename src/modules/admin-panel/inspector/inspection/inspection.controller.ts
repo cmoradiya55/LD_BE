@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, HttpStatus, Param, Post, Query } from '@nestjs/common';
 import { InspectionService } from './inspection.service';
 import { UserRole } from '@common/enums/user.enum';
 import { Roles } from '../../u-auth/decorator/user-roles.decorator';
@@ -41,10 +41,10 @@ export class InspectionController {
     @CurrentUser() user: User,
     @Body() body: StartInspectionDto,
   ) {
-    await this.inspectionService.startInspection(user, body);
-    return ApiResponseUtil.success(
-      'Inspection started successfully',
-    );
+    const { code, message } = await this.inspectionService.startInspection(user, body);
+    return code === HttpStatus.ALREADY_REPORTED 
+      ? ApiResponseUtil.alreadyReported(message)
+      : ApiResponseUtil.success(message);
   }
 
   @Post(':usedCarId/progress')
