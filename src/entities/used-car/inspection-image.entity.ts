@@ -2,10 +2,11 @@
 // entities/inspection-image.entity.ts
 // =============================================
 
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne, JoinColumn, Index, UpdateDateColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne, JoinColumn, Index, UpdateDateColumn, Unique } from 'typeorm';
 import { UsedCar } from './used-car.entity';
 
 @Entity('inspection_images')
+@Unique('uk_inspection_vehicle_type_subtype', ['vehicle_id', 'image_type', 'image_subtype'])
 @Index('idx_inspection_images_lookup', ['vehicle_id', 'is_active', 'image_type', 'image_subtype', 'sort_order'])
 export class InspectionImage {
     @PrimaryGeneratedColumn()

@@ -34,6 +34,7 @@ import { User } from '@entity/user/user.entity';
 import { UserRefreshToken } from '@entity/user/user-refresh-token.entity';
 import { InspectionCentre } from '@entity/inapection-centre/inspection-centre.entity';
 import { InspectionCentreRepository } from './inspection-centre/inspection-centre.repository';
+import { InspectionImageRepository } from './used-car/inspection-image.repository';
 
 @Module({
   imports: [
@@ -62,7 +63,7 @@ import { InspectionCentreRepository } from './inspection-centre/inspection-centr
       // Admiinn User
       User,
       UserRefreshToken,
-      InspectionCentre
+      InspectionCentre,
     ]),
   ],
   providers: [
@@ -84,7 +85,9 @@ import { InspectionCentreRepository } from './inspection-centre/inspection-centr
     UserRepository,
     UserRefreshTokenRepository,
 
-    InspectionCentreRepository
+    InspectionCentreRepository,
+
+    InspectionImageRepository
   ],
   exports: [
     CarBrandRepository,
@@ -105,7 +108,9 @@ import { InspectionCentreRepository } from './inspection-centre/inspection-centr
 
     UserRepository,
     UserRefreshTokenRepository,
-    InspectionCentreRepository
+    InspectionCentreRepository,
+
+    InspectionImageRepository
   ],
 })
 export class RepositoriesModule { }

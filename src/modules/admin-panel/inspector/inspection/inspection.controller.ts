@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { InspectionService } from './inspection.service';
 import { UserRole } from '@common/enums/user.enum';
 import { Roles } from '../../u-auth/decorator/user-roles.decorator';
@@ -8,8 +8,9 @@ import { CurrentUser } from '@common/decorators/admin-panel/current-user.decorat
 import { User } from '@entity/user/user.entity';
 import { StartInspectionDto } from './dto/start-inspection.dto';
 import { ApiResponseUtil } from '@common/utils/api-response.utils';
-import { GetAssignedCarQueryDto } from './dto/get-assigned-car.dto';
+import { SaveInspectionDraftDto, SaveInspectionDraftParamDto } from './dto/save-inspection-image.dto';
 import { AssignedCarListingResource } from './resource/assigned-car-list.resource';
+import { GetAssignedCarQueryDto } from './dto/get-assigned-car.dto';
 
 @Controller(`${MODULE_PREFIX.INSPECTOR}/inspection`)
 @AdminAuth()
@@ -45,13 +46,13 @@ export class InspectionController {
     );
   }
 
-  @Post('save-progress')
+  @Post(':usedCarId/progress')
   async saveProgress(
+    @Param() param: SaveInspectionDraftParamDto,
     @CurrentUser() user: User,
-    @Body() body: any,
+    @Body() body: SaveInspectionDraftDto,
   ) {
-    await this.inspectionService.saveInspectionProgress();
-    // Implementation for saving progress in an inspection workflow
+    await this.inspectionService.saveInspectionProgress(param, user, body);
     return ApiResponseUtil.success(
       'Inspection progress saved successfully',
     );

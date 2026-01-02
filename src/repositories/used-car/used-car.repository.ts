@@ -131,6 +131,23 @@ export class UsedCarRepository {
         return !!isExist;
     }
 
+    async validateInspectorAccess(
+        user: User,
+        usedCarId: number,
+        status: UsedCarListingStatus,
+        manager?: EntityManager,
+    ) {
+        const repo = this.getRepo(manager);
+        const isExist = await repo.exists({
+            where: {
+                status: status,
+                id: usedCarId,
+                inspection_assigned_to: user.id,
+            },
+        });
+        return !!isExist;
+    }
+
     async startInspection(
         vehicleId: number,
         inspectorId: number,
@@ -644,6 +661,25 @@ export class UsedCarRepository {
                 inspection_assigned_to: inspectorId,
                 status: UsedCarListingStatus.INSPECTOR_ASSIGNED,
                 assigned_by: assignedBy,
+                updated_at: new Date(),
+            },
+        );
+    }
+
+    async update(
+        vehicleId: number,
+        inspectorId: number,
+        carUpdates: Partial<UsedCar>,
+        manager?: EntityManager,
+    ): Promise<void> {
+        const repo = this.getRepo(manager);
+        await repo.update(
+            {
+                id: vehicleId,
+                inspection_assigned_to: inspectorId,
+            },
+            {
+                ...carUpdates,
                 updated_at: new Date(),
             },
         );

@@ -29,6 +29,12 @@ export class UsedCar {
     @Column({ name: 'slug', type: 'varchar', length: 255 })
     slug: string;
 
+    @Column({ name: 'rc_image', nullable: true, type: 'varchar', length: 255 })
+    rc_image: string;
+
+    @Column({ name: 'insurance_image', nullable: true, type: 'varchar', length: 255 })
+    insurance_image: string;
+
     @Column({ name: 'customer_id', type: 'int' })
     customer_id: number;
 
