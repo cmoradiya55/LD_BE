@@ -7,7 +7,7 @@ import { MAX_FILE_UPLOAD_ALLOWED, MIN_FILE_UPLOAD_REQUIRED } from '@common/const
 class FileRequestDto {
     @IsNotEmpty()
     @IsString()
-    @Matches(/^[a-zA-Z0-9.-]+$/, { message: 'Invalid filename' })
+    @Matches(/^[a-zA-Z0-9._ -]+$/, { message: 'Invalid filename' })  /// /^[a-zA-Z0-9._ -]+$/,
     name: string;
 
 

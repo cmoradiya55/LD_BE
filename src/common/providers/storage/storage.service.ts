@@ -30,7 +30,7 @@ export class StorageService {
                 this.validateFileType(name, type);
 
                 // B. SANITIZATION LAYER
-                const cleanName = name.replace(/[^a-zA-Z0-9.-]/g, '_');
+                const cleanName = StorageService.sanitizeFilename(name);
 
                 const parts: any = [zone, category];
 
@@ -71,5 +71,16 @@ export class StorageService {
                 `File extension .${extension} does not match content type ${mimeType}`
             );
         }
+    }
+
+    private static sanitizeFilename(name: string): string {
+        return name
+            .trim()                                // remove leading/trailing spaces
+            .replace(/[^a-zA-Z0-9._ -]/g, '_')     // replace unsafe chars
+            .replace(/_+/g, '_')                    // collapse multiple underscores
+            .replace(/\s+/g, '_')                   // replace spaces with underscore
+            .replace(/\.{2,}/g, '.')                // collapse multiple dots
+            .replace(/^\.*/, '')                     // remove leading dots
+            .substring(0, 255);                     // max filename length
     }
 }
