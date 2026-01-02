@@ -84,7 +84,6 @@ export class InspectionService {
                 insurance_image,
             } = dto;
 
-
             const car = await this.usedCarRepo.validateInspectorAccess(user, usedCarId, UsedCarListingStatus.INSPECTION_STARTED, manager);
             if (!car) {
                 throw new BadRequestException('Inspection not found for the vehicle');
@@ -100,19 +99,19 @@ export class InspectionService {
                 carUpdates.registration_number_clean = clean;
             }
 
-            if (registration_year?.toString().trim()) {
+            if (registration_year?.toString()?.trim()) {
                 carUpdates.registration_year = registration_year;
             }
 
-            if (km_driven?.toString().trim()) {
+            if (km_driven?.toString()?.trim()) {
                 carUpdates.km_driven = km_driven;
             }
 
-            if (rc_image?.toString().trim()) {
+            if (rc_image?.toString()?.trim()) {
                 carUpdates.rc_image = rc_image;
             }
 
-            if (insurance_image?.toString().trim()) {
+            if (insurance_image?.toString()?.trim()) {
                 carUpdates.insurance_image = insurance_image;
             }
 
@@ -127,7 +126,7 @@ export class InspectionService {
 
             // Save/update images
             if (images && images.length > 0) {
-                const validImages = images.filter(img => img.image_url.trim());
+                const validImages = images.filter(img => img.image_url?.trim());
                 if (validImages.length > 0) {
                     // Upsert
                     await this.inspectionImageRepo.saveImagesUpsert(
@@ -166,6 +165,12 @@ export class InspectionService {
             );
 
         }, true);
+    }
+
+    async getInspectionDetails(user: User, usedCarId: number) {
+        return this.baseService.catch(async () => {
+
+        });
     }
 
     async getAssignedCars(

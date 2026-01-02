@@ -107,17 +107,22 @@ const TYRES_MANDATORY: RequiredTyreConfig = {
 };
 
 const ENGINE_MANDATORY: RequiredEngineConfig = {
-    [InspectionImageSubType[InspectionImageType.ENGINE_AND_TRANSMISSION].EXHAUST_SMOKE]: true,
-    [InspectionImageSubType[InspectionImageType.ENGINE_AND_TRANSMISSION].ENGINE]: true,
-    [InspectionImageSubType[InspectionImageType.ENGINE_AND_TRANSMISSION].ENGINE_SOUND]: true,
-    [InspectionImageSubType[InspectionImageType.ENGINE_AND_TRANSMISSION].ENGINE_MOUNTING]: true,
-    [InspectionImageSubType[InspectionImageType.ENGINE_AND_TRANSMISSION].CLUTCH]: true,
     [InspectionImageSubType[InspectionImageType.ENGINE_AND_TRANSMISSION].GEAR_SHIFTING]: true,
-    [InspectionImageSubType[InspectionImageType.ENGINE_AND_TRANSMISSION].ENGINE_OIL_LEVEL_DIPSTICK]: true,
-    [InspectionImageSubType[InspectionImageType.ENGINE_AND_TRANSMISSION].ENGINE_OIL]: true,
     [InspectionImageSubType[InspectionImageType.ENGINE_AND_TRANSMISSION].BATTERY]: true,
     [InspectionImageSubType[InspectionImageType.ENGINE_AND_TRANSMISSION].COOLANT]: true,
-    [InspectionImageSubType[InspectionImageType.ENGINE_AND_TRANSMISSION].SUMP]: true,
+
+    // Petrol/Diesel specific
+    [InspectionImageSubType[InspectionImageType.ENGINE_AND_TRANSMISSION].EXHAUST_SMOKE]: false,
+    [InspectionImageSubType[InspectionImageType.ENGINE_AND_TRANSMISSION].ENGINE]: false,
+    [InspectionImageSubType[InspectionImageType.ENGINE_AND_TRANSMISSION].ENGINE_SOUND]: false,
+    [InspectionImageSubType[InspectionImageType.ENGINE_AND_TRANSMISSION].ENGINE_MOUNTING]: false,
+    [InspectionImageSubType[InspectionImageType.ENGINE_AND_TRANSMISSION].CLUTCH]: false,
+    [InspectionImageSubType[InspectionImageType.ENGINE_AND_TRANSMISSION].ENGINE_OIL_LEVEL_DIPSTICK]: false,
+    [InspectionImageSubType[InspectionImageType.ENGINE_AND_TRANSMISSION].SUMP]: false,
+    [InspectionImageSubType[InspectionImageType.ENGINE_AND_TRANSMISSION].COLD_START]: false,
+    
+    // Electric specific
+    [InspectionImageSubType[InspectionImageType.ENGINE_AND_TRANSMISSION].MOTOR_SOUND]: false,
 };
 
 const STEERING_MANDATORY: RequiredSteeringConfig = {
@@ -143,12 +148,13 @@ const ELECTRICAL_MANDATORY: RequiredElectricalConfig = {
     [InspectionImageSubType[InspectionImageType.ELECTRICAL].MUSIC_SYSTEM]: true,
     [InspectionImageSubType[InspectionImageType.ELECTRICAL].ELECTRICAL]: true,
     [InspectionImageSubType[InspectionImageType.ELECTRICAL].PARKING_SENSOR]: true,
-    [InspectionImageSubType[InspectionImageType.ELECTRICAL].INTERIOR]: true,
+    [InspectionImageSubType[InspectionImageType.ELECTRICAL].INTERIOR]: false,
 };
 
 const INTERIOR_MANDATORY: RequiredInteriorConfig = {
     [InspectionImageSubType[InspectionImageType.INTERIOR].DASHBOARD]: true,
     [InspectionImageSubType[InspectionImageType.INTERIOR].ODOMETER]: true,
+    [InspectionImageSubType[InspectionImageType.INTERIOR].FRONT_SEAT_SIDE]: true,
     [InspectionImageSubType[InspectionImageType.INTERIOR].REAR_SEAT_SIDE]: true,
     [InspectionImageSubType[InspectionImageType.INTERIOR].BOOT_SPACE]: true,
 };

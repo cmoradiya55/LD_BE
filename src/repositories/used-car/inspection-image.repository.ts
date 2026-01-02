@@ -1,5 +1,5 @@
 import { InspectionImageBaseDto } from "@common/dto/inspection-image-base.dto";
-import { IMAGE_SUBTYPE_NAMES, InspectionImageType } from "@common/providers/inspection-image/enum/inspection-image.enum";
+import { IMAGE_SUBTYPE_NAMES, InspectionImageSubType, InspectionImageType } from "@common/providers/inspection-image/enum/inspection-image.enum";
 import { InspectionImage } from "@entity/used-car/inspection-image.entity";
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
@@ -26,6 +26,13 @@ export class InspectionImageRepository {
 
         const repo = this.getRepo(manager);
 
+        const isPowerWindowSubtypes = [
+            InspectionImageSubType[InspectionImageType.ELECTRICAL].LHS_FRONT_WINDOW,
+            InspectionImageSubType[InspectionImageType.ELECTRICAL].LHS_REAR_WINDOW,
+            InspectionImageSubType[InspectionImageType.ELECTRICAL].RHS_FRONT_WINDOW,
+            InspectionImageSubType[InspectionImageType.ELECTRICAL].RHS_REAR_WINDOW,
+        ];
+
         const values = images.map(img => ({
             vehicle_id: vehicleId,
             inspector_id: inspectorId,
@@ -35,6 +42,7 @@ export class InspectionImageRepository {
             title: IMAGE_SUBTYPE_NAMES[img.type]?.[img.sub_type] || null,
             image_url: img.image_url,
             has_damage: img.is_damage || false,
+            is_power: isPowerWindowSubtypes.includes(img.sub_type as any) ? img.is_power : null,
             remarks: img.remarks || null,
             is_active: true,
         }));

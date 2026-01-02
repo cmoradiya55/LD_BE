@@ -42,6 +42,9 @@ export class InspectionImage {
     @Column({ type: 'boolean', default: false })
     has_damage: boolean;
 
+    @Column({ type: 'boolean', nullable: true })
+    is_power: boolean | null;
+
     @Column({ type: 'smallint', default: 0 })
     sort_order: number;
 

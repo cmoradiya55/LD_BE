@@ -113,11 +113,14 @@ export const InspectionImageSubType = {
         GEAR_SHIFTING: 6,
 
         ENGINE_OIL_LEVEL_DIPSTICK: 7,
-        ENGINE_OIL: 8,
 
-        BATTERY: 9,
-        COOLANT: 10,
-        SUMP: 11,
+        BATTERY: 8,
+        COOLANT: 9,
+        SUMP: 10,
+        COLD_START: 11,
+        
+        // Electric vehicles
+        MOTOR_SOUND: 12,
     },
 
     [InspectionImageType.STEERING_SUSPENSION_AND_BRAKES]: {
@@ -153,9 +156,9 @@ export const InspectionImageSubType = {
         DASHBOARD: 1,
         ODOMETER: 2,
 
-        FRONT_SEAT_SIDE: 2,
-        REAR_SEAT_SIDE: 3,
-        BOOT_SPACE: 4,
+        FRONT_SEAT_SIDE: 3,
+        REAR_SEAT_SIDE: 4,
+        BOOT_SPACE: 5,
     },
 
     [InspectionImageType.SEATS]: {
@@ -250,16 +253,17 @@ export const IMAGE_SUBTYPE_NAMES = {
 
     [InspectionImageType.ENGINE_AND_TRANSMISSION]: {
         [InspectionImageSubType[InspectionImageType.ENGINE_AND_TRANSMISSION].EXHAUST_SMOKE]: 'Exhaust Smoke',
+        [InspectionImageSubType[InspectionImageType.ENGINE_AND_TRANSMISSION].COLD_START]: 'Cold Start',
         [InspectionImageSubType[InspectionImageType.ENGINE_AND_TRANSMISSION].ENGINE]: 'Engine',
         [InspectionImageSubType[InspectionImageType.ENGINE_AND_TRANSMISSION].ENGINE_SOUND]: 'Engine Sound',
         [InspectionImageSubType[InspectionImageType.ENGINE_AND_TRANSMISSION].ENGINE_MOUNTING]: 'Engine Mounting',
         [InspectionImageSubType[InspectionImageType.ENGINE_AND_TRANSMISSION].CLUTCH]: 'Clutch',
         [InspectionImageSubType[InspectionImageType.ENGINE_AND_TRANSMISSION].GEAR_SHIFTING]: 'Gear Shifting',
         [InspectionImageSubType[InspectionImageType.ENGINE_AND_TRANSMISSION].ENGINE_OIL_LEVEL_DIPSTICK]: 'Engine Oil Level (Dipstick)',
-        [InspectionImageSubType[InspectionImageType.ENGINE_AND_TRANSMISSION].ENGINE_OIL]: 'Engine Oil',
         [InspectionImageSubType[InspectionImageType.ENGINE_AND_TRANSMISSION].BATTERY]: 'Battery',
         [InspectionImageSubType[InspectionImageType.ENGINE_AND_TRANSMISSION].COOLANT]: 'Coolant',
         [InspectionImageSubType[InspectionImageType.ENGINE_AND_TRANSMISSION].SUMP]: 'Sump',
+        [InspectionImageSubType[InspectionImageType.ENGINE_AND_TRANSMISSION].MOTOR_SOUND]: 'Motor Sound',
     },
 
     [InspectionImageType.STEERING_SUSPENSION_AND_BRAKES]: {

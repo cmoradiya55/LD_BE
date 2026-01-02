@@ -69,4 +69,17 @@ export class InspectionController {
       'Inspection completed successfully',
     );
   }
+
+  @Get(':usedCarId/details')
+  async getInspectionDetails(
+    @Param('usedCarId') usedCarId: number,
+    @CurrentUser() user: User,
+  ) {
+    const data = await this.inspectionService.getInspectionDetails(user, usedCarId);
+    // Implementation for fetching inspection details can be added here
+    return ApiResponseUtil.success(
+      'Inspection details fetched successfully',
+      data,
+    );
+  }
 }
