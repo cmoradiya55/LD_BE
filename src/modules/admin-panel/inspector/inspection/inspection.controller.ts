@@ -8,9 +8,10 @@ import { CurrentUser } from '@common/decorators/admin-panel/current-user.decorat
 import { User } from '@entity/user/user.entity';
 import { StartInspectionDto } from './dto/start-inspection.dto';
 import { ApiResponseUtil } from '@common/utils/api-response.utils';
-import { SaveInspectionDraftDto, SaveInspectionDraftParamDto } from './dto/save-inspection-image.dto';
+import { SaveInspectionDraftDto, SaveInspectionDraftParamDto } from './dto/save-inspection.dto';
 import { AssignedCarListingResource } from './resource/assigned-car-list.resource';
 import { GetAssignedCarQueryDto } from './dto/get-assigned-car.dto';
+import { CompleteInspectionParamDto } from './dto/complete-inpection.dto';
 
 @Controller(`${MODULE_PREFIX.INSPECTOR}/inspection`)
 @AdminAuth()
@@ -58,9 +59,12 @@ export class InspectionController {
     );
   }
 
-  @Post('complete')
-  async completeInspection() {
-    // Implementation for completing an inspection workflow
+  @Post(':usedCarId/complete')
+  async completeInspection(
+    @Param() param: CompleteInspectionParamDto,
+    @CurrentUser() user: User,
+  ) {
+    await this.inspectionService.completeInspection(user, param);
     return ApiResponseUtil.success(
       'Inspection completed successfully',
     );

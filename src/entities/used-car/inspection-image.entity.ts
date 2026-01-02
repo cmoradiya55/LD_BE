@@ -24,6 +24,9 @@ export class InspectionImage {
     @Column({ type: 'smallint' })
     image_subtype: number;
 
+    @Column({ type: 'smallint', nullable: true })
+    tread_depth: number | null;
+
     @Column({ type: 'varchar', length: 500 })
     image_url: string;
 
@@ -31,7 +34,7 @@ export class InspectionImage {
     title: string;
 
     @Column({ type: 'text', nullable: true })
-    remarks: string;
+    remarks: string | null;
 
     @Column({ type: 'smallint', nullable: true })
     condition_rating: number;

@@ -1,6 +1,16 @@
 // =============================================
 // enums/inspection-image.enum.ts
 // =============================================
+export enum TreadDepthEnum {
+    LESS_THAN_3MM = 3,
+    BETWEEN_3MM_AND_4MM = 4,
+    BETWEEN_4MM_AND_5MM = 5,
+    BETWEEN_5MM_AND_6MM = 6,
+    BETWEEN_6MM_AND_7MM = 7,
+    BETWEEN_7MM_AND_8MM = 8,
+    BETWEEN_8MM_AND_9MM = 9,
+    BETWEEN_9MM_AND_MM = 10,
+}
 
 export const InspectionImageType = {
     EXTERIOR: 1,
@@ -76,10 +86,10 @@ export const InspectionImageSubType = {
         LEFT_FRONT: 41,
         FRONT: 42,
         LEFT_SIDE: 43,
-        
+
         LEFT_BACK: 44,
         BACK: 45,
-        
+
         RIGHT_BACK: 46,
         RIGHT_SIDE: 47,
         RIGHT_FRONT: 48,

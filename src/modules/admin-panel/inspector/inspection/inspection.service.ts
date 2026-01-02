@@ -4,11 +4,27 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { StartInspectionDto } from './dto/start-inspection.dto';
 import { UsedCarRepository } from '@repository/used-car/used-car.repository';
 import { GetAssignedCarQueryDto } from './dto/get-assigned-car.dto';
-import { SaveInspectionDraftDto, SaveInspectionDraftParamDto } from './dto/save-inspection-image.dto';
+import { SaveInspectionDraftDto, SaveInspectionDraftParamDto } from './dto/save-inspection.dto';
 import { UsedCarListingStatus } from '@common/enums/car-detail.enum';
 import { UsedCar } from '@entity/used-car/used-car.entity';
 import { VehicleHelper } from '@common/helpers/vehicle-helper';
 import { InspectionImageRepository } from '@repository/used-car/inspection-image.repository';
+import { CompleteInspectionParamDto } from './dto/complete-inpection.dto';
+import { InspectionImageType } from '@common/providers/inspection-image/enum/inspection-image.enum';
+import { BASIC_FIELD_RULES, REQUIRED_INSPECTION_IMAGES } from '@common/providers/inspection-image/config/inspection-image-validation.config';
+import { InspectionImage } from '@entity/used-car/inspection-image.entity';
+
+interface ValidationResult {
+    isValid: boolean;
+    errors: ValidationError[];
+}
+
+interface ValidationError {
+    field: string;
+    message: string;
+    code: string;
+    details?: any;
+}
 
 @Injectable()
 export class InspectionService {
@@ -31,7 +47,10 @@ export class InspectionService {
             const isInspectionAssigned = await this.usedCarRepo.checkInspectionAssigned(vehicleId, inspectorId);
             if (!isInspectionAssigned) throw new BadRequestException('Inspection not found for the vehicle');
 
-            await this.usedCarRepo.startInspection(vehicleId, inspectorId);
+            const updateResult = await this.usedCarRepo.startInspection(vehicleId, inspectorId);
+            if (updateResult.affected === 0) {
+                throw new BadRequestException('Failed to start inspection. Please try again.');
+            }
         });
     }
 
@@ -109,47 +128,32 @@ export class InspectionService {
         }, true);
     }
 
-    // ========================================
-    // SUBMIT - Comprehensive DB Validation
-    // ========================================
-    // async submitInspection(user: User, dto: SubmitInspectionDto) {
-    // return this.baseService.catch(async (manager) => {
-    //     const car = await this.validateInspectorAccess(user, dto.usedCarId, manager);
+    async completeInspection(user: User, param: CompleteInspectionParamDto) {
+        return this.baseService.catch(async (manager) => {
+            const { usedCarId } = param;
+            const car = await this.usedCarRepo.validateInspectorAccess(user, usedCarId, UsedCarListingStatus.INSPECTION_STARTED, manager, true);
+            if (!car) {
+                throw new BadRequestException('Inspection already completed or not found for the vehicle');
+            }
 
-    //     // ✅ Validate from DB
-    //     const validation = await this.validateInspectionData(car.id, manager);
+            const validation = this.validateInspection(car);
 
-    //     if (!validation.isValid) {
-    //         throw new BadRequestException({
-    //             message: 'Inspection incomplete. Please fix the following issues:',
-    //             errors: validation.errors,
-    //             completionPercentage: validation.completionPercentage,
-    //         });
-    //     }
+            if (!validation.isValid) {
+                throw new BadRequestException({
+                    message: 'Inspection incomplete. Please fix the following issues:',
+                    errors: validation.errors,
+                });
+            }
 
-    //     // ✅ Update car with final submission data
-    //     await this.usedCarRepo.update(car.id, {
-    //         status: UsedCarListingStatus.INSPECTED,
-    //         inspected_at: new Date(),
-    //         inspected_by: user.id,
-    //         inspector_remarks: dto.inspectorRemarks,
-    //         final_price: dto.finalPrice,
-    //         is_verified: dto.isCarPassed ?? true,
-    //     }, manager);
+            // Update status
+            await this.usedCarRepo.completeInspection(
+                usedCarId,
+                user.id,
+                manager,
+            );
 
-    //     // ✅ Create inspection report (async)
-    //     await this.generateInspectionReport(car.id, manager);
-
-    //     // ✅ Notify stakeholders
-    //     await this.notifyInspectionComplete(car.id);
-
-    //     return {
-    //         message: 'Inspection submitted successfully',
-    //         carId: car.id,
-    //         reportUrl: `/inspections/${car.id}/report`,
-    //     };
-    // }, true);
-    // }
+        }, true);
+    }
 
     async getAssignedCars(
         user: User,
@@ -169,56 +173,109 @@ export class InspectionService {
         });
     }
 
-    // ========================================
-    // VALIDATION - From Database
-    // ========================================
-    // private async validateInspectionData(
-    //     carId: number,
-    //     manager: EntityManager,
-    // ): Promise<ValidationResult> {
-    //     const errors: ValidationError[] = [];
+    private validateInspection(car: UsedCar): ValidationResult {
+        const errors: ValidationError[] = [];
 
-    //     // Load car with all inspection data
-    //     const car = await this.usedCarRepo.findOne({
-    //         where: { id: carId },
-    //         relations: ['inspectionImages'],
-    //     }, manager);
+        // 1. Basic fields
+        errors.push(...this.validateBasicFields(car));
 
-    //     // 1. Basic car details
-    //     if (!car.registration_number) {
-    //         errors.push({ field: 'registration_number', message: 'Required', code: 'REQUIRED' });
-    //     }
-    //     if (!car.registration_year) {
-    //         errors.push({ field: 'registration_year', message: 'Required', code: 'REQUIRED' });
-    //     }
-    //     if (car.km_driven === null) {
-    //         errors.push({ field: 'km_driven', message: 'Required', code: 'REQUIRED' });
-    //     }
+        // 2. Images
+        errors.push(...this.validateImages(car.inspectionImages || []));
 
-    //     // 2. Images validation
-    //     const imageValidation = this.validateImages(car.inspectionImages);
-    //     errors.push(...imageValidation.errors);
+        return {
+            isValid: errors.length === 0,
+            errors,
+        };
+    }
 
-    //     // 3. Documents validation
-    //     const hasRC = car.inspectionImages.some(img =>
-    //         img.image_type === InspectionImageType.OTHER && img.title === 'RC_DOCUMENT'
-    //     );
-    //     const hasInsurance = car.inspectionImages.some(img =>
-    //         img.image_type === InspectionImageType.OTHER && img.title === 'INSURANCE_DOCUMENT'
-    //     );
+    private validateBasicFields(car: UsedCar): ValidationError[] {
+        return BASIC_FIELD_RULES
+            .filter(rule => !rule.validator(car))
+            .map(rule => ({
+                field: rule.field,
+                message: rule.message,
+                code: rule.code,
+            }));
+    }
 
-    //     if (!hasRC) errors.push({ field: 'documents', message: 'RC document required', code: 'MISSING_RC' });
-    //     if (!hasInsurance) errors.push({ field: 'documents', message: 'Insurance document required', code: 'MISSING_INSURANCE' });
+    private validateImages(images: InspectionImage[]): ValidationError[] {
+        const errors: ValidationError[] = [];
 
-    //     // 4. Calculate completion
-    //     const totalRequired = 20; // Define based on your requirements
-    //     const completed = this.countCompletedItems(car);
-    //     const completionPercentage = Math.round((completed / totalRequired) * 100);
+        const activeImages = images.filter(img => img.is_active);
 
-    //     return {
-    //         isValid: errors.length === 0 && completionPercentage >= 80,
-    //         errors,
-    //         completionPercentage,
-    //     };
-    // }
+        if (activeImages.length === 0) {
+            errors.push({
+                field: 'images',
+                message: 'At least one inspection image is required',
+                code: 'NO_IMAGES',
+            });
+            return errors;
+        }
+
+        // ✅ Create Set for O(1) lookup
+        const existingImages = new Set(
+            activeImages.map(img => `${img.image_type}-${img.image_subtype}`)
+        );
+
+        // ✅ Find missing mandatory images
+        const missingImages = REQUIRED_INSPECTION_IMAGES
+            .filter(req => req.isMandatory)
+            .filter(req => !existingImages.has(`${req.type}-${req.subtype}`));
+
+        if (missingImages.length > 0) {
+            errors.push({
+                field: 'images.missing',
+                message: `Missing ${missingImages.length} required image(s)`,
+                code: 'MISSING_REQUIRED_IMAGES',
+                details: {
+                    count: missingImages.length,
+                    missing: missingImages.map(img => ({
+                        type: img.type,
+                        subtype: img.subtype,
+                        name: img.name,
+                    })),
+                },
+            });
+        }
+
+        // ✅ Validate damage remarks
+        const damagedWithoutRemarks = activeImages.filter(
+            img => img.has_damage && (!img.remarks || img.remarks.trim() === '')
+        );
+
+        if (damagedWithoutRemarks.length > 0) {
+            errors.push({
+                field: 'images.damage_remarks',
+                message: `${damagedWithoutRemarks.length} damaged item(s) need remarks`,
+                code: 'MISSING_DAMAGE_REMARKS',
+                details: {
+                    count: damagedWithoutRemarks.length,
+                    images: damagedWithoutRemarks.map(img => ({
+                        type: img.image_type,
+                        subtype: img.image_subtype,
+                    })),
+                },
+            });
+        }
+
+        // ✅ Validate OTHER type
+        const otherImages = activeImages.filter(
+            img => img.image_type === InspectionImageType.OTHER
+        );
+
+        const invalidOtherImages = otherImages.filter(
+            img => !img.title?.trim() && !img.remarks?.trim()
+        );
+
+        if (invalidOtherImages.length > 0) {
+            errors.push({
+                field: 'images.other',
+                message: 'Other images must have a title or remarks',
+                code: 'INVALID_OTHER_IMAGES',
+                details: { count: invalidOtherImages.length },
+            });
+        }
+
+        return errors;
+    }
 }

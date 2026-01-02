@@ -1,6 +1,6 @@
-import { IsInt, IsString, IsBoolean, IsOptional, Min, Max, IsEnum, IsNotEmpty, ValidateIf } from 'class-validator';
+import { IsInt, IsString, IsEnum, IsNotEmpty, ValidateIf } from 'class-validator';
 import { Type } from 'class-transformer';
-import { InspectionImageSubType, InspectionImageType } from '@common/providers/inspection-image/enum/inspection-image.enum';
+import { InspectionImageType, TreadDepthEnum } from '@common/providers/inspection-image/enum/inspection-image.enum';
 import { ParseBoolean } from '@common/decorators/parse-boolean.decorator';
 import { IsValidInspectionImageSubtype } from '@common/decorators/admin-panel/is-valid-sub-inpection-image-subtype.decorator';
 
@@ -22,6 +22,11 @@ export class InspectionImageBaseDto {
 
     @ParseBoolean()
     is_damage: boolean;
+
+    @ValidateIf(o => o.type === InspectionImageType.TYRES)
+    @Type(() => Number)
+    @IsEnum(TreadDepthEnum)
+    tread_depth: number;
 
     @ValidateIf(o => o.is_damage === true)
     @IsNotEmpty()

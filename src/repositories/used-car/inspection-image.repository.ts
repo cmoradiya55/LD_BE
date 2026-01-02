@@ -1,5 +1,5 @@
 import { InspectionImageBaseDto } from "@common/dto/inspection-image-base.dto";
-import { IMAGE_SUBTYPE_NAMES } from "@common/providers/inspection-image/enum/inspection-image.enum";
+import { IMAGE_SUBTYPE_NAMES, InspectionImageType } from "@common/providers/inspection-image/enum/inspection-image.enum";
 import { InspectionImage } from "@entity/used-car/inspection-image.entity";
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
@@ -31,10 +31,11 @@ export class InspectionImageRepository {
             inspector_id: inspectorId,
             image_type: img.type,
             image_subtype: img.sub_type,
+            tread_depth: img.type === InspectionImageType.TYRES ? img.tread_depth : null,
             title: IMAGE_SUBTYPE_NAMES[img.type]?.[img.sub_type] || null,
             image_url: img.image_url,
             has_damage: img.is_damage || false,
-            remarks: img.remarks || undefined,
+            remarks: img.remarks || null,
             is_active: true,
         }));
 
