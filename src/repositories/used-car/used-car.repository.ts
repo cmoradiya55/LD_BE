@@ -3,7 +3,7 @@ import { DUPLICATE_REGISTRATION_STATUS_CHECK } from '@common/constants/used-car.
 import { UsedCar } from '@entity/used-car/used-car.entity';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { EntityManager, In, LessThan, Not, Repository, UpdateResult } from 'typeorm';
+import { And, EntityManager, LessThan, MoreThanOrEqual, Repository, UpdateResult } from 'typeorm';
 import { UsedCarListingDto } from '../../modules/customer/used-car/dto/used-car-listing.dto';
 import { QBHelper } from '@common/helpers/query-builder.helper';
 import { USED_CAR_FILTER_CONFIG, USED_CAR_LIST_SELECT_COLUMNS, USED_CAR_SEARCH_COLUMNS, USED_CAR_TABLE_ALIASES, USED_CAR_TABLES } from './config/used-car-query.filter.config';
@@ -136,19 +136,40 @@ export class UsedCarRepository {
         usedCarId: number,
         status: UsedCarListingStatus,
         manager?: EntityManager,
+        isInspectionImageRequired: boolean = false,
     ) {
         const repo = this.getRepo(manager);
-        const isExist = await repo.exists({
+        const data = await repo.findOne({
             where: {
                 status: status,
                 id: usedCarId,
                 inspection_assigned_to: user.id,
             },
+            ...(isInspectionImageRequired && { relations: ['inspectionImages'] }),
         });
-        return !!isExist;
+        return data;
     }
 
     async startInspection(
+        vehicleId: number,
+        inspectorId: number,
+        manager?: EntityManager,
+    ): Promise<UpdateResult> {
+        const repo = this.getRepo(manager);
+        return await repo.update(
+            {
+                id: vehicleId,
+                inspection_assigned_to: inspectorId,
+                status: UsedCarListingStatus.INSPECTOR_ASSIGNED,
+            },
+            {
+                status: UsedCarListingStatus.INSPECTION_STARTED,
+                updated_at: new Date(),
+            },
+        );
+    }
+
+    async completeInspection(
         vehicleId: number,
         inspectorId: number,
         manager?: EntityManager,
@@ -158,10 +179,11 @@ export class UsedCarRepository {
             {
                 id: vehicleId,
                 inspection_assigned_to: inspectorId,
-                status: UsedCarListingStatus.PENDING,
+                status: And(MoreThanOrEqual(UsedCarListingStatus.INSPECTION_STARTED), LessThan(UsedCarListingStatus.INSPECTION_COMPLETED)),
             },
             {
-                status: UsedCarListingStatus.INSPECTION_STARTED,
+                status: UsedCarListingStatus.INSPECTION_COMPLETED,
+                updated_at: new Date(),
             },
         );
     }
