@@ -123,7 +123,7 @@ export class UsedCarRepository {
         const repo = this.getRepo(manager);
         const isExist = await repo.exists({
             where: {
-                status: UsedCarListingStatus.PENDING,
+                status: UsedCarListingStatus.INSPECTOR_ASSIGNED,
                 id: vehicleId,
                 inspection_assigned_to: inspectorId,
             },
