@@ -9,6 +9,10 @@ export enum MediaCategory {
     SENSITIVE_DOCUMENT = 'sensitive_document',
 }
 
+export enum VideoCategory {
+    INSPECTION_VIDEO = 'inspection_video',
+}
+
 // 2. The Zones
 export enum SecurityZone {
     PUBLIC = 'public',
@@ -17,7 +21,7 @@ export enum SecurityZone {
 
 // 3. THE MAP: This determines the logic. 
 // If you want to make RC Books public later, you change ONE line here.
-export const MEDIA_ZONE_MAP: Record<MediaCategory, SecurityZone> = {
+export const MEDIA_ZONE_MAP: Record<MediaCategory | VideoCategory, SecurityZone> = {
     // Public Stuff
     [MediaCategory.CAR]: SecurityZone.PUBLIC,
     [MediaCategory.IMAGE]: SecurityZone.PUBLIC,
@@ -25,4 +29,10 @@ export const MEDIA_ZONE_MAP: Record<MediaCategory, SecurityZone> = {
 
     // Private Stuff (STRICT)
     [MediaCategory.SENSITIVE_DOCUMENT]: SecurityZone.PRIVATE,
+    [VideoCategory.INSPECTION_VIDEO]: SecurityZone.PRIVATE,
 };
+
+// ✅ Define which categories are videos
+export const VIDEO_CATEGORIES = [
+    VideoCategory.INSPECTION_VIDEO,
+];

@@ -31,7 +31,11 @@ export class S3Service {
      * a different file type than what was requested, S3 will reject it.
      */
     // async generatePresignedUrl(key: string, contentType: string): Promise<{ url: string; key: string }> {
-    async signUrl(key: string, contentType: string): Promise<any> {
+    async signUrl(
+        key: string,
+        contentType: string,
+        expiresIn: number = 120
+    ): Promise<any> {
         try {
             const command = new PutObjectCommand({
                 Bucket: this.bucket,
@@ -42,7 +46,7 @@ export class S3Service {
             });
 
             // Url expires in 2 minutes (120 seconds)
-            const url = await getSignedUrl(this.s3, command, { expiresIn: 120 });
+            const url = await getSignedUrl(this.s3, command, { expiresIn: expiresIn });
 
             return { url, key };
         } catch (error) {

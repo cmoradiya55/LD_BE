@@ -27,11 +27,32 @@ export const ALLOWED_FILE_TYPES: Record<string, string[]> = {
     'image/jpeg': ['jpg', 'jpeg'],
     'image/png': ['png'],
     'image/webp': ['webp'],
+
+    // Documents
     'application/pdf': ['pdf'],
 };
 
+export const ALLOWED_VIDEO_FILE_TYPES: Record<string, string[]> = {
+    // ✅ Videos
+    'video/mp4': ['mp4'],
+    'video/quicktime': ['mov'],
+    'video/x-msvideo': ['avi'],
+    'video/webm': ['webm'],
+    'video/x-matroska': ['mkv'],
+}
+
+// ✅ Video-specific constraints
+export const VIDEO_CONSTRAINTS = {
+    MAX_SIZE: 20 * 1024 * 1024, // 20MB
+    MAX_DURATION: 60, // 60 seconds
+};
+
+
 export const MIN_FILE_UPLOAD_REQUIRED = 1;
 export const MAX_FILE_UPLOAD_ALLOWED = 20;
+
+export const MIN_VIDEO_FILE_UPLOAD_REQUIRED = 1;
+export const MAX_VIDEO_FILE_UPLOAD_ALLOWED = 5;
 
 export const S3_BUCKET_FOLDERS = [] as const;
 
