@@ -145,7 +145,7 @@ export class UsedCarRepository {
                 id: usedCarId,
                 inspection_assigned_to: user.id,
             },
-            ...(isInspectionImageRequired && { relations: ['inspectionImages'] }),
+            ...(isInspectionImageRequired && { relations: ['inspectionImages', 'variant'] }),
         });
         return data;
     }

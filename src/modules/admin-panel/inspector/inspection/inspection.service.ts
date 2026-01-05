@@ -5,13 +5,13 @@ import { StartInspectionDto } from './dto/start-inspection.dto';
 import { UsedCarRepository } from '@repository/used-car/used-car.repository';
 import { GetAssignedCarQueryDto } from './dto/get-assigned-car.dto';
 import { SaveInspectionDraftDto, SaveInspectionDraftParamDto } from './dto/save-inspection.dto';
-import { UsedCarListingStatus } from '@common/enums/car-detail.enum';
+import { FuelType, UsedCarListingStatus } from '@common/enums/car-detail.enum';
 import { UsedCar } from '@entity/used-car/used-car.entity';
 import { VehicleHelper } from '@common/helpers/vehicle-helper';
 import { InspectionImageRepository } from '@repository/used-car/inspection-image.repository';
 import { CompleteInspectionParamDto } from './dto/complete-inpection.dto';
-import { InspectionImageType } from '@common/providers/inspection-image/enum/inspection-image.enum';
-import { BASIC_FIELD_RULES, REQUIRED_INSPECTION_IMAGES } from '@common/providers/inspection-image/config/inspection-image-validation.config';
+import { IMAGE_SUBTYPE_NAMES, InspectionImageType } from '@common/providers/inspection-image/enum/inspection-image.enum';
+import { BASIC_FIELD_RULES, ENGINE_COMMON_MANDATORY, ENGINE_ELECTRIC_MANDATORY, ENGINE_ICE_MANDATORY, REQUIRED_INSPECTION_IMAGES } from '@common/providers/inspection-image/config/inspection-image-validation.config';
 import { InspectionImage } from '@entity/used-car/inspection-image.entity';
 
 interface ValidationResult {
@@ -23,7 +23,25 @@ interface ValidationError {
     field: string;
     message: string;
     code: string;
-    details?: any;
+    details?: ValidationErrorDetails;
+}
+
+interface ValidationErrorDetails {
+    count?: number;
+    missing?: Array<{
+        type: number;
+        subtype: number;
+        name: string;
+    }>;
+    images?: Array<{
+        type: number;
+        subtype: number;
+    }>;
+    fuelType?: FuelType;
+    percentage?: number;
+    required?: number;
+    found?: number;
+    [key: string]: any; // Allow additional fields if needed
 }
 
 @Injectable()
@@ -200,6 +218,13 @@ export class InspectionService {
         // 2. Images
         errors.push(...this.validateImages(car.inspectionImages || []));
 
+        // 3. Validate engine-specific images by fuel type
+        const fuelTypeErrors = this.validateEngineImagesByFuelType(
+            car.variant?.fuel_type,
+            car.inspectionImages || []
+        );
+        errors.push(...fuelTypeErrors);
+
         return {
             isValid: errors.length === 0,
             errors,
@@ -292,6 +317,104 @@ export class InspectionService {
                 code: 'INVALID_OTHER_IMAGES',
                 details: { count: invalidOtherImages.length },
             });
+        }
+
+        return errors;
+    }
+
+    /**
+     * ✅ Validate engine images based on fuel type
+     */
+    private validateEngineImagesByFuelType(
+        fuelType: FuelType,
+        images: InspectionImage[]
+    ): ValidationError[] {
+        const errors: ValidationError[] = [];
+
+        // Check if fuel type exists
+        if (!fuelType) {
+            errors.push({
+                field: 'variant.fuel_type',
+                message: 'Fuel type information is missing for the car variant',
+                code: 'MISSING_FUEL_TYPE',
+            });
+            return errors;
+        }
+
+        const activeImages = images.filter(img => img.is_active);
+
+        // Create set of existing engine images
+        const existingEngineImages = new Set(
+            activeImages
+                .filter(img => img.image_type === InspectionImageType.ENGINE_AND_TRANSMISSION)
+                .map(img => img.image_subtype)
+        );
+
+        // ✅ Validate common engine images (required for all fuel types)
+        const missingCommon = ENGINE_COMMON_MANDATORY.filter(
+            subtype => !existingEngineImages.has(subtype)
+        );
+
+        if (missingCommon.length > 0) {
+            errors.push({
+                field: 'images.engine.common',
+                message: `Missing ${missingCommon.length} common engine image(s)`,
+                code: 'MISSING_COMMON_ENGINE_IMAGES',
+                details: {
+                    count: missingCommon.length,
+                    missing: missingCommon.map(subtype => ({
+                        type: InspectionImageType.ENGINE_AND_TRANSMISSION,
+                        subtype,
+                        name: IMAGE_SUBTYPE_NAMES[InspectionImageType.ENGINE_AND_TRANSMISSION]?.[subtype],
+                    })),
+                },
+            });
+        }
+
+        // ✅ Validate fuel-type specific images
+        if (fuelType === FuelType.ELECTRIC) {
+            // Electric vehicle validation
+            const missingElectric = ENGINE_ELECTRIC_MANDATORY.filter(
+                subtype => !existingEngineImages.has(subtype)
+            );
+
+            if (missingElectric.length > 0) {
+                errors.push({
+                    field: 'images.engine.electric',
+                    message: `Missing ${missingElectric.length} electric motor image(s)`,
+                    code: 'MISSING_ELECTRIC_ENGINE_IMAGES',
+                    details: {
+                        count: missingElectric.length,
+                        missing: missingElectric.map(subtype => ({
+                            type: InspectionImageType.ENGINE_AND_TRANSMISSION,
+                            subtype,
+                            name: IMAGE_SUBTYPE_NAMES[InspectionImageType.ENGINE_AND_TRANSMISSION]?.[subtype],
+                        })),
+                    },
+                });
+            }
+        } else {
+            // ICE (Petrol/Diesel/CNG/Hybrid) validation
+            const missingICE = ENGINE_ICE_MANDATORY.filter(
+                subtype => !existingEngineImages.has(subtype)
+            );
+
+            if (missingICE.length > 0) {
+                errors.push({
+                    field: 'images.engine.ice',
+                    message: `Missing ${missingICE.length} engine image(s) for ${fuelType} vehicle`,
+                    code: 'MISSING_ICE_ENGINE_IMAGES',
+                    details: {
+                        fuelType,
+                        count: missingICE.length,
+                        missing: missingICE.map(subtype => ({
+                            type: InspectionImageType.ENGINE_AND_TRANSMISSION,
+                            subtype,
+                            name: IMAGE_SUBTYPE_NAMES[InspectionImageType.ENGINE_AND_TRANSMISSION]?.[subtype],
+                        })),
+                    },
+                });
+            }
         }
 
         return errors;

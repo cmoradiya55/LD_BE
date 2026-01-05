@@ -22,7 +22,7 @@ interface RequiredImageSpec {
 // ✅ Fix: Use keyof to get valid type keys
 type ValidInspectionType = keyof typeof InspectionImageSubType;
 
-type ExtractSubtypes<T extends ValidInspectionType> = 
+type ExtractSubtypes<T extends ValidInspectionType> =
     typeof InspectionImageSubType[T][keyof typeof InspectionImageSubType[T]];
 
 type ExteriorSubtypes = ExtractSubtypes<typeof InspectionImageType.EXTERIOR>;
@@ -106,6 +106,25 @@ const TYRES_MANDATORY: RequiredTyreConfig = {
     [InspectionImageSubType[InspectionImageType.TYRES].SPARE_TYRE]: true,
 };
 
+// Common for all fuel types
+export const ENGINE_COMMON_MANDATORY = [
+    InspectionImageSubType[InspectionImageType.ENGINE_AND_TRANSMISSION].GEAR_SHIFTING,
+    InspectionImageSubType[InspectionImageType.ENGINE_AND_TRANSMISSION].BATTERY,
+    InspectionImageSubType[InspectionImageType.ENGINE_AND_TRANSMISSION].COOLANT,
+];
+
+// Required only for Petrol/Diesel/CNG/Hybrid
+export const ENGINE_ICE_MANDATORY = [
+    InspectionImageSubType[InspectionImageType.ENGINE_AND_TRANSMISSION].ENGINE,
+    InspectionImageSubType[InspectionImageType.ENGINE_AND_TRANSMISSION].EXHAUST_SMOKE,
+    InspectionImageSubType[InspectionImageType.ENGINE_AND_TRANSMISSION].ENGINE_OIL_LEVEL_DIPSTICK,
+];
+
+// Required only for Electric
+export const ENGINE_ELECTRIC_MANDATORY = [
+    InspectionImageSubType[InspectionImageType.ENGINE_AND_TRANSMISSION].MOTOR_SOUND,
+];
+
 const ENGINE_MANDATORY: RequiredEngineConfig = {
     [InspectionImageSubType[InspectionImageType.ENGINE_AND_TRANSMISSION].GEAR_SHIFTING]: true,
     [InspectionImageSubType[InspectionImageType.ENGINE_AND_TRANSMISSION].BATTERY]: true,
@@ -120,7 +139,7 @@ const ENGINE_MANDATORY: RequiredEngineConfig = {
     [InspectionImageSubType[InspectionImageType.ENGINE_AND_TRANSMISSION].ENGINE_OIL_LEVEL_DIPSTICK]: false,
     [InspectionImageSubType[InspectionImageType.ENGINE_AND_TRANSMISSION].SUMP]: false,
     [InspectionImageSubType[InspectionImageType.ENGINE_AND_TRANSMISSION].COLD_START]: false,
-    
+
     // Electric specific
     [InspectionImageSubType[InspectionImageType.ENGINE_AND_TRANSMISSION].MOTOR_SOUND]: false,
 };
@@ -237,8 +256,8 @@ export const BASIC_FIELD_RULES: BasicFieldRule[] = [
     },
     {
         field: 'registration_year',
-        validator: (car) => 
-            !!car.registration_year && 
+        validator: (car) =>
+            !!car.registration_year &&
             car.registration_year >= 1900 &&
             car.registration_year <= new Date().getFullYear() + 1,
         message: 'Valid registration year is required',
@@ -246,10 +265,10 @@ export const BASIC_FIELD_RULES: BasicFieldRule[] = [
     },
     {
         field: 'km_driven',
-        validator: (car) => 
-            car.km_driven !== null && 
-            car.km_driven !== undefined && 
-            car.km_driven >= 0 && 
+        validator: (car) =>
+            car.km_driven !== null &&
+            car.km_driven !== undefined &&
+            car.km_driven >= 0 &&
             car.km_driven <= 500000,
         message: 'Valid KM driven is required (0-500,000)',
         code: 'INVALID_KM_DRIVEN',
