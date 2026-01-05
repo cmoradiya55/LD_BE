@@ -20,6 +20,7 @@ import { KilometerDriven, OwnershipType, UsedCarListingStatus } from '@common/en
 import { InspectionImage } from './inspection-image.entity';
 import { CustomerWishlist } from '@entity/customer-ops/customer-wishlist.entity';
 import { User } from '@entity/user/user.entity';
+import { Customer } from '@entity/customer/customer.entity';
 
 @Entity('used_car')
 export class UsedCar {
@@ -134,6 +135,11 @@ export class UsedCar {
     @ManyToOne(() => Pincode)
     @JoinColumn({ name: 'pincode_id' })
     pincode: Pincode;
+
+    // customer relation
+    @ManyToOne(() => Customer, customer => customer.usedCars)
+    @JoinColumn({ name: 'customer_id' })
+    customer: Customer;
 
     @OneToMany(() => UsedCarCustomerPhoto, (photo) => photo.listing)
     photos: UsedCarCustomerPhoto[];

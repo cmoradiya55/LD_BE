@@ -2,6 +2,7 @@ import { Entity, Column, PrimaryGeneratedColumn, OneToMany, CreateDateColumn, Up
 import { CustomerRefreshToken } from './customer-refresh-token.entity';
 import { CustomerFcmToken } from './customer-fcm-token.entity';
 import { City } from '@entity/general/city.entity';
+import { UsedCar } from '@entity/used-car/used-car.entity';
 
 @Entity('customers')
 export class Customer {
@@ -95,4 +96,7 @@ export class Customer {
     @ManyToOne(() => City, { nullable: true })
     @JoinColumn({ name: 'city_id' })
     city: City | null;
+
+    @OneToMany(() => UsedCar, usedCar => usedCar.customer)
+    usedCars: UsedCar[];
 }

@@ -187,7 +187,11 @@ export class InspectionService {
 
     async getInspectionDetails(user: User, usedCarId: number) {
         return this.baseService.catch(async () => {
-
+            const car = await this.usedCarRepo.getInspectionDetailsByInspector(user, usedCarId);
+            if (!car) {
+                throw new BadRequestException('Inspection not found for the vehicle');
+            }
+            return car;
         });
     }
 

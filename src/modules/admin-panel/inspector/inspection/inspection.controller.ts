@@ -12,6 +12,7 @@ import { SaveInspectionDraftDto, SaveInspectionDraftParamDto } from './dto/save-
 import { AssignedCarListingResource } from './resource/assigned-car-list.resource';
 import { GetAssignedCarQueryDto } from './dto/get-assigned-car.dto';
 import { CompleteInspectionParamDto } from './dto/complete-inpection.dto';
+import { GetInspectionDetailResource } from './resource/get-inspection-detail.resource';
 
 @Controller(`${MODULE_PREFIX.INSPECTOR}/inspection`)
 @AdminAuth()
@@ -79,7 +80,7 @@ export class InspectionController {
     // Implementation for fetching inspection details can be added here
     return ApiResponseUtil.success(
       'Inspection details fetched successfully',
-      data,
+      new GetInspectionDetailResource(data),
     );
   }
 }

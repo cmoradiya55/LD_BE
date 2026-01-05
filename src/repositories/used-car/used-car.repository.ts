@@ -3,7 +3,7 @@ import { DUPLICATE_REGISTRATION_STATUS_CHECK } from '@common/constants/used-car.
 import { UsedCar } from '@entity/used-car/used-car.entity';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { And, EntityManager, LessThan, MoreThanOrEqual, Repository, UpdateResult } from 'typeorm';
+import { And, EntityManager, IsNull, LessThan, MoreThanOrEqual, Repository, UpdateResult } from 'typeorm';
 import { UsedCarListingDto } from '../../modules/customer/used-car/dto/used-car-listing.dto';
 import { QBHelper } from '@common/helpers/query-builder.helper';
 import { USED_CAR_FILTER_CONFIG, USED_CAR_LIST_SELECT_COLUMNS, USED_CAR_SEARCH_COLUMNS, USED_CAR_TABLE_ALIASES, USED_CAR_TABLES } from './config/used-car-query.filter.config';
@@ -705,6 +705,32 @@ export class UsedCarRepository {
                 updated_at: new Date(),
             },
         );
+    }
+
+    async getInspectionDetailsByInspector(
+        user: User,
+        usedCarId: number,
+    ) {
+        const repo = this.getRepo();
+        const car = await repo.findOne({
+            where: {
+                id: usedCarId,
+                inspection_assigned_to: user.id,
+                deleted_at: IsNull(),
+            },
+            relations: [
+                'brand',
+                'model',
+                'variant',
+                'pincode',
+                'pincode.city',
+                'customer',
+                'inspectionImages',
+            ],
+        });
+        console.log('Inspection car details:', car);
+
+        return car;
     }
 
     // ============ Private Methods ============
