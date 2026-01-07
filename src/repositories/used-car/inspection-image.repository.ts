@@ -24,6 +24,18 @@ export class InspectionImageRepository {
     ): Promise<void> {
         if (!images.length) return;
 
+
+        // ✅ Deduplicate by (image_type + image_subtype)
+        const uniqueMap = new Map<string, InspectionImageBaseDto>();
+
+        for (const img of images) {
+            const key = `${img.type}-${img.sub_type}`;
+            uniqueMap.set(key, img); // last one wins
+        }
+
+        const dedupedImages = Array.from(uniqueMap.values());
+        if (!dedupedImages.length) return;
+
         const repo = this.getRepo(manager);
 
         const isPowerWindowSubtypes = [
@@ -33,7 +45,7 @@ export class InspectionImageRepository {
             InspectionImageSubType[InspectionImageType.ELECTRICAL].RHS_REAR_WINDOW,
         ];
 
-        const values = images.map(img => ({
+        const values = dedupedImages.map(img => ({
             vehicle_id: vehicleId,
             inspector_id: inspectorId,
             image_type: img.type,
