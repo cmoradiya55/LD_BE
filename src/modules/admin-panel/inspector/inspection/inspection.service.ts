@@ -91,7 +91,7 @@ export class InspectionService {
     async saveInspectionProgress(param: SaveInspectionDraftParamDto, user: User, dto: SaveInspectionDraftDto) {
         return this.baseService.catch(async (manager) => {
 
-            // tregistrtion number major udate
+            // registrtion number major udate
             const { usedCarId } = param;
             const {
                 registration_number,
@@ -155,6 +155,8 @@ export class InspectionService {
                     );
                 }
             }
+
+            return await this.getInspectionDetails(user, usedCarId);
         }, true);
     }
 

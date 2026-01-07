@@ -54,9 +54,10 @@ export class InspectionController {
     @CurrentUser() user: User,
     @Body() body: SaveInspectionDraftDto,
   ) {
-    await this.inspectionService.saveInspectionProgress(param, user, body);
+    const data = await this.inspectionService.saveInspectionProgress(param, user, body);
     return ApiResponseUtil.success(
       'Inspection progress saved successfully',
+      new GetInspectionDetailResource(data),
     );
   }
 

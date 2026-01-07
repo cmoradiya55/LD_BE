@@ -179,10 +179,7 @@ const INTERIOR_MANDATORY: RequiredInteriorConfig = {
 };
 
 const SEATS_MANDATORY: RequiredSeatConfig = {
-    [InspectionImageSubType[InspectionImageType.SEATS].LHS_FRONT_SEAT]: true,
-    [InspectionImageSubType[InspectionImageType.SEATS].RHS_FRONT_SEAT]: true,
-    [InspectionImageSubType[InspectionImageType.SEATS].LHS_REAR_SEAT]: true,
-    [InspectionImageSubType[InspectionImageType.SEATS].RHS_REAR_SEAT]: true,
+    [InspectionImageSubType[InspectionImageType.SEATS].LEATHER_SEATS]: true,
 };
 
 // =============================================

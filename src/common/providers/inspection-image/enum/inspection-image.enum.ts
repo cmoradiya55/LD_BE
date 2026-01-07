@@ -162,10 +162,7 @@ export const InspectionImageSubType = {
     },
 
     [InspectionImageType.SEATS]: {
-        LHS_FRONT_SEAT: 1,
-        RHS_FRONT_SEAT: 2,
-        LHS_REAR_SEAT: 3,
-        RHS_REAR_SEAT: 4,
+        LEATHER_SEATS: 1,
     }
 } as const;
 
@@ -300,10 +297,7 @@ export const IMAGE_SUBTYPE_NAMES = {
     },
 
     [InspectionImageType.SEATS]: {
-        [InspectionImageSubType[InspectionImageType.SEATS].LHS_FRONT_SEAT]: 'LHS Front Seat',
-        [InspectionImageSubType[InspectionImageType.SEATS].RHS_FRONT_SEAT]: 'RHS Front Seat',
-        [InspectionImageSubType[InspectionImageType.SEATS].LHS_REAR_SEAT]: 'LHS Rear Seat',
-        [InspectionImageSubType[InspectionImageType.SEATS].RHS_REAR_SEAT]: 'RHS Rear Seat',
+        [InspectionImageSubType[InspectionImageType.SEATS].LEATHER_SEATS]: 'Leather Seats',
     },
 } as const;
 
