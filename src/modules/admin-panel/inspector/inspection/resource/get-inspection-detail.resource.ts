@@ -18,14 +18,18 @@ export class InspectionImageResource extends BaseResource<any> {
             remarks: CommonHelper.text(this.data.remarks)
         };
 
-        if (this.data.type === InspectionImageType.TYRES) {
+        if (this.data.image_type === InspectionImageType.TYRES) {
             data['treadDepth'] = CommonHelper.number(this.data.tread_depth);
         }
 
-        if (this.data.sub_type === InspectionImageSubType[InspectionImageType.ELECTRICAL].LHS_FRONT_WINDOW ||
-            this.data.sub_type === InspectionImageSubType[InspectionImageType.ELECTRICAL].LHS_REAR_WINDOW ||
-            this.data.sub_type === InspectionImageSubType[InspectionImageType.ELECTRICAL].RHS_FRONT_WINDOW ||
-            this.data.sub_type === InspectionImageSubType[InspectionImageType.ELECTRICAL].RHS_REAR_WINDOW) {
+        if (
+            this.data.image_type === InspectionImageType.ELECTRICAL
+            &&
+            (this.data.image_subtype === InspectionImageSubType[InspectionImageType.ELECTRICAL].LHS_FRONT_WINDOW ||
+                this.data.image_subtype === InspectionImageSubType[InspectionImageType.ELECTRICAL].LHS_REAR_WINDOW ||
+                this.data.image_subtype === InspectionImageSubType[InspectionImageType.ELECTRICAL].RHS_FRONT_WINDOW ||
+                this.data.image_subtype === InspectionImageSubType[InspectionImageType.ELECTRICAL].RHS_REAR_WINDOW)
+        ) {
             data['isPower'] = CommonHelper.number(this.data.is_power);
         }
 
