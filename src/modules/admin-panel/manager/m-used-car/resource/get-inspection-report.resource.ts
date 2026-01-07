@@ -4,7 +4,7 @@ import { InspectionImageSubType, InspectionImageType } from '@common/providers/i
 import { BaseResource } from '@common/utils/resource.utils';
 
 
-export class InspectionImageResource extends BaseResource<any> {
+export class InspectionReportImageResource extends BaseResource<any> {
     toJSON() {
         const data = {
             id: CommonHelper.number(this.data.id),
@@ -37,7 +37,7 @@ export class InspectionImageResource extends BaseResource<any> {
     }
 }
 
-export class GetInspectionDetailResource extends BaseResource<any> {
+export class GetInspectionReportResource extends BaseResource<any> {
     toJSON() {
 
         const brand = this.data?.brand;
@@ -85,7 +85,7 @@ export class GetInspectionDetailResource extends BaseResource<any> {
             inspection: {
                 kmDriven: CommonHelper.number(this.data.km_driven),
             },
-            inspectionImages: InspectionImageResource.collection(inspectionImages),
+            inspectionImages: InspectionReportImageResource.collection(inspectionImages),
         };
     }
 }

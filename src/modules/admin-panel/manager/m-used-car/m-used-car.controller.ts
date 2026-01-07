@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { MUsedCarService } from './m-used-car.service';
 import { MODULE_PREFIX } from '@common/constants/app.constant';
 import { ApiResponseUtil } from '@common/utils/api-response.utils';
@@ -10,6 +10,8 @@ import { Roles } from '../../u-auth/decorator/user-roles.decorator';
 import { UserRole } from '@common/enums/user.enum';
 import { ManagerUsedCarListingResource } from './resource/manager-used-car-listing.resource';
 import { MAssignInspectorDto } from './dto/m-assign-inspector.dto';
+import { GetInspectionReportParamDto } from './dto/get-inspection-report.dto';
+import { GetInspectionReportResource } from './resource/get-inspection-report.resource';
 
 @Controller(`${MODULE_PREFIX.MANAGER}/used-car`)
 @AdminAuth()
@@ -30,6 +32,18 @@ export class MUsedCarController {
       page,
       limit,
       total,
+    );
+  }
+
+  @Get(':usedCarId/inspection-report')
+  async getInspectionReport(
+    @CurrentUser() user: User,
+    @Param() param: GetInspectionReportParamDto
+  ) {
+    const report = await this.mUsedCarService.getInspectionReport(user, param);
+    return ApiResponseUtil.success(
+      'Inspection report fetched successfully',
+      new GetInspectionReportResource(report)
     );
   }
 

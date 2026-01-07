@@ -733,6 +733,32 @@ export class UsedCarRepository {
         return car;
     }
 
+        async getInspectionDetailsByManager(
+        user: User,
+        usedCarId: number,
+    ) {
+        const repo = this.getRepo();
+        const car = await repo.findOne({
+            where: {
+                id: usedCarId,
+                assigned_by: user.id,
+                status: MoreThanOrEqual(UsedCarListingStatus.INSPECTION_COMPLETED),
+                deleted_at: IsNull(),
+            },
+            relations: [
+                'brand',
+                'model',
+                'variant',
+                'pincode',
+                'pincode.city',
+                'customer',
+                'inspectionImages',
+            ],
+        });
+
+        return car;
+    }
+
     // ============ Private Methods ============
 
     private createBaseListQuery(customerId: number | undefined, isStatusFilter: boolean = true): SelectQueryBuilder<any> {

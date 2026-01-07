@@ -7,6 +7,7 @@ import { CityRepository } from '@repository/general/city.repository';
 import { UsedCarRepository } from '@repository/used-car/used-car.repository';
 import { MAssignInspectorDto } from './dto/m-assign-inspector.dto';
 import { UserRepository } from '@repository/user/user.repository';
+import { GetInspectionReportParamDto } from './dto/get-inspection-report.dto';
 
 @Injectable()
 export class MUsedCarService {
@@ -78,6 +79,21 @@ export class MUsedCarService {
                     throw new Error('Failed to assign inspector. Please check the Car ID.');
                 }
             }
+        });
+    }
+
+    async getInspectionReport(
+        user: User,
+        param: GetInspectionReportParamDto
+    ) {
+        return this.baseService.catch(async () => {
+            const { usedCarId } = param;
+
+            const report = await this.usedCarRepo.getInspectionDetailsByManager(user, usedCarId);
+            if (!report) {
+                throw new BadRequestException('Inspection report not found for the selected car');
+            }
+            return report;
         });
     }
 }
