@@ -1,22 +1,17 @@
-// storage/resource/upload-url.resource.ts
-export class UploadVideoUrlResource {
-    originalName: string;
-    uploadUrl: string;
-    key: string;
-    contentType: string;
-    maxSize?: number;
-    maxDuration?: number;
-    expiresIn: number;
+import { CommonHelper } from "@common/helpers/common.helper";
+import { BaseResource } from "@common/utils/resource.utils";
 
-    static collection(data: any[]) {
-        return data.map(item => ({
-            originalName: item.originalName,
-            uploadUrl: item.uploadUrl,
-            key: item.key,
-            contentType: item.contentType,
-            maxSize: item.maxSize,
-            maxDuration: item.maxDuration,
-            expiresIn: item.expiresIn,
-        }));
+export class UploadVideoUrlResource extends BaseResource<any> {
+    toJSON() {
+        return {
+            originalName: CommonHelper.text(this.data.originalName),
+            uploadUrl: CommonHelper.text(this.data.uploadUrl),
+            key: CommonHelper.text(this.data.key),
+            keyWithBaseUrl: CommonHelper.buildImageUrl(this.data.key),
+            contentType: CommonHelper.text(this.data.contentType),
+            maxSize: CommonHelper.number(this.data.maxSize),
+            maxDuration: CommonHelper.number(this.data.maxDuration),
+            expiresIn: CommonHelper.number(this.data.expiresIn),
+        };
     }
 }
