@@ -20,6 +20,20 @@ export class CommonHelper {
         });
     }
 
+    static date(date: Date | string | null | undefined): string | null {
+        if (!date) return null;
+
+        const d = date instanceof Date ? date : new Date(date);
+
+        if (isNaN(d.getTime())) return null;
+
+        return d.toLocaleString('en-IN', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+        });
+    }
+
     // ============ OTP ============
     static generateOtp(length: number = CUSTOMER_OTP_LENGTH): string {
         if (process.env.NODE_ENV === 'development') {

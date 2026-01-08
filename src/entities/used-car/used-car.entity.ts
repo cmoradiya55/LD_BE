@@ -106,6 +106,80 @@ export class UsedCar {
     @Column({ name: 'assigned_by', type: 'int', nullable: true })
     assigned_by: number | null;
 
+    @Column({ type: 'date', nullable: true })
+    registration_date: Date;
+
+    @Column({ type: 'date', nullable: true })
+    fitness_valid_until: Date;
+
+    @Column({ type: 'date', nullable: true })
+    insurance_valid_until: Date;
+
+    @Column({ type: 'date', nullable: true })
+    puc_valid_until: Date;
+
+    @Column({ type: 'jsonb', nullable: true , default: {}})
+    challan_details: Record<string, any>;
+
+    @Column({ type: 'boolean', default: false })
+    loan_status: boolean;
+
+    @Column({ type: 'smallint', nullable: true })
+    owner: number;
+
+    @Column({ type: 'varchar', length: 100, nullable: true })
+    registration_place: string;
+
+    @Column({ type: 'boolean', default: false })
+    is_blacklisted: boolean;
+
+    @Column({ type: 'boolean', default: false })
+    is_rto_noc_issued: boolean;
+
+    @Column({ type: 'boolean', default: false })
+    is_party_peshi: boolean;
+
+    @Column({ type: 'boolean', default: false })
+    is_hypothecated: boolean;
+
+    @Column({ type: 'boolean', default: false })
+    is_converted: boolean;
+
+    @Column({ type: 'boolean', default: false })
+    is_migrated: boolean;
+
+    @Column({ type: 'boolean', default: false })
+    adapted_for_special_use: boolean;
+
+    @Column({ type: 'smallint', default: 0 })
+    criminal_cases: number;
+
+    @Column({ type: 'smallint', default: 0 })
+    civil_cases: number;
+
+    @Column({ type: 'smallint', default: 0 })
+    road_accidents: number;
+
+    @Column({ type: 'smallint', default: 0 })
+    compensation_cases: number;
+
+    @Column({ type: 'smallint', default: 0 })
+    other_cases: number;
+
+    @Column({ type: 'text', nullable: true })
+    staff_remarks: string;
+
+    @Column({ type: 'int', nullable: true })
+    updated_by_staff: number;
+
+    @Column({ type: 'timestamptz', nullable: true })
+    staff_updated_at: Date;
+
+    // ✅ Relations
+    @ManyToOne(() => User)
+    @JoinColumn({ name: 'updated_by_staff' })
+    updatedByStaff: User;
+
     // Timestamps
     @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
     created_at: Date;

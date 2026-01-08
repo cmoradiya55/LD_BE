@@ -134,7 +134,7 @@ export class InspectionService {
             }
 
             if (Object.keys(carUpdates).length > 0) {
-                await this.usedCarRepo.update(
+                await this.usedCarRepo.updateForInspection(
                     usedCarId,
                     user.id,
                     carUpdates,

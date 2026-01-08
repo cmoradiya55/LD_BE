@@ -201,6 +201,42 @@ export class UsedCarRepository {
         });
     }
 
+
+    async getCarDetailsForStaff(
+        usedCarId: number,
+    ) {
+        const repo = this.getRepo();
+        const car = await repo.findOne({
+            where: {
+                id: usedCarId,
+                deleted_at: IsNull(),
+            },
+            relations: [
+                'brand',
+                'model',
+                'variant',
+                'pincode',
+                'pincode.city',
+                'customer',
+                'inspectionImages',
+            ],
+        });
+
+        return car;
+    }
+
+    async findByIdRaw(
+        id: number,
+        manager?: EntityManager,
+    ): Promise<UsedCar | null> {
+        const repo = this.getRepo(manager);
+        return await repo.findOne({
+            where: {
+                id,
+            },
+        });
+    }
+
     async getBasicUsedCarDetailsWithPincodeByIdAndCustomer(
         id: number,
         customerId: number,
@@ -688,7 +724,7 @@ export class UsedCarRepository {
         );
     }
 
-    async update(
+    async updateForInspection(
         vehicleId: number,
         inspectorId: number,
         carUpdates: Partial<UsedCar>,
@@ -699,6 +735,23 @@ export class UsedCarRepository {
             {
                 id: vehicleId,
                 inspection_assigned_to: inspectorId,
+            },
+            {
+                ...carUpdates,
+                updated_at: new Date(),
+            },
+        );
+    }
+
+    async update(
+        vehicleId: number,
+        carUpdates: Partial<UsedCar>,
+        manager?: EntityManager,
+    ): Promise<UpdateResult> {
+        const repo = this.getRepo(manager);
+        return await repo.update(
+            {
+                id: vehicleId,
             },
             {
                 ...carUpdates,
@@ -733,7 +786,7 @@ export class UsedCarRepository {
         return car;
     }
 
-        async getInspectionDetailsByManager(
+    async getInspectionDetailsByManager(
         user: User,
         usedCarId: number,
     ) {
