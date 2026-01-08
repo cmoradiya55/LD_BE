@@ -5,6 +5,7 @@ import { UsedCarRepository } from '@repository/used-car/used-car.repository';
 import { UpdateVehicleDetailsDto, UpdateVehicleDetailsParamDto } from './dto/update-vehicle-detail.dto';
 import { UsedCarListingStatus } from '@common/enums/car-detail.enum';
 import { UsedCar } from '@entity/used-car/used-car.entity';
+import { GetVehicleListQueryDto } from './dto/get-vehicle-list.dto';
 
 @Injectable()
 export class VehicleVerificationService {
@@ -82,6 +83,13 @@ export class VehicleVerificationService {
 
             await this.usedCarRepository.update(id, updateData, manager);
         }, true)
+    }
+
+    async getVehicleList(query: GetVehicleListQueryDto) {
+        return this.baseService.catch(async () => {
+            const { page, limit } = query;
+            return await this.usedCarRepository.getVehicleListForStaffDashboard(query, page, limit);
+        });
     }
 
     async getVehicleDetails(id: number) {

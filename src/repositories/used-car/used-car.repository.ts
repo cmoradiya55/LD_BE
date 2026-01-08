@@ -18,6 +18,8 @@ import { UsedCarListingStatus } from '@common/enums/car-detail.enum';
 import { GetUsedCarQueryDto } from '../../modules/admin-panel/manager/m-used-car/dto/get-inspector.dto';
 import { User } from '@entity/user/user.entity';
 import { GetAssignedCarQueryDto } from '../../modules/admin-panel/inspector/inspection/dto/get-assigned-car.dto';
+import { GetVehicleListQueryDto } from '../../modules/admin-panel/staff/vehicle-verification/dto/get-vehicle-list.dto';
+import { STAFF_CAR_LIST_FILTER } from '@common/constants/admin/s-car-filter.constant';
 
 export interface UsedCarListResult {
     data: any[];
@@ -223,6 +225,55 @@ export class UsedCarRepository {
         });
 
         return car;
+    }
+
+    async getVehicleListForStaffDashboard(
+        query: GetVehicleListQueryDto,
+        page: number,
+        limit: number,
+    ): Promise<UsedCarListResult> {
+        const repo = this.getRepo();
+        const skip = (page - 1) * limit;
+        const { status } = query;
+
+
+        const qb = repo
+            .createQueryBuilder(USED_CAR_TABLE_ALIASES.usedCar)
+
+            // Load relations
+            .leftJoinAndSelect(`${USED_CAR_TABLE_ALIASES.usedCar}.brand`, 'brand')
+            .leftJoinAndSelect(`${USED_CAR_TABLE_ALIASES.usedCar}.model`, 'model')
+            .leftJoinAndSelect(`${USED_CAR_TABLE_ALIASES.usedCar}.variant`, 'variant')
+            .leftJoinAndSelect(`${USED_CAR_TABLE_ALIASES.usedCar}.pincode`, 'pincode')
+            .leftJoinAndSelect('pincode.city', 'city')
+            // .leftJoinAndSelect(`${USED_CAR_TABLE_ALIASES.usedCar}.inspector`, 'inspector')
+            // .leftJoinAndSelect(`${USED_CAR_TABLE_ALIASES.usedCar}.photos`, 'customerPhotos')
+            // .leftJoinAndSelect(`${USED_CAR_TABLE_ALIASES.usedCar}.inspectionImages`, 'inspectionImages')
+
+            // Filters
+            .where(`${USED_CAR_TABLE_ALIASES.usedCar}.deleted_at IS NULL`)
+            .orderBy(`${USED_CAR_TABLE_ALIASES.usedCar}.created_at`, 'DESC')
+
+        const statusesToFilter = status ? [status] : STAFF_CAR_LIST_FILTER;
+
+        qb.andWhere(
+            `${USED_CAR_TABLE_ALIASES.usedCar}.status IN (:...statuses)`,
+            { statuses: statusesToFilter },
+        );
+
+        const [data, total] = await Promise.all([
+            qb.skip(skip)
+                .take(limit)  // ✅ Use .take() not .limit()
+                .getMany(),
+            qb.getCount(),
+        ])
+
+        return {
+            data: data,
+            total,
+            page,
+            limit,
+        };
     }
 
     async findByIdRaw(

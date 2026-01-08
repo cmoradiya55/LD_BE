@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post, Query } from '@nestjs/common';
 import { VehicleVerificationService } from './vehicle-verification.service';
 import { MODULE_PREFIX } from '@common/constants/app.constant';
 import { UserRole } from '@common/enums/user.enum';
@@ -9,6 +9,8 @@ import { CurrentUser } from '@common/decorators/admin-panel/current-user.decorat
 import { UpdateVehicleDetailsDto, UpdateVehicleDetailsParamDto } from './dto/update-vehicle-detail.dto';
 import { ApiResponseUtil } from '@common/utils/api-response.utils';
 import { GetVehicleDetailResource } from './resource/get-vehicle-detail.resource';
+import { GetVehicleListQueryDto } from './dto/get-vehicle-list.dto';
+import { GetVehicleListingResource } from './resource/get-vehicle-list.resource';
 
 @Controller(`${MODULE_PREFIX.STAFF}/vehicles`)
 @AdminAuth()
@@ -24,6 +26,20 @@ export class VehicleVerificationController {
   ) {
     await this.vehicleVerificationService.updateVehicleDetails(user, param, body);
     return ApiResponseUtil.updated("Vehicle details updated successfully");
+  }
+
+  @Get()
+  async getVehicleList(
+    @Query() query: GetVehicleListQueryDto,
+  ) {
+    const { data, page, limit, total } = await this.vehicleVerificationService.getVehicleList(query);
+    return ApiResponseUtil.paginated(
+      'Cars fetched successfully',
+      GetVehicleListingResource.collection(data),
+      page,
+      limit,
+      total,
+    );
   }
 
   @Get(':id/details')
