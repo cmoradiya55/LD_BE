@@ -21,6 +21,16 @@ export class GetAllUsersResource extends BaseResource<any> {
             isEmailVerified: CommonHelper.bool(this.data.is_email_verified),
             documentStatus: CommonHelper.number(this.data.document_status),
             documentStatusName: CommonHelper.text(CommonHelper.getUserDocumentStatusName(this.data.document_status)),
+            document: {
+                remarks: CommonHelper.text(this.data.remarks),
+                selfieImage: CommonHelper.buildImageUrl(this.data.selfie_image),
+                aadharFrontImage: CommonHelper.buildImageUrl(this.data.aadhar_front_image),
+                aadharBackImage: CommonHelper.buildImageUrl(this.data.aadhar_back_image),
+                panImage: CommonHelper.buildImageUrl(this.data.pan_image),
+                aadharNumber: CommonHelper.text(this.data.aadhar_number),
+                panNumber: CommonHelper.text(this.data.pan_number),
+            },
+
             createdAt: CommonHelper.dateTime(this.data.created_at),
             createdBy: CommonHelper.number(this.data.created_by),
             createdByName: CommonHelper.text(this.data.createdByUser?.name),

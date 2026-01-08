@@ -5,7 +5,6 @@ export class GetAllInspectorResource extends BaseResource<any> {
     toJSON() {
         return {
             id: CommonHelper.number(this.data.id),
-            selfie_image: CommonHelper.buildImageUrl(this.data.selfie_image),
             name: CommonHelper.text(this.data.name),
             countryCode: CommonHelper.number(this.data.country_code),
             mobileNo: CommonHelper.number(this.data.mobile_number),
