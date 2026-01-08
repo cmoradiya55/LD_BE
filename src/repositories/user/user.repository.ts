@@ -236,11 +236,15 @@ export class UserRepository {
 
     async getAllUsers(query: GetAllUsersDto, page: number, limit: number, manager?: EntityManager) {
         const repo = this.getRepo(manager);
-        const { documentStatus } = query;
+        const { documentStatus, role } = query;
         const whereConditions: FindOptionsWhere<User> = {};
 
         if (documentStatus) {
             whereConditions.document_status = documentStatus;
+        }
+
+        if (role) {
+            whereConditions.role = role;
         }
 
         const skip = (page - 1) * limit;
@@ -265,7 +269,7 @@ export class UserRepository {
                 role: UserRole.INSPECTOR,
                 manager_id: managerId,
             },
-            relations: ['manager', 'manager.inspectionCentre', 'manager.inspectionCentre.city','createdByUser', 'updatedByUser'],
+            relations: ['manager', 'manager.inspectionCentre', 'manager.inspectionCentre.city', 'createdByUser', 'updatedByUser'],
             take: limit,
             skip: skip,
             order: {
