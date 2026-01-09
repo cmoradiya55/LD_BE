@@ -8,6 +8,8 @@ import { UsedCarRepository } from '@repository/used-car/used-car.repository';
 import { MAssignInspectorDto } from './dto/m-assign-inspector.dto';
 import { UserRepository } from '@repository/user/user.repository';
 import { GetInspectionReportParamDto } from './dto/get-inspection-report.dto';
+import { MApproveAndSuggestPriceDto, MApproveAndSuggestPriceParamDto } from './dto/approve-and-suggest-price.dto';
+import { UsedCarListingStatus } from '@common/enums/car-detail.enum';
 
 @Injectable()
 export class MUsedCarService {
@@ -95,5 +97,40 @@ export class MUsedCarService {
             }
             return report;
         });
+    }
+
+    async approveUsedCarAndSuggestPrice(
+        user: User,
+        param: MApproveAndSuggestPriceParamDto,
+        body: MApproveAndSuggestPriceDto,
+    ) {
+        return this.baseService.catch(async (manager) => {
+            const { price } = body;
+            const { usedCarId } = param;
+
+            //    check that car is assigned under that manager and car status is valid for approval
+            const usedCar = await this.usedCarRepo.findByIdRaw(usedCarId, manager);
+            if (!usedCar) {
+                throw new BadRequestException('Car not found');
+            }
+
+            if (usedCar.assigned_by !== user.id) {
+                throw new BadRequestException('You are not authorized to approve this car');
+            }
+
+            if (usedCar.status >= UsedCarListingStatus.APPROVED_BY_MANAGER) {
+                throw new BadRequestException('Car is already approved');
+            }
+            
+            // update the price and status
+            await this.usedCarRepo.update(
+                usedCarId,
+                {
+                    final_price: price,
+                    status: UsedCarListingStatus.APPROVED_BY_MANAGER,
+                },
+                manager
+            );
+        }, true);
     }
 }

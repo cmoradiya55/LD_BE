@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post, Query } from '@nestjs/common';
 import { MUsedCarService } from './m-used-car.service';
 import { MODULE_PREFIX } from '@common/constants/app.constant';
 import { ApiResponseUtil } from '@common/utils/api-response.utils';
@@ -12,6 +12,7 @@ import { ManagerUsedCarListingResource } from './resource/manager-used-car-listi
 import { MAssignInspectorDto } from './dto/m-assign-inspector.dto';
 import { GetInspectionReportParamDto } from './dto/get-inspection-report.dto';
 import { GetInspectionReportResource } from './resource/get-inspection-report.resource';
+import { MApproveAndSuggestPriceDto, MApproveAndSuggestPriceParamDto } from './dto/approve-and-suggest-price.dto';
 
 @Controller(`${MODULE_PREFIX.MANAGER}/used-car`)
 @AdminAuth()
@@ -55,4 +56,15 @@ export class MUsedCarController {
     await this.mUsedCarService.assignInspector(user, body);
     return ApiResponseUtil.success('Inspector assigned successfully');
   }
+
+  @Patch(':usedCarId/approve')
+  async approveUsedCar(
+    @Param() param: MApproveAndSuggestPriceParamDto,
+    @Body() body: MApproveAndSuggestPriceDto,
+    @CurrentUser() user: User,
+  ) {
+    await this.mUsedCarService.approveUsedCarAndSuggestPrice(user, param, body);
+    return ApiResponseUtil.success('Used car approved successfully');
+  }
+
 }
