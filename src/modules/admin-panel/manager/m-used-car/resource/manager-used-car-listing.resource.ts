@@ -64,6 +64,7 @@ export class ManagerUsedCarListingResource extends BaseResource<any> {
             fuelType: CommonHelper.text(FuelTypeLabel[variant.fuel_type] || 'Other'),
             transmissionType: CommonHelper.text(TransmissionTypeLabel[variant.transmission_type] || 'Other'),
             customerExpectedPrice: CommonHelper.currency(this.data.expected_price),
+            managerSuggestedPrice: CommonHelper.currency(this.data.manager_suggested_price),
             linkDrivePrice: CommonHelper.currency(this.data.final_price),
             status: CommonHelper.number(this.data.status),
             statusLabel: CommonHelper.getCarListingsStatusName(this.data.status),

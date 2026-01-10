@@ -126,7 +126,7 @@ export class MUsedCarService {
             await this.usedCarRepo.update(
                 usedCarId,
                 {
-                    final_price: price,
+                    manager_suggested_price: price,
                     status: UsedCarListingStatus.APPROVED_BY_MANAGER,
                 },
                 manager

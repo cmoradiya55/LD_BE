@@ -6,7 +6,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { And, EntityManager, IsNull, LessThan, MoreThanOrEqual, Repository, UpdateResult } from 'typeorm';
 import { UsedCarListingDto } from '../../modules/customer/used-car/dto/used-car-listing.dto';
 import { QBHelper } from '@common/helpers/query-builder.helper';
-import { USED_CAR_FILTER_CONFIG, USED_CAR_LIST_SELECT_COLUMNS, USED_CAR_SEARCH_COLUMNS, USED_CAR_TABLE_ALIASES, USED_CAR_TABLES } from './config/used-car-query.filter.config';
+import { USED_CAR_ADMIN_LIST_SELECT_COLUMNS, USED_CAR_FILTER_CONFIG, USED_CAR_LIST_SELECT_COLUMNS, USED_CAR_SEARCH_COLUMNS, USED_CAR_TABLE_ALIASES, USED_CAR_TABLES } from './config/used-car-query.filter.config';
 import { SelectQueryBuilder } from 'typeorm/browser';
 import { USED_CAR_SORT_CONFIG } from './config/used-car-query.sort.config';
 import { VehicleHelper } from '@common/helpers/vehicle-helper';
@@ -20,6 +20,7 @@ import { User } from '@entity/user/user.entity';
 import { GetAssignedCarQueryDto } from '../../modules/admin-panel/inspector/inspection/dto/get-assigned-car.dto';
 import { GetVehicleListQueryDto } from '../../modules/admin-panel/staff/vehicle-verification/dto/get-vehicle-list.dto';
 import { STAFF_CAR_LIST_FILTER } from '@common/constants/admin/s-car-filter.constant';
+import { GetAllUsedCarsForAdminDto } from '../../modules/admin-panel/admin/a-used-car/dto/get-all-used-cars-for-admin.dto';
 
 export interface UsedCarListResult {
     data: any[];
@@ -390,7 +391,7 @@ export class UsedCarRepository {
         const { status, inspectorId } = filter;
 
         // Build query
-        const queryBuilder = this.createAdminBaseListQuery(pincodeIds);
+        const queryBuilder = this.createManagerBaseListQuery(pincodeIds);
         // Apply filters
         if (status) {
             queryBuilder.andWhere(`${USED_CAR_TABLE_ALIASES.usedCar}.status = :status`, { status });
@@ -863,6 +864,65 @@ export class UsedCarRepository {
         return car;
     }
 
+    async getAllUsedCarsForAdmin(
+        query: GetAllUsedCarsForAdminDto,
+        page: number,
+        limit: number,
+    ): Promise<UsedCarListResult> {
+        const skip = (page - 1) * limit;
+        const { status } = query;
+
+        // Build query
+        const queryBuilder = this.createBaseListQueryForAdmin()
+            .addSelect('COUNT(*) OVER() as "totalCount"')
+            .addSelect(`${USED_CAR_TABLE_ALIASES.usedCar}.status as "status"`)
+            .leftJoin(
+                `${USED_CAR_TABLE_ALIASES.usedCar}.pincode`,
+                USED_CAR_TABLE_ALIASES.pincode,
+            )
+
+            // Join city through pincode
+            .leftJoin(
+                `${USED_CAR_TABLE_ALIASES.pincode}.city`,
+                USED_CAR_TABLE_ALIASES.city,
+            )
+
+            // Select ONLY what you need
+            .addSelect([
+                `${USED_CAR_TABLE_ALIASES.pincode}.area_name as "areaName"`,
+                `${USED_CAR_TABLE_ALIASES.city}.city_name as "cityName"`,
+            ]);
+
+        if (status) {
+            queryBuilder.andWhere(`${USED_CAR_TABLE_ALIASES.usedCar}.status = :status`, { status });
+        }
+
+        // Execute query
+        const data = await queryBuilder
+            .offset(skip)
+            .limit(limit)
+            .getRawMany();
+
+        // Extract total and clean data
+        const { cleanedData, total } = QBHelper.extractTotalAndCleanData(data);
+
+        return {
+            data: cleanedData,
+            total,
+            page,
+            limit,
+        };
+    }
+
+    async getUsedCarDetailForAdmin(
+        usedCarId: number,
+    ) {
+        // Build query
+        const queryBuilder = this.createAdminBaseDetailQuery(usedCarId);
+        const data = await queryBuilder.getOne();
+        return data;
+    }
+
     // ============ Private Methods ============
 
     private createBaseListQuery(customerId: number | undefined, isStatusFilter: boolean = true): SelectQueryBuilder<any> {
@@ -908,8 +968,26 @@ export class UsedCarRepository {
 
     }
 
+    private createBaseListQueryForAdmin(): SelectQueryBuilder<any> {
+        const repo = this.getRepo();
+        const qb = repo
+            .createQueryBuilder(USED_CAR_TABLE_ALIASES.usedCar)
+            .select(USED_CAR_ADMIN_LIST_SELECT_COLUMNS)
+            .innerJoin(USED_CAR_TABLES.brand, USED_CAR_TABLE_ALIASES.brand, `${USED_CAR_TABLE_ALIASES.brand}.id = ${USED_CAR_TABLE_ALIASES.usedCar}.brand_id`)
+            .innerJoin(USED_CAR_TABLES.model, USED_CAR_TABLE_ALIASES.model, `${USED_CAR_TABLE_ALIASES.model}.id = ${USED_CAR_TABLE_ALIASES.usedCar}.model_id`)
+            .innerJoin(USED_CAR_TABLES.variant, USED_CAR_TABLE_ALIASES.variant, `${USED_CAR_TABLE_ALIASES.variant}.id = ${USED_CAR_TABLE_ALIASES.usedCar}.variant_id`)
+            .innerJoin(USED_CAR_TABLES.customer, USED_CAR_TABLE_ALIASES.customer, `${USED_CAR_TABLE_ALIASES.customer}.id = ${USED_CAR_TABLE_ALIASES.usedCar}.customer_id`)
+            .where(`${USED_CAR_TABLE_ALIASES.usedCar}.deleted_at IS NULL`)
 
-    private createAdminBaseListQuery(pincodeIds: number[]): SelectQueryBuilder<any> {
+        // Append primary image using helper
+        PrimaryImageQueryHelper.appendToQuery(qb, {
+            mainTableAlias: USED_CAR_TABLE_ALIASES.usedCar,
+        });
+        return qb;
+    }
+
+
+    private createManagerBaseListQuery(pincodeIds: number[]): SelectQueryBuilder<any> {
         const repo = this.getRepo();
 
         const qb = repo
@@ -933,7 +1011,36 @@ export class UsedCarRepository {
             })
 
             // ✅ FIX: Use proper column reference for sorting
-            .orderBy(`${USED_CAR_TABLE_ALIASES.usedCar}.created_at`, 'DESC')
+            .orderBy(`${USED_CAR_TABLE_ALIASES.usedCar}.created_at`, SORT_ORDER.DESC)
+
+        return qb;
+    }
+
+    private createAdminBaseDetailQuery(usedCarId: number): SelectQueryBuilder<any> {
+        const repo = this.getRepo();
+
+        const qb = repo
+            .createQueryBuilder(USED_CAR_TABLE_ALIASES.usedCar)
+
+            // Load relations
+            .leftJoinAndSelect(`${USED_CAR_TABLE_ALIASES.usedCar}.brand`, 'brand')
+            .leftJoinAndSelect(`${USED_CAR_TABLE_ALIASES.usedCar}.model`, 'model')
+            .leftJoinAndSelect(`${USED_CAR_TABLE_ALIASES.usedCar}.variant`, 'variant')
+            .leftJoinAndSelect(`${USED_CAR_TABLE_ALIASES.usedCar}.pincode`, 'pincode')
+            .leftJoinAndSelect('pincode.city', 'city')
+            .leftJoinAndSelect(`${USED_CAR_TABLE_ALIASES.usedCar}.inspector`, 'inspector')
+            .leftJoinAndSelect(`${USED_CAR_TABLE_ALIASES.usedCar}.photos`, 'customerPhotos')
+            .leftJoinAndSelect(`${USED_CAR_TABLE_ALIASES.usedCar}.inspectionImages`, 'inspectionImages')
+
+            // Filters
+            .where(`${USED_CAR_TABLE_ALIASES.usedCar}.deleted_at IS NULL`)
+
+            // ✅ FIX: Use proper column reference for sorting
+            .orderBy(`${USED_CAR_TABLE_ALIASES.usedCar}.created_at`, SORT_ORDER.DESC)
+
+        if (usedCarId) {
+            qb.andWhere(`${USED_CAR_TABLE_ALIASES.usedCar}.id = :usedCarId`, { usedCarId });
+        }
 
         return qb;
     }

@@ -78,6 +78,9 @@ export class UsedCar {
     @Column({ name: 'expected_price', type: 'bigint' })
     expected_price: number;
 
+    @Column({ name: 'manager_suggested_price', type: 'bigint', nullable: true })
+    manager_suggested_price: number | null;
+
     @Column({ name: 'final_price', type: 'bigint', nullable: true })
     final_price: number | null;
 

@@ -55,6 +55,7 @@ export class GetInspectionReportResource extends BaseResource<any> {
 
             rc_image: CommonHelper.buildImageUrl(this.data.rc_image),
             insurance_image: CommonHelper.buildImageUrl(this.data.insurance_image),
+            managerSuggestedPrice: CommonHelper.currency(this.data.manager_suggested_price),
 
             car: {
                 brand: CommonHelper.text(brand?.display_name),

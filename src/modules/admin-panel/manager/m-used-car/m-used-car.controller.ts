@@ -66,5 +66,4 @@ export class MUsedCarController {
     await this.mUsedCarService.approveUsedCarAndSuggestPrice(user, param, body);
     return ApiResponseUtil.success('Used car approved successfully');
   }
-
 }

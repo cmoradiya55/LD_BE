@@ -75,6 +75,43 @@ export const USED_CAR_LIST_SELECT_COLUMNS: string[] = [
 ];
 
 /**
+ * Select columns for list view
+ */
+export const USED_CAR_ADMIN_LIST_SELECT_COLUMNS: string[] = [
+    // Used car
+    'uc.id as "id"',
+    'uc.customer_id as "customerId"',
+    'uc.slug as "slug"',
+    'uc.rc_image as "rcImage"',
+    'uc.insurance_image as "insuranceImage"',
+    'uc.registration_year as "registrationYear"',
+    'uc.owner_type as "ownerType"',
+    'uc.km_driven_range as "kmDrivenRange"',
+    'uc.km_driven as "kmDriven"',
+
+    'uc.registration_number as "registrationNumber"',
+    'uc.expected_price as "expectedPrice"',
+    'uc.manager_suggested_price as "managerSuggestedPrice"',
+
+    'uc.final_price as "finalPrice"',
+    'uc.rto_code as "rtoCode"',
+    'uc.status as "status"',
+    'uc.created_at as "createdAt"',
+    // Brand
+    'b.display_name as "brandName"',
+    // Model
+    'm.display_name as "modelName"',
+    // Variant
+    'v.display_name as "variantName"',
+    'v.fuel_type as "fuelType"',
+    'v.transmission_type as "transmissionType"',
+    // Photo
+    // 'ph.url as "primaryPhoto"',
+
+    'cust.full_name as "customerName"',
+];
+
+/**
  * Select columns for detail view
  */
 export const USED_CAR_DETAIL_SELECT_COLUMNS: string[] = [
@@ -133,6 +170,7 @@ export const USED_CAR_TABLE_ALIASES = {
     city: 'c',
     photo: 'ph',
     wishlist: 'cw',
+    customer: 'cust',
 } as const;
 
 /**
@@ -147,4 +185,5 @@ export const USED_CAR_TABLES = {
     city: 'cities',
     photo: 'used_car_customer_photos',
     wishlist: 'customer_wishlists',
+    customer: 'customers',
 } as const;
