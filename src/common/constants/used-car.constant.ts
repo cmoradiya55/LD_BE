@@ -16,3 +16,5 @@ export const WHITELISTED_STATUS_FOR_UPDATE_MY_USED_CAR_DETAIL: UsedCarListingSta
 
 export const USED_CAR_MIN_YEAR_FILTER = 2010;
 export const USED_CAR_MAX_YEAR_FILTER = new Date().getFullYear() - 1;
+
+export const USED_CAR_MINIMUM_PRICE_FILTER = 5000;

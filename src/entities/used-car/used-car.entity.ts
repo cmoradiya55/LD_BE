@@ -93,6 +93,9 @@ export class UsedCar {
 
     @Column({ name: 'rejection_reason', type: 'text', nullable: true })
     rejection_reason: string | null;
+ 
+    @Column({ name: 'cancel_reason', type: 'text', nullable: true })
+    cancel_reason: string | null | undefined;
 
     // Verification
     @Column({ name: 'is_verified', type: 'boolean', default: false })
@@ -191,6 +194,9 @@ export class UsedCar {
 
     @DeleteDateColumn({ name: 'deleted_at', type: 'timestamptz', nullable: true })
     deleted_at: Date | null;
+
+    @Column({ name: 'approved_at', type: 'timestamptz', nullable: true })
+    approved_at: Date | null;
 
     // Relations
     @ManyToOne(() => CarBrand)
