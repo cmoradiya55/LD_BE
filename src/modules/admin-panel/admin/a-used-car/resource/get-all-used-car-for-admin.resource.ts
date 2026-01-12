@@ -1,10 +1,12 @@
 import { FuelTypeLabel, TransmissionTypeLabel } from '@common/enums/car-detail.enum';
 import { CommonHelper } from '@common/helpers/common.helper';
 import { BaseResource } from '@common/utils/resource.utils';
+import { stat } from 'fs';
 
 export class GetAllUsedCarsForAdminResource extends BaseResource<any> {
     toJSON() {
         const car = this.data;
+        console.log('car', car);
 
         return {
             id: CommonHelper.number(car.id),
@@ -36,6 +38,9 @@ export class GetAllUsedCarsForAdminResource extends BaseResource<any> {
 
             areaName: CommonHelper.text(car.areaName),
             cityName: CommonHelper.capitalizeWords(car.cityName),
+
+            status: CommonHelper.number(car.status),
+            statusLabel: CommonHelper.getCarListingsStatusName(car.status),
         };
     }
 }

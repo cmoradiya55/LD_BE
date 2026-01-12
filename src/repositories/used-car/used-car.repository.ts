@@ -750,10 +750,10 @@ export class UsedCarRepository {
             {
                 id: usedCarId,
                 customer_id: customerId,
-            },{
-                ...updateData,
-                updated_at: new Date(),
-            }
+            }, {
+            ...updateData,
+            updated_at: new Date(),
+        }
 
         );
     }
@@ -880,7 +880,11 @@ export class UsedCarRepository {
         limit: number,
     ): Promise<UsedCarListResult> {
         const skip = (page - 1) * limit;
-        const { status } = query;
+        const {
+            status,
+            cityId,
+            managerId,
+        } = query;
 
         // Build query
         const queryBuilder = this.createBaseListQueryForAdmin()
@@ -905,6 +909,13 @@ export class UsedCarRepository {
 
         if (status) {
             queryBuilder.andWhere(`${USED_CAR_TABLE_ALIASES.usedCar}.status = :status`, { status });
+        }
+
+        if (cityId) {
+            queryBuilder.andWhere(`${USED_CAR_TABLE_ALIASES.pincode}.city_id = :cityId`, { cityId });
+            if (managerId) {
+                queryBuilder.andWhere(`${USED_CAR_TABLE_ALIASES.usedCar}.assigned_by = :managerId`, { managerId });
+            }
         }
 
         // Execute query
