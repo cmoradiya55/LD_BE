@@ -118,10 +118,16 @@ export class MUsedCarService {
                 throw new BadRequestException('You are not authorized to approve this car');
             }
 
-            if (usedCar.status >= UsedCarListingStatus.APPROVED_BY_MANAGER) {
-                throw new BadRequestException('Car is already approved');
+            const canUpdatePrice =
+                usedCar.status >= UsedCarListingStatus.DETAILS_UPDATED_BY_STAFF &&
+                usedCar.status < UsedCarListingStatus.APPROVED_BY_ADMIN;
+
+            if (!canUpdatePrice) {
+                throw new BadRequestException(
+                    'Price can only be updated after staff updates details and before admin approval'
+                );
             }
-            
+
             // update the price and status
             await this.usedCarRepo.update(
                 usedCarId,

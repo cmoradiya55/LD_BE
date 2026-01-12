@@ -83,6 +83,31 @@ export class GetInspectionReportResource extends BaseResource<any> {
                 state: CommonHelper.capitalizeWords(city?.state_name),
             },
 
+            staffReport: {
+                registartionDate: CommonHelper.text(this.data.registration_date),
+                fitnessValidUntil: CommonHelper.text(this.data.fitness_valid_until),
+                insuranceValidUntil: CommonHelper.text(this.data.insurance_valid_until),
+                pucValidUntil: CommonHelper.text(this.data.puc_valid_until),
+                challanDetails: this.data.challan_details,
+                loanStatus: CommonHelper.text(this.data.loan_status),
+                owner: CommonHelper.text(this.data.owner),
+
+                registrationPlace: CommonHelper.text(this.data.registration_place),
+                isBlacklisted: CommonHelper.bool(this.data.is_blacklisted),
+                isRtoNocIssued: CommonHelper.bool(this.data.is_rto_noc_issued),
+                isPartyPeshi: CommonHelper.bool(this.data.is_party_peshi),
+                isHypothecated: CommonHelper.bool(this.data.is_hypothecated),
+                isConverted: CommonHelper.bool(this.data.is_converted),
+                isMigrated: CommonHelper.bool(this.data.is_migrated),
+                adaptedForSpecialUse: CommonHelper.bool(this.data.adapted_for_special_use),
+                criminalCases: CommonHelper.number(this.data.criminal_cases),
+                civilCases: CommonHelper.number(this.data.civil_cases),
+                roadAccidents: CommonHelper.number(this.data.road_accidents),
+                compensationCases: CommonHelper.number(this.data.compensation_cases),
+                otherCases: CommonHelper.number(this.data.other_cases),
+                staffRemarks: CommonHelper.text(this.data.staff_remarks),
+            },
+
             inspection: {
                 kmDriven: CommonHelper.number(this.data.km_driven),
             },
