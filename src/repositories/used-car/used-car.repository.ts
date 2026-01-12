@@ -301,6 +301,13 @@ export class UsedCarRepository {
         });
     }
 
+    async getCarDettailsOfCustomer(id: number, customerId: number, manager?: EntityManager): Promise<UsedCar | null> {
+        const repo = this.getRepo(manager);
+        return await repo.findOne({
+            where: { id, customer_id: customerId },
+        });
+    }
+
     /**
      * Find used cars with filters, search, and pagination
      */
@@ -743,8 +750,11 @@ export class UsedCarRepository {
             {
                 id: usedCarId,
                 customer_id: customerId,
-            },
-            updateData,
+            },{
+                ...updateData,
+                updated_at: new Date(),
+            }
+
         );
     }
 

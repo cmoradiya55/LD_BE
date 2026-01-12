@@ -16,6 +16,7 @@ import { MyUsedCarDetailParamDto } from './dto/my-used-car-detail.dto';
 import { MyUsedCarDetailResource } from './resources/my-used-car-detail.resource copy';
 import { UpdateMyUsedCarDetailParamDto, UpdateMyUsedCarDto } from './dto/update-my-used-car.dto';
 import { CurrentCustomer } from '@common/decorators/current-customer.decorator';
+import { ApproveOrRejectListingDto, ApproveOrRejectListingParamDto } from './dto/approve-or-reject-listing.dto';
 
 @Controller(`${MODULE_PREFIX.CUSTOMER}/used-car`)
 export class UsedCarController {
@@ -76,6 +77,19 @@ export class UsedCarController {
     return ApiResponseUtil.success(
       'Car details fetched successfully',
       new MyUsedCarDetailResource(data),
+    );
+  }
+
+  @Patch(':id/status')
+  @UseGuards(CJwtAuthGuard)
+  async updateUsedCarStatus(
+    @CurrentCustomer() customer: Customer,
+    @Param() param: ApproveOrRejectListingParamDto,
+    @Body() body: ApproveOrRejectListingDto
+  ) {
+    const { message } = await this.usedCarService.updateUsedCarStatus(customer, param, body);
+    return ApiResponseUtil.success(
+      message,
     );
   }
 
