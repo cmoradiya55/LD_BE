@@ -58,7 +58,7 @@ export class GetUsedCarDetailForAdminResource extends BaseResource<any> {
         const model = this.data?.model;
         const variant = this.data?.variant;
 
-        const pincode = this.data.pincode;
+        const pincode = this.data?.pincode;
         const city = pincode?.city;
 
         const customerPhotos = this.data?.photos;
@@ -95,8 +95,8 @@ export class GetUsedCarDetailForAdminResource extends BaseResource<any> {
             exShowroomPrice: CommonHelper.number(car.ex_showroom_price),
 
             address: {
-                pincode: CommonHelper.text(pincode.pincode),
-                areaName: CommonHelper.text(pincode.area_name),
+                pincode: CommonHelper.text(pincode?.pincode),
+                areaName: CommonHelper.text(pincode?.area_name),
                 cityName: CommonHelper.capitalizeWords(city?.city_name),
             },
 
