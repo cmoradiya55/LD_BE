@@ -667,6 +667,7 @@ export class UsedCarRepository {
                 'used_car.pincode_id',
                 'used_car.rc_image',
                 'used_car.insurance_image',
+                'used_car.status',
 
                 'used_car.expected_price',
                 'used_car.registration_date',

@@ -83,6 +83,8 @@ export class MyUsedCarDetailResource extends BaseResource<any> {
 
         return {
             id: CommonHelper.number(data.id),
+            status: CommonHelper.number(data.status),
+            statusLabel: CommonHelper.getCarListingsStatusName(data.status),
             displayName: CommonHelper.text(`${brand?.display_name} ${model?.display_name}`),
             variantName: CommonHelper.text(variant?.display_name),
 
