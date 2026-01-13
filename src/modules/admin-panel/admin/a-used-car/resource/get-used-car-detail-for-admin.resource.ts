@@ -70,6 +70,9 @@ export class GetUsedCarDetailForAdminResource extends BaseResource<any> {
             registrationNumberClean: CommonHelper.text(car.registration_number_clean),
             registrationYear: CommonHelper.number(this.data.registration_year),
 
+            status: CommonHelper.number(this.data.status),
+            statusLabel: CommonHelper.getCarListingsStatusName(this.data.status),
+
             rtoCode: CommonHelper.text(car.rto_code),
 
             kmDriven: CommonHelper.number(car.km_driven),
