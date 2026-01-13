@@ -51,7 +51,6 @@ class CustomerPhotosAdminResource extends BaseResource<any> {
 
 export class GetUsedCarDetailForAdminResource extends BaseResource<any> {
     toJSON() {
-        console.log(this.data);
         const car = this.data;
 
         const brand = this.data?.brand;
@@ -69,8 +68,10 @@ export class GetUsedCarDetailForAdminResource extends BaseResource<any> {
             slug: CommonHelper.text(car.slug),
             registrationNumber: CommonHelper.text(car.registration_number),
             registrationNumberClean: CommonHelper.text(car.registration_number_clean),
+            registrationYear: CommonHelper.number(this.data.registration_year),
+
             rtoCode: CommonHelper.text(car.rto_code),
-            
+
             kmDriven: CommonHelper.number(car.km_driven),
 
             owner: CommonHelper.number(car.owner_type),
