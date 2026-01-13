@@ -75,7 +75,8 @@ export class GetUsedCarDetailForAdminResource extends BaseResource<any> {
 
             owner: CommonHelper.number(car.owner_type),
             customerKmDrivenRange: CommonHelper.number(car.km_driven_range),
-            customerExpectedPrice: CommonHelper.number(car.customer_expected_price),
+            customerExpectedPrice: CommonHelper.number(car.expected_price),
+            managerSuggestedPrice: CommonHelper.number(car.manager_suggested_price),
             finalPrice: CommonHelper.number(car.final_price),
 
             rcImage: CommonHelper.buildImageUrl(car.rc_image),
@@ -97,6 +98,31 @@ export class GetUsedCarDetailForAdminResource extends BaseResource<any> {
                 pincode: CommonHelper.text(pincode.pincode),
                 areaName: CommonHelper.text(pincode.area_name),
                 cityName: CommonHelper.capitalizeWords(city?.city_name),
+            },
+
+            staffReport: {
+                registartionDate: CommonHelper.text(this.data.registration_date),
+                fitnessValidUntil: CommonHelper.text(this.data.fitness_valid_until),
+                insuranceValidUntil: CommonHelper.text(this.data.insurance_valid_until),
+                pucValidUntil: CommonHelper.text(this.data.puc_valid_until),
+                challanDetails: this.data.challan_details,
+                loanStatus: CommonHelper.text(this.data.loan_status),
+                owner: CommonHelper.text(this.data.owner),
+
+                registrationPlace: CommonHelper.text(this.data.registration_place),
+                isBlacklisted: CommonHelper.bool(this.data.is_blacklisted),
+                isRtoNocIssued: CommonHelper.bool(this.data.is_rto_noc_issued),
+                isPartyPeshi: CommonHelper.bool(this.data.is_party_peshi),
+                isHypothecated: CommonHelper.bool(this.data.is_hypothecated),
+                isConverted: CommonHelper.bool(this.data.is_converted),
+                isMigrated: CommonHelper.bool(this.data.is_migrated),
+                adaptedForSpecialUse: CommonHelper.bool(this.data.adapted_for_special_use),
+                criminalCases: CommonHelper.number(this.data.criminal_cases),
+                civilCases: CommonHelper.number(this.data.civil_cases),
+                roadAccidents: CommonHelper.number(this.data.road_accidents),
+                compensationCases: CommonHelper.number(this.data.compensation_cases),
+                otherCases: CommonHelper.number(this.data.other_cases),
+                staffRemarks: CommonHelper.text(this.data.staff_remarks),
             },
 
             customerPhotos: CustomerPhotosAdminResource.collection(customerPhotos),
