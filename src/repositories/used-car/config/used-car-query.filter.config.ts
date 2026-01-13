@@ -60,6 +60,7 @@ export const USED_CAR_LIST_SELECT_COLUMNS: string[] = [
     'uc.km_driven as "kmDriven"',
     'uc.final_price as "finalPrice"',
     'uc.rto_code as "rtoCode"',
+    'uc.expected_price as "customerExpectedPrice"',
     'uc.status as "status"',
     'uc.created_at as "createdAt"',
     // Brand
