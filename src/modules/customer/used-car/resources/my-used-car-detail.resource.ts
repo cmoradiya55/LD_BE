@@ -1,8 +1,42 @@
 import { FeatureValueType, FuelTypeLabel, TransmissionTypeLabel } from '@common/enums/car-detail.enum';
 import { CommonHelper } from '@common/helpers/common.helper';
-import { IMAGE_TYPE_NAMES } from '@common/providers/inspection-image/enum/inspection-image.enum';
+import { IMAGE_TYPE_NAMES, InspectionImageSubType, InspectionImageType } from '@common/providers/inspection-image/enum/inspection-image.enum';
 import { BaseResource } from '@common/utils/resource.utils';
 
+
+
+export class InspectionReportImageCustomerResource extends BaseResource<any> {
+    toJSON() {
+        const data = {
+            id: CommonHelper.number(this.data.id),
+            type: CommonHelper.number(this.data.image_type),
+            subType: CommonHelper.number(this.data.image_subtype),
+            imageUrl: CommonHelper.buildImageUrl(this.data.image_url),
+
+            title: CommonHelper.text(this.data.title),
+
+            isDamage: CommonHelper.bool(this.data.has_damage),
+            remarks: CommonHelper.text(this.data.remarks)
+        };
+
+        if (this.data.image_type === InspectionImageType.TYRES) {
+            data['treadDepth'] = CommonHelper.number(this.data.tread_depth);
+        }
+
+        if (
+            this.data.image_type === InspectionImageType.ELECTRICAL
+            &&
+            (this.data.image_subtype === InspectionImageSubType[InspectionImageType.ELECTRICAL].LHS_FRONT_WINDOW ||
+                this.data.image_subtype === InspectionImageSubType[InspectionImageType.ELECTRICAL].LHS_REAR_WINDOW ||
+                this.data.image_subtype === InspectionImageSubType[InspectionImageType.ELECTRICAL].RHS_FRONT_WINDOW ||
+                this.data.image_subtype === InspectionImageSubType[InspectionImageType.ELECTRICAL].RHS_REAR_WINDOW)
+        ) {
+            data['isPower'] = CommonHelper.bool(this.data.is_power);
+        }
+
+        return data;
+    }
+}
 
 class MyUsedCarFeatureResource extends BaseResource<any> {
     toJSON() {
@@ -51,20 +85,30 @@ export class MyUsedCarDetailResource extends BaseResource<any> {
             id: CommonHelper.number(data.id),
             displayName: CommonHelper.text(`${brand?.display_name} ${model?.display_name}`),
             variantName: CommonHelper.text(variant?.display_name),
+
             registrationYear: CommonHelper.number(data.registration_year),
             kmDrivenRange: CommonHelper.number(data.km_driven_range),
+
             kmDriven: CommonHelper.number(data.km_driven),
+
             registrationNumber: CommonHelper.text(data.registration_number),
             ownerType: data.owner_type,
+
+            rcImage: CommonHelper.buildImageUrl(data.rc_image),
+            insuranceImage: CommonHelper.buildImageUrl(data.insurance_image),
+
             rtoCode: CommonHelper.text(data.rto_code),
-            pincodeId: CommonHelper.number(pincode?.id),
-            pincode: CommonHelper.text(pincode?.pincode),
-            areaName: CommonHelper.text(pincode?.area_name),
-            cityId: CommonHelper.number(city?.id),
-            city: CommonHelper.text(city?.city_name),
+
+            address: {
+                pincodeId: CommonHelper.number(pincode?.id),
+                pincode: CommonHelper.text(pincode?.pincode),
+                areaName: CommonHelper.text(pincode?.area_name),
+                cityId: CommonHelper.number(city?.id),
+                cityName: CommonHelper.capitalizeWords(city?.city_name),
+            },
             customerExpectedPrice: CommonHelper.currency(data.expected_price),
 
-            final_price: CommonHelper.currency(data.final_price),
+            finalPrice: CommonHelper.currency(data.final_price),
 
             transmissionType: TransmissionTypeLabel[variant.transmission_type] || 'Other',
             transmissionTypeId: variant.transmission_type,
@@ -119,7 +163,8 @@ export class MyUsedCarDetailResource extends BaseResource<any> {
 
             customerPhotos: MyUsedCarCustomerPhotosResource.collection(data.photos || []),
             // Group images by type
-            inspectionImages: this.groupImagesByType(data.images || []),
+            // inspectionImages: this.groupImagesByType(data.images || []),
+            inspectionImages: InspectionReportImageCustomerResource.collection(data.images || []),
         };
     }
 
