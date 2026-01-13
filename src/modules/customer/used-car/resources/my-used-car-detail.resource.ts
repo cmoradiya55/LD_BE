@@ -62,8 +62,9 @@ export class MyUsedCarDetailResource extends BaseResource<any> {
             areaName: CommonHelper.text(pincode?.area_name),
             cityId: CommonHelper.number(city?.id),
             city: CommonHelper.text(city?.city_name),
+            customerExpectedPrice: CommonHelper.currency(data.expected_price),
 
-            final_price: data.final_price,
+            final_price: CommonHelper.currency(data.final_price),
 
             transmissionType: TransmissionTypeLabel[variant.transmission_type] || 'Other',
             transmissionTypeId: variant.transmission_type,
@@ -89,6 +90,28 @@ export class MyUsedCarDetailResource extends BaseResource<any> {
             electricMotorTorqueNm: CommonHelper.number(variant.electric_motor_torque_nm),
 
             numberOfGears: CommonHelper.number(variant.num_gears),
+            staffReport: {
+                registartionDate: CommonHelper.text(data.registration_date),
+                fitnessValidUntil: CommonHelper.text(data.fitness_valid_until),
+                insuranceValidUntil: CommonHelper.text(data.insurance_valid_until),
+                pucValidUntil: CommonHelper.text(data.puc_valid_until),
+                challanDetails: data.challan_details,
+                loanStatus: CommonHelper.text(data.loan_status),
+
+                registrationPlace: CommonHelper.text(data.registration_place),
+                isBlacklisted: CommonHelper.bool(data.is_blacklisted),
+                isRtoNocIssued: CommonHelper.bool(data.is_rto_noc_issued),
+                isPartyPeshi: CommonHelper.bool(data.is_party_peshi),
+                isHypothecated: CommonHelper.bool(data.is_hypothecated),
+                isConverted: CommonHelper.bool(data.is_converted),
+                isMigrated: CommonHelper.bool(data.is_migrated),
+                adaptedForSpecialUse: CommonHelper.bool(data.adapted_for_special_use),
+                criminalCases: CommonHelper.number(data.criminal_cases),
+                civilCases: CommonHelper.number(data.civil_cases),
+                roadAccidents: CommonHelper.number(data.road_accidents),
+                compensationCases: CommonHelper.number(data.compensation_cases),
+                otherCases: CommonHelper.number(data.other_cases),
+            },
 
 
             // Features

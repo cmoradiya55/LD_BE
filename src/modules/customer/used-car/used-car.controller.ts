@@ -13,7 +13,7 @@ import { CJwtAuthGuard } from '../c-auth/guards/jwt-c-auth.guard';
 import { MyUsedCarListingResource } from './resources/my-used-car-listing.resource';
 import { CustomerUsedCarListingDto } from './dto/customer-used-car-listing.dto';
 import { MyUsedCarDetailParamDto } from './dto/my-used-car-detail.dto';
-import { MyUsedCarDetailResource } from './resources/my-used-car-detail.resource copy';
+import { MyUsedCarDetailResource } from './resources/my-used-car-detail.resource';
 import { UpdateMyUsedCarDetailParamDto, UpdateMyUsedCarDto } from './dto/update-my-used-car.dto';
 import { CurrentCustomer } from '@common/decorators/current-customer.decorator';
 import { ApproveOrRejectListingDto, ApproveOrRejectListingParamDto } from './dto/approve-or-reject-listing.dto';

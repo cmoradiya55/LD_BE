@@ -666,6 +666,27 @@ export class UsedCarRepository {
                 'used_car.km_driven_range',
                 'used_car.pincode_id',
 
+                'used_car.expected_price',
+                'used_car.registration_date',
+                'used_car.fitness_valid_until',
+                'used_car.insurance_valid_until',
+                'used_car.puc_valid_until',
+                'used_car.challan_details',
+                'used_car.loan_status',
+                'used_car.registration_place',
+                'used_car.is_blacklisted',
+                'used_car.is_rto_noc_issued',
+                'used_car.is_party_peshi',
+                'used_car.is_hypothecated',
+                'used_car.is_converted',
+                'used_car.is_migrated',
+                'used_car.adapted_for_special_use',
+                'used_car.criminal_cases',
+                'used_car.civil_cases',
+                'used_car.road_accidents',
+                'used_car.compensation_cases',
+                'used_car.other_cases',
+
                 // Brand
                 'brand.display_name',
 
