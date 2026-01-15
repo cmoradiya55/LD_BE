@@ -59,6 +59,7 @@ export class InspectionImageBaseDto {
     })
     image_url: string;
 
+    @IsNotEmpty()
     @ParseBoolean()
     is_damage: boolean;
 
