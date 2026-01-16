@@ -72,6 +72,7 @@ export class GetUsedCarDetailForAdminResource extends BaseResource<any> {
 
             status: CommonHelper.number(car.status),
             statusLabel: CommonHelper.getCarListingsStatusName(car.status),
+            adminCancelReason: CommonHelper.text(car.cancel_reason),
 
             rtoCode: CommonHelper.text(car.rto_code),
 
