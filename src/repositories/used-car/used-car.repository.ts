@@ -944,6 +944,7 @@ export class UsedCarRepository {
 
         // Execute query
         const data = await queryBuilder
+            .orderBy(`${USED_CAR_TABLE_ALIASES.usedCar}.id`, SORT_ORDER.DESC)
             .offset(skip)
             .limit(limit)
             .getRawMany();
