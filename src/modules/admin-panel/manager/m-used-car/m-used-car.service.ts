@@ -10,6 +10,7 @@ import { UserRepository } from '@repository/user/user.repository';
 import { GetInspectionReportParamDto } from './dto/get-inspection-report.dto';
 import { MApproveAndSuggestPriceDto, MApproveAndSuggestPriceParamDto } from './dto/approve-and-suggest-price.dto';
 import { UsedCarListingStatus } from '@common/enums/car-detail.enum';
+import { UserDocumentVerificationStatus } from '@common/enums/user.enum';
 
 @Injectable()
 export class MUsedCarService {
@@ -70,6 +71,10 @@ export class MUsedCarService {
 
                 if (!isValidInspector) {
                     throw new BadRequestException('Inspector does not belong to this manager');
+                }
+
+                if (isValidInspector.document_status !== UserDocumentVerificationStatus.VERIFIED) {
+                    throw new BadRequestException('Inspector documents are not verified');
                 }
 
                 const result = await this.usedCarRepo.assignInspectorToUsedCar(
