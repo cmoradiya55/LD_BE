@@ -55,6 +55,17 @@ export class MUsedCarService {
         return this.baseService.catch(async () => {
             const { inspectorId, usedCarId } = body;
 
+            const usedCar = await this.usedCarRepo.findByIdRaw(usedCarId);
+            if (!usedCar) {
+                throw new BadRequestException('Car not found');
+            }
+
+            if (usedCar.status === UsedCarListingStatus.INSPECTION_STARTED) {
+                throw new BadRequestException('Cannot assign inspector. Inspection already started for this car');
+            } else if (usedCar.status > UsedCarListingStatus.INSPECTION_STARTED) {
+                throw new BadRequestException('Cannot assign inspector. Inspection already completed for this car');
+            }
+
             if (user.id === inspectorId) {
                 // assign directly
                 const result = await this.usedCarRepo.assignInspectorToUsedCar(
@@ -83,7 +94,7 @@ export class MUsedCarService {
                     user.id
                 );
                 if (result.affected === 0) {
-                    throw new Error('Failed to assign inspector. Please check the Car ID.');
+                    throw new BadRequestException('Failed to assign inspector. Please check the Car ID.');
                 }
             }
         });
