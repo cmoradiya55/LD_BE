@@ -156,7 +156,11 @@ export class InspectionService {
                 }
             }
 
-            return await this.getInspectionDetails(user, usedCarId);
+            const updatedCar = await this.usedCarRepo.getInspectionDetailsByInspector(user, usedCarId, manager);
+            if (!updatedCar) {
+                throw new BadRequestException('Inspection not found for the vehicle');
+            }
+            return updatedCar;
         }, true);
     }
 

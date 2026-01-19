@@ -849,8 +849,9 @@ export class UsedCarRepository {
     async getInspectionDetailsByInspector(
         user: User,
         usedCarId: number,
+        manager?: EntityManager,
     ) {
-        const repo = this.getRepo();
+        const repo = this.getRepo(manager);
         const car = await repo.findOne({
             where: {
                 id: usedCarId,
