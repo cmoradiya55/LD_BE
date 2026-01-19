@@ -238,6 +238,15 @@ export const IMAGE_SUBTYPE_NAMES = {
 
         [InspectionImageSubType[InspectionImageType.EXTERIOR].ORVM_LHS]: 'ORVM LHS',
         [InspectionImageSubType[InspectionImageType.EXTERIOR].ORVM_RHS]: 'ORVM RHS',
+        
+        [InspectionImageSubType[InspectionImageType.EXTERIOR].LEFT_FRONT]: 'Left Front',
+        [InspectionImageSubType[InspectionImageType.EXTERIOR].FRONT]: 'Front',
+        [InspectionImageSubType[InspectionImageType.EXTERIOR].LEFT_SIDE]: 'Left Side',
+        [InspectionImageSubType[InspectionImageType.EXTERIOR].LEFT_BACK]: 'Left Back',
+        [InspectionImageSubType[InspectionImageType.EXTERIOR].BACK]: 'Back',
+        [InspectionImageSubType[InspectionImageType.EXTERIOR].RIGHT_BACK]: 'Right Back',
+        [InspectionImageSubType[InspectionImageType.EXTERIOR].RIGHT_SIDE]: 'Right Side',
+        [InspectionImageSubType[InspectionImageType.EXTERIOR].RIGHT_FRONT]: 'Right Front',
     },
 
     [InspectionImageType.TYRES]: {

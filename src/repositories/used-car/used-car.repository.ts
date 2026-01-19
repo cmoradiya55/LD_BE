@@ -97,6 +97,23 @@ export class UsedCarRepository {
         // Build query
         const queryBuilder = this.createBaseListQuery(customerId)
             .addSelect('COUNT(*) OVER() as "totalCount"')
+            // Join pincode (SQL only)
+            .leftJoin(
+                `${USED_CAR_TABLE_ALIASES.usedCar}.pincode`,
+                USED_CAR_TABLE_ALIASES.pincode,
+            )
+
+            // Join city through pincode
+            .leftJoin(
+                `${USED_CAR_TABLE_ALIASES.pincode}.city`,
+                USED_CAR_TABLE_ALIASES.city,
+            )
+
+            // Select ONLY what you need
+            .addSelect([
+                `${USED_CAR_TABLE_ALIASES.pincode}.area_name as "areaName"`,
+                `${USED_CAR_TABLE_ALIASES.city}.city_name as "cityName"`,
+            ])
             .andWhere('uc.id IN (:...ids)', { ids });
 
 
@@ -1005,7 +1022,8 @@ export class UsedCarRepository {
                 .addSelect(
                     `CASE WHEN ${USED_CAR_TABLE_ALIASES.wishlist}.id IS NOT NULL THEN true ELSE false END`,
                     'isWishlisted',
-                );
+                )
+                .orderBy(`${USED_CAR_TABLE_ALIASES.wishlist}.created_at`, SORT_ORDER.DESC);
         } else {
             // User is not logged in - always return false
             qb.addSelect('false', 'isWishlisted');
