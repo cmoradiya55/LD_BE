@@ -10,6 +10,7 @@ import { AUsedCarModule } from './admin/a-used-car/a-used-car.module';
 import { AProfileModule } from './admin/a-profile/a-profile.module';
 import { MProfileModule } from './manager/m-profile/m-profile.module';
 import { SProfileModule } from './staff/s-profile/s-profile.module';
+import { IProfileModule } from './inspector/i-profile/i-profile.module';
 
 @Module({
     imports: [
@@ -24,6 +25,7 @@ import { SProfileModule } from './staff/s-profile/s-profile.module';
         AProfileModule,
         MProfileModule,
         SProfileModule,
+        IProfileModule,
     ],
     providers: [],
     exports: [],
