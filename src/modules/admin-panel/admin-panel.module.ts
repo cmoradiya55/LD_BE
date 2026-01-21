@@ -8,6 +8,8 @@ import { MUsedCarModule } from './manager/m-used-car/m-used-car.module';
 import { VehicleVerificationModule } from './staff/vehicle-verification/vehicle-verification.module';
 import { AUsedCarModule } from './admin/a-used-car/a-used-car.module';
 import { AProfileModule } from './admin/a-profile/a-profile.module';
+import { MProfileModule } from './manager/m-profile/m-profile.module';
+import { SProfileModule } from './staff/s-profile/s-profile.module';
 
 @Module({
     imports: [
@@ -20,6 +22,8 @@ import { AProfileModule } from './admin/a-profile/a-profile.module';
         VehicleVerificationModule,
         AUsedCarModule,
         AProfileModule,
+        MProfileModule,
+        SProfileModule,
     ],
     providers: [],
     exports: [],
