@@ -7,6 +7,7 @@ import { MUserManagementModule } from './manager/user-management/user-management
 import { MUsedCarModule } from './manager/m-used-car/m-used-car.module';
 import { VehicleVerificationModule } from './staff/vehicle-verification/vehicle-verification.module';
 import { AUsedCarModule } from './admin/a-used-car/a-used-car.module';
+import { AProfileModule } from './admin/a-profile/a-profile.module';
 
 @Module({
     imports: [
@@ -18,6 +19,7 @@ import { AUsedCarModule } from './admin/a-used-car/a-used-car.module';
         MUsedCarModule,
         VehicleVerificationModule,
         AUsedCarModule,
+        AProfileModule,
     ],
     providers: [],
     exports: [],
