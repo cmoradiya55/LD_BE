@@ -11,6 +11,7 @@ import { AProfileModule } from './admin/a-profile/a-profile.module';
 import { MProfileModule } from './manager/m-profile/m-profile.module';
 import { SProfileModule } from './staff/s-profile/s-profile.module';
 import { IProfileModule } from './inspector/i-profile/i-profile.module';
+import { MInspectionModule } from './manager/m-inspection/m-inspection.module';
 
 @Module({
     imports: [
@@ -26,6 +27,7 @@ import { IProfileModule } from './inspector/i-profile/i-profile.module';
         MProfileModule,
         SProfileModule,
         IProfileModule,
+        MInspectionModule,
     ],
     providers: [],
     exports: [],
