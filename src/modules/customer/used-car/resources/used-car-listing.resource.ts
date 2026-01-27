@@ -18,6 +18,7 @@ export class UsedCarListingResource extends BaseResource<any> {
             fuelType: CommonHelper.text(FuelTypeLabel[this.data.fuelType] || 'Other'),
             transmissionType: CommonHelper.text(TransmissionTypeLabel[this.data.transmissionType] || 'Other'),
             price: CommonHelper.currency(this.data.finalPrice),
+            customerExpectedPrice: CommonHelper.currency(this.data.customerExpectedPrice),
             isWishlisted: CommonHelper.bool(this.data?.isWishlisted),
         };
     }
