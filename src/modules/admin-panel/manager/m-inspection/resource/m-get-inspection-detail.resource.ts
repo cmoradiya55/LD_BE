@@ -15,7 +15,8 @@ export class InspectionImageResource extends BaseResource<any> {
             title: CommonHelper.text(this.data.title),
 
             is_damage: CommonHelper.bool(this.data.has_damage),
-            remarks: CommonHelper.text(this.data.remarks)
+            remarks: CommonHelper.text(this.data.remarks),
+            other_remarks: this.data.other_remarks,
         };
 
         if (this.data.image_type === InspectionImageType.TYRES) {

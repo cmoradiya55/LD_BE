@@ -620,7 +620,7 @@ export class UsedCarRepository {
             .leftJoinAndSelect('pincode.city', 'city')
             // .leftJoinAndSelect(`${USED_CAR_TABLE_ALIASES.usedCar}.inspector`, 'inspector')
             .leftJoinAndSelect(`${USED_CAR_TABLE_ALIASES.usedCar}.photos`, 'customerPhotos')
-            .leftJoinAndSelect(`${USED_CAR_TABLE_ALIASES.usedCar}.inspectionImages`, 'inspectionImages')
+            // .leftJoinAndSelect(`${USED_CAR_TABLE_ALIASES.usedCar}.inspectionImages`, 'inspectionImages')
 
             // Filters
             .where(`${USED_CAR_TABLE_ALIASES.usedCar}.deleted_at IS NULL`)
@@ -885,7 +885,6 @@ export class UsedCarRepository {
                 'inspectionImages',
             ],
         });
-        console.log('Inspection car details:', car);
 
         return car;
     }
@@ -1066,7 +1065,7 @@ export class UsedCarRepository {
             .leftJoinAndSelect('pincode.city', 'city')
             .leftJoinAndSelect(`${USED_CAR_TABLE_ALIASES.usedCar}.inspector`, 'inspector')
             .leftJoinAndSelect(`${USED_CAR_TABLE_ALIASES.usedCar}.photos`, 'customerPhotos')
-            .leftJoinAndSelect(`${USED_CAR_TABLE_ALIASES.usedCar}.inspectionImages`, 'inspectionImages')
+            // .leftJoinAndSelect(`${USED_CAR_TABLE_ALIASES.usedCar}.inspectionImages`, 'inspectionImages')
 
             // Filters
             .where(`${USED_CAR_TABLE_ALIASES.usedCar}.deleted_at IS NULL`)

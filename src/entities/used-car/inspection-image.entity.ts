@@ -36,6 +36,9 @@ export class InspectionImage {
     @Column({ type: 'text', nullable: true })
     remarks: string | null;
 
+    @Column('text', { array: true, default: null })
+    other_remarks: string[];
+
     @Column({ type: 'smallint', nullable: true })
     condition_rating: number;
 

@@ -42,7 +42,7 @@ export class ManagerUsedCarListingResource extends BaseResource<any> {
 
         const inspector = this.data.inspector;
         const customerPhotos = this.data.photos;
-        const inspectionImages = this.data.inspectionImages;
+        // const inspectionImages = this.data.inspectionImages;
 
         return {
             id: CommonHelper.number(this.data.id),
@@ -76,7 +76,7 @@ export class ManagerUsedCarListingResource extends BaseResource<any> {
                 roleLabel: CommonHelper.getRoleName(inspector?.role),
             } : null,
             customerPhotos: CustomerPhotosResource.collection(customerPhotos || []),
-            inspectionImages: InspectionImagesResource.collection(inspectionImages || []),
+            // inspectionImages: InspectionImagesResource.collection(inspectionImages || []),
         };
     }
 }

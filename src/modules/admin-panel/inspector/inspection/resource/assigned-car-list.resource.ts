@@ -23,6 +23,7 @@ class InspectionImagesResource extends BaseResource<any> {
             subtype: CommonHelper.number(photos.image_subtype),
             title: CommonHelper.text(photos.title),
             remarks: CommonHelper.text(photos.remarks),
+            otherRemarks: photos.other_remarks,
             hasDamage: CommonHelper.bool(photos.has_damage),
             sortOrder: CommonHelper.number(photos.sort_order),
             isActive: CommonHelper.bool(photos.is_active),
@@ -41,7 +42,7 @@ export class AssignedCarListingResource extends BaseResource<any> {
         const city = pincode?.city;
 
         const customerPhotos = this.data.photos;
-        const inspectionImages = this.data.inspectionImages;
+        // const inspectionImages = this.data.inspectionImages;
 
         return {
             id: CommonHelper.number(this.data.id),
@@ -67,7 +68,7 @@ export class AssignedCarListingResource extends BaseResource<any> {
             status: CommonHelper.number(this.data.status),
             statusLabel: CommonHelper.getCarListingsStatusName(this.data.status),
             customerPhotos: CustomerPhotosResource.collection(customerPhotos || []),
-            inspectionImages: InspectionImagesResource.collection(inspectionImages || []),
+            // inspectionImages: InspectionImagesResource.collection(inspectionImages || []),
         };
     }
 }

@@ -1,8 +1,9 @@
-import { IsInt, IsString, IsEnum, IsNotEmpty, ValidateIf, IsOptional } from 'class-validator';
+import { IsInt, IsString, IsEnum, IsNotEmpty, ValidateIf, IsOptional, IsArray } from 'class-validator';
 import { Type } from 'class-transformer';
 import { InspectionImageSubType, InspectionImageType, TreadDepthEnum } from '@common/providers/inspection-image/enum/inspection-image.enum';
 import { ParseBoolean } from '@common/decorators/parse-boolean.decorator';
 import { IsValidInspectionImageSubtype } from '@common/decorators/admin-panel/is-valid-sub-inpection-image-subtype.decorator';
+import { AtLeastOneRemark } from './at-least-one-remark.decorator';
 
 export class InspectionImageBaseDto {
     @Type(() => Number)
@@ -84,7 +85,18 @@ export class InspectionImageBaseDto {
     tread_depth: number;
 
     @ValidateIf(o => o.is_damage === true)
-    @IsNotEmpty()
+    @IsOptional()
     @IsString()
     remarks?: string;
+
+    @ValidateIf(o => o.is_damage === true)
+    @IsOptional()
+    @IsArray()
+    @IsString({ each: true })
+    other_remarks?: string[];
+
+    @AtLeastOneRemark({
+        message: 'Either remarks or other_remarks must be provided when damage is true',
+    })
+    private readonly _remarksValidation?: any;
 }
