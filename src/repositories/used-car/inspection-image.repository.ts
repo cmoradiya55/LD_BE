@@ -55,7 +55,7 @@ export class InspectionImageRepository {
             image_url: img.image_url,
             has_damage: img.is_damage || false,
             is_power: isPowerWindowSubtypes.includes(img.sub_type as any) ? img.is_power : null,
-            remarks: img.remarks || null,
+            remarks: img?.remarks,
             other_remarks: img.other_remarks || [],
             is_active: true,
         }));

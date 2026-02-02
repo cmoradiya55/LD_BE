@@ -293,7 +293,7 @@ export class InspectionService {
 
         // ✅ Validate damage remarks
         const damagedWithoutRemarks = activeImages.filter(
-            img => img.has_damage && (!img.remarks || img.remarks.trim() === '')
+            img => img.has_damage && !this.hasAtLeastOneRemark(img.remarks, img.other_remarks),
         );
 
         if (damagedWithoutRemarks.length > 0) {
@@ -428,5 +428,20 @@ export class InspectionService {
         }
 
         return errors;
+    }
+
+    private hasAtLeastOneRemark(
+        remarks?: string,
+        otherRemarks?: string[],
+    ): boolean {
+        const hasRemarks = remarks && remarks.trim().length > 0;
+
+        const hasOtherRemarks =
+            Array.isArray(otherRemarks) &&
+            otherRemarks.some(
+                r => typeof r === 'string' && r.trim().length > 0,
+            );
+
+        return hasRemarks || hasOtherRemarks;
     }
 }

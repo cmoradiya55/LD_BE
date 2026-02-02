@@ -34,7 +34,7 @@ export class InspectionImage {
     title: string;
 
     @Column({ type: 'text', nullable: true })
-    remarks: string | null;
+    remarks: string;
 
     @Column('text', { array: true, default: null })
     other_remarks: string[];
