@@ -1,0 +1,108 @@
+import { Body, Controller, Get, Param, Patch, Put, Query, UseGuards } from '@nestjs/common';
+import { UsedCarService } from './used-car.service';
+import { MODULE_PREFIX } from '@common/constants/app.constant';
+import { UsedCarListingDto } from './dto/used-car-listing.dto';
+import { ApiResponseUtil } from '@common/utils/api-response.utils';
+import { UsedCarListingResource } from './resources/used-car-listing.resource';
+import { UsedCarDetailParamDto } from './dto/used-car-detail.dto';
+import { UsedCarDetailResource } from './resources/used-car-detail.resource';
+import { OptionalAuthGuard } from '../c-auth/guards/jwt-optional-c-auth.guard';
+import { Customer } from '@entity/customer/customer.entity';
+import { OptionalUser } from '@common/decorators/optional-user.decorator';
+import { CJwtAuthGuard } from '../c-auth/guards/jwt-c-auth.guard';
+import { MyUsedCarListingResource } from './resources/my-used-car-listing.resource';
+import { CustomerUsedCarListingDto } from './dto/customer-used-car-listing.dto';
+import { MyUsedCarDetailParamDto } from './dto/my-used-car-detail.dto';
+import { MyUsedCarDetailResource } from './resources/my-used-car-detail.resource';
+import { UpdateMyUsedCarDetailParamDto, UpdateMyUsedCarDto } from './dto/update-my-used-car.dto';
+import { CurrentCustomer } from '@common/decorators/current-customer.decorator';
+import { ApproveOrRejectListingDto, ApproveOrRejectListingParamDto } from './dto/approve-or-reject-listing.dto';
+
+@Controller(`${MODULE_PREFIX.CUSTOMER}/used-car`)
+export class UsedCarController {
+  constructor(private readonly usedCarService: UsedCarService) { }
+
+  @Get('list')
+  @UseGuards(OptionalAuthGuard)
+  async getUsedCars(
+    @Query() query: UsedCarListingDto,
+    @OptionalUser() customer: Customer | null,
+  ) {
+    const { data, page, total, limit } = await this.usedCarService.findUsedCars(query, customer?.id);
+    return ApiResponseUtil.paginated(
+      'Cars fetched successfully',
+      UsedCarListingResource.collection(data),
+      page,
+      limit,
+      total,
+    );
+  }
+
+  @Get('detail/:slug')
+  @UseGuards(OptionalAuthGuard)
+  async getUsedCarDetailBySlug(
+    @Param() params: UsedCarDetailParamDto,
+    @OptionalUser() customer: Customer | null,
+  ) {
+    const data = await this.usedCarService.getUsedCarDetailBySlug(params, customer?.id);
+    return ApiResponseUtil.success(
+      'Car details fetched successfully',
+      new UsedCarDetailResource(data),
+    );
+  }
+
+  @Get()
+  @UseGuards(CJwtAuthGuard)
+  async getCustomerUsedCars(
+    @CurrentCustomer('id') customer_id: number,
+    @Query() query: CustomerUsedCarListingDto,
+  ) {
+    const { data, page, total, limit } = await this.usedCarService.getCustomerUsedCars(customer_id, query);
+    return ApiResponseUtil.paginated(
+      'Cars fetched successfully',
+      MyUsedCarListingResource.collection(data),
+      page,
+      limit,
+      total,
+    );
+  }
+
+  @Get(':id')
+  @UseGuards(CJwtAuthGuard)
+  async myUsedCarDetailById(
+    @CurrentCustomer() customer: Customer,
+    @Param() params: MyUsedCarDetailParamDto
+  ) {
+    const data = await this.usedCarService.getMyUsedCarDetailById(customer, params);
+    return ApiResponseUtil.success(
+      'Car details fetched successfully',
+      new MyUsedCarDetailResource(data),
+    );
+  }
+
+  @Patch(':id/status')
+  @UseGuards(CJwtAuthGuard)
+  async updateUsedCarStatus(
+    @CurrentCustomer() customer: Customer,
+    @Param() param: ApproveOrRejectListingParamDto,
+    @Body() body: ApproveOrRejectListingDto
+  ) {
+    const { message } = await this.usedCarService.updateUsedCarStatus(customer, param, body);
+    return ApiResponseUtil.success(
+      message,
+    );
+  }
+
+  @Patch(':id')
+  @UseGuards(CJwtAuthGuard)
+  async updateMyUsedCarById(
+    @CurrentCustomer() customer: Customer,
+    @Param() params: UpdateMyUsedCarDetailParamDto,
+    @Body() dto: UpdateMyUsedCarDto
+  ) {
+    await this.usedCarService.updateMyUsedCarById(customer, params, dto);
+    return ApiResponseUtil.updated(
+      'Car details updated successfully',
+    );
+  }
+}

@@ -1,0 +1,202 @@
+import { FeatureValueType, FuelTypeLabel, TransmissionTypeLabel } from '@common/enums/car-detail.enum';
+import { CommonHelper } from '@common/helpers/common.helper';
+import { IMAGE_TYPE_NAMES, InspectionImageSubType, InspectionImageType } from '@common/providers/inspection-image/enum/inspection-image.enum';
+import { BaseResource } from '@common/utils/resource.utils';
+
+
+
+export class InspectionReportImageCustomerResource extends BaseResource<any> {
+    toJSON() {
+        const data = {
+            id: CommonHelper.number(this.data.id),
+            type: CommonHelper.number(this.data.image_type),
+            subType: CommonHelper.number(this.data.image_subtype),
+            imageUrl: CommonHelper.buildImageUrl(this.data.image_url),
+
+            title: CommonHelper.text(this.data.title),
+
+            isDamage: CommonHelper.bool(this.data.has_damage),
+            remarks: CommonHelper.text(this.data.remarks)
+        };
+
+        if (this.data.image_type === InspectionImageType.TYRES) {
+            data['treadDepth'] = CommonHelper.number(this.data.tread_depth);
+        }
+
+        if (
+            this.data.image_type === InspectionImageType.ELECTRICAL
+            &&
+            (this.data.image_subtype === InspectionImageSubType[InspectionImageType.ELECTRICAL].LHS_FRONT_WINDOW ||
+                this.data.image_subtype === InspectionImageSubType[InspectionImageType.ELECTRICAL].LHS_REAR_WINDOW ||
+                this.data.image_subtype === InspectionImageSubType[InspectionImageType.ELECTRICAL].RHS_FRONT_WINDOW ||
+                this.data.image_subtype === InspectionImageSubType[InspectionImageType.ELECTRICAL].RHS_REAR_WINDOW)
+        ) {
+            data['isPower'] = CommonHelper.bool(this.data.is_power);
+        }
+
+        return data;
+    }
+}
+
+class MyUsedCarFeatureResource extends BaseResource<any> {
+    toJSON() {
+        const valueType = this.data.feature?.value_type;
+        let featureValue: any = null;
+
+        if (valueType === FeatureValueType.BOOLEAN) {
+            featureValue = CommonHelper.bool(this.data.feature_value);
+        } else if (valueType === FeatureValueType.NUMBER) {
+            featureValue = CommonHelper.number(this.data.feature_value);
+        } else {
+            featureValue = CommonHelper.text(this.data.feature_value);
+        }
+
+        return {
+            id: CommonHelper.number(this.data.feature_id),
+            name: CommonHelper.text(this.data.feature?.name),
+            displayName: CommonHelper.text(this.data.feature?.display_name),
+            valueType: valueType,
+            featureValue: featureValue,
+        };
+    }
+}
+
+class MyUsedCarCustomerPhotosResource extends BaseResource<any> {
+    toJSON() {
+        return {
+            id: CommonHelper.number(this.data.id),
+            url: CommonHelper.buildImageUrl(this.data.url),
+        };
+    }
+}
+
+export class MyUsedCarDetailResource extends BaseResource<any> {
+    toJSON() {
+        const data = this.data;
+        const brand = this.data?.brand;
+        const model = this.data?.model;
+        const variant = this.data?.variant;
+        const variantFeatures = variant?.variantFeatures || [];
+        const pincode = this.data?.pincode;
+        const city = pincode?.city;
+        console.log('data', data);
+
+        return {
+            id: CommonHelper.number(data.id),
+            status: CommonHelper.number(data.status),
+            statusLabel: CommonHelper.getCarListingsStatusName(data.status),
+            displayName: CommonHelper.text(`${brand?.display_name} ${model?.display_name}`),
+            variantName: CommonHelper.text(variant?.display_name),
+
+            registrationYear: CommonHelper.number(data.registration_year),
+            kmDrivenRange: CommonHelper.number(data.km_driven_range),
+
+            kmDriven: CommonHelper.number(data.km_driven),
+
+            registrationNumber: CommonHelper.text(data.registration_number),
+            ownerType: data.owner_type,
+
+            rcImage: CommonHelper.buildImageUrl(data.rc_image),
+            insuranceImage: CommonHelper.buildImageUrl(data.insurance_image),
+
+            rtoCode: CommonHelper.text(data.rto_code),
+
+            address: {
+                pincodeId: CommonHelper.number(pincode?.id),
+                pincode: CommonHelper.text(pincode?.pincode),
+                areaName: CommonHelper.text(pincode?.area_name),
+                cityId: CommonHelper.number(city?.id),
+                cityName: CommonHelper.capitalizeWords(city?.city_name),
+            },
+            customerExpectedPrice: CommonHelper.currency(data.expected_price),
+
+            finalPrice: CommonHelper.currency(data.final_price),
+
+            transmissionType: TransmissionTypeLabel[variant.transmission_type] || 'Other',
+            transmissionTypeId: variant.transmission_type,
+
+            bootSpaceLiters: CommonHelper.number(variant.boot_space_liters),
+            seatingCapacity: CommonHelper.number(variant.seating_capacity),
+            groundClearanceMm: CommonHelper.number(variant.ground_clearance_mm),
+
+            // engine specs
+            fuelType: FuelTypeLabel[variant.fuel_type] || 'Other',
+            fuelTypeId: CommonHelper.number(variant.fuel_type),
+
+            displacementCc: CommonHelper.number(variant.engine_displacement_cc),
+            cylinders: CommonHelper.number(variant.cylinders),
+            powerBhp: CommonHelper.number(variant.max_power_ps),
+            powerRpm: CommonHelper.number(variant.max_power_rpm),
+            torqueNm: CommonHelper.number(variant.max_torque_nm),
+            fuelTankCapacityLiters: CommonHelper.number(variant.fuel_tank_liters),
+            mileageKmpl: CommonHelper.number(variant.mileage_kmpl),
+            batteryCapacityKwh: CommonHelper.number(variant.battery_capacity_kwh),
+            electricRangeKm: CommonHelper.number(variant.electric_range_km),
+            electricMotorPowerKw: CommonHelper.number(variant.electric_motor_power_kw),
+            electricMotorTorqueNm: CommonHelper.number(variant.electric_motor_torque_nm),
+
+            numberOfGears: CommonHelper.number(variant.num_gears),
+            staffReport: {
+                registartionDate: CommonHelper.text(data.registration_date),
+                fitnessValidUntil: CommonHelper.text(data.fitness_valid_until),
+                insuranceValidUntil: CommonHelper.text(data.insurance_valid_until),
+                pucValidUntil: CommonHelper.text(data.puc_valid_until),
+                challanDetails: data.challan_details,
+                loanStatus: CommonHelper.text(data.loan_status),
+
+                registrationPlace: CommonHelper.text(data.registration_place),
+                isBlacklisted: CommonHelper.bool(data.is_blacklisted),
+                isRtoNocIssued: CommonHelper.bool(data.is_rto_noc_issued),
+                isPartyPeshi: CommonHelper.bool(data.is_party_peshi),
+                isHypothecated: CommonHelper.bool(data.is_hypothecated),
+                isConverted: CommonHelper.bool(data.is_converted),
+                isMigrated: CommonHelper.bool(data.is_migrated),
+                adaptedForSpecialUse: CommonHelper.bool(data.adapted_for_special_use),
+                criminalCases: CommonHelper.number(data.criminal_cases),
+                civilCases: CommonHelper.number(data.civil_cases),
+                roadAccidents: CommonHelper.number(data.road_accidents),
+                compensationCases: CommonHelper.number(data.compensation_cases),
+                otherCases: CommonHelper.number(data.other_cases),
+            },
+
+
+            // Features
+            features: MyUsedCarFeatureResource.collection(variantFeatures),
+
+            customerPhotos: MyUsedCarCustomerPhotosResource.collection(data.photos || []),
+            // Group images by type
+            // inspectionImages: this.groupImagesByType(data.images || []),
+            inspectionImages: InspectionReportImageCustomerResource.collection(data.images || []),
+        };
+    }
+
+    /**
+     * Group images by image_type
+     */
+    private groupImagesByType(images: any[]) {
+        const grouped = images.reduce((acc, image) => {
+            const type = image.image_type;
+
+            if (!acc[type]) {
+                acc[type] = {
+                    type: type,
+                    typeName: IMAGE_TYPE_NAMES[type] || 'Other',
+                    images: [],
+                };
+            }
+
+            acc[type].images.push({
+                id: image.id,
+                imageSubtype: image.image_subtype,
+                imageUrl: image.image_url,
+                title: image.title,
+            });
+
+            return acc;
+        }, {});
+
+        // Convert to array and sort by type
+        // return Object.values(grouped).sort((a: any, b: any) => a.type - b.type);
+        return Object.values(grouped);
+    }
+}

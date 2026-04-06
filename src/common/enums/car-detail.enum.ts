@@ -6,6 +6,18 @@ export enum FuelType {
     HYBRID = 5,
 }
 
+export enum BodyType {
+    SEDAN = 1,
+    SUB_COMPACT_SUV = 2,
+    SUV = 3,
+    HATCHBACK = 4,
+    MUV = 5,
+    COUPE = 6,
+    CONVERTIBLE = 7,
+    PICKUP = 8,
+    WAGON = 9,
+}
+
 export const FuelTypeLabel: Record<number, string> = {
     [FuelType.PETROL]: 'Petrol',
     [FuelType.DIESEL]: 'Diesel',
@@ -17,15 +29,64 @@ export const FuelTypeLabel: Record<number, string> = {
 export enum TransmissionType {
     MANUAL = 1,
     AUTOMATIC = 2,
-    CVT = 3,
-    DCT = 4,
-    AMT = 5,
 }
 
-export const TransmissionTypeLabel: Record<number, string> = {
+export const TransmissionTypeLabel: Record<TransmissionType, string> = {
     [TransmissionType.MANUAL]: 'Manual',
     [TransmissionType.AUTOMATIC]: 'Automatic',
-    [TransmissionType.CVT]: 'CVT',
-    [TransmissionType.DCT]: 'DCT',
-    [TransmissionType.AMT]: 'AMT',
 };
+
+export enum OwnershipType {
+    FIRST = 1,
+    SECOND = 2,
+    THIRD = 3,
+    FOURTH = 4,
+    FIFTH = 5,
+}
+
+export enum KilometerDriven {
+    ZERO_TO_10K = 1,
+    TEN_TO_20K = 2,
+    TWENTY_TO_30K = 3,
+    THIRTY_TO_40K = 4,
+    FORTY_TO_50K = 5,
+    FIFTY_TO_60K = 6,
+    SIXTY_TO_70K = 7,
+    SEVENTY_TO_80K = 8,
+    EIGHTY_TO_90K = 9,
+    NINTY_TO_1LAKH = 10,
+    ONE_LAKH_TO_1_2_LAKH = 11,
+    ONE_2_LAKH_TO_1_5_LAKH = 12,
+    ONE_5_LAKH_PLUS = 13,
+}
+
+export enum UsedCarListingStatus {
+    PENDING = 100,
+    INSPECTOR_ASSIGNED = 200,
+    INSPECTION_STARTED = 300,
+    INSPECTION_COMPLETED = 400,
+    DETAILS_UPDATED_BY_STAFF = 500,
+    APPROVED_BY_MANAGER = 600,
+    APPROVED_BY_ADMIN = 700,
+    LISTED = 800,
+    SOLD = 900,
+    REJECTED_BY_MANAGER = 1000,
+    REJECTED_BY_ADMIN = 1100,
+    REJECTED_BY_CUSTOMER = 1200,
+    EXPIRED = 1300,
+    CANCELLED = 1400,
+}
+
+export enum SafetyRating {
+    ONE = 1,
+    TWO = 2,
+    THREE = 3,
+    FOUR = 4,
+    FIVE = 5,
+}
+
+export enum FeatureValueType {
+    BOOLEAN = 1,
+    TEXT = 2,
+    NUMBER = 3,
+}

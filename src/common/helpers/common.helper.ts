@@ -1,4 +1,105 @@
+import { ADMIN_OTP_LENGTH, CUSTOMER_OTP_LENGTH } from "@common/constants/app.constant";
+import { UsedCarListingStatus } from "@common/enums/car-detail.enum";
+import { UserDocumentVerificationStatus, UserRole } from "@common/enums/user.enum";
+
 export class CommonHelper {
+    static dateTime(date: Date | string | null | undefined): string | null {
+        if (!date) return null;
+
+        const d = date instanceof Date ? date : new Date(date);
+
+        if (isNaN(d.getTime())) return null;
+
+        return d.toLocaleString('en-IN', {
+            day: '2-digit',
+            month: 'long',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: true,
+        });
+    }
+
+    static date(date: Date | string | null | undefined): string | null {
+        if (!date) return null;
+
+        const d = date instanceof Date ? date : new Date(date);
+
+        if (isNaN(d.getTime())) return null;
+
+        return d.toLocaleString('en-IN', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+        });
+    }
+
+    // ============ OTP ============
+    static generateOtp(length: number = CUSTOMER_OTP_LENGTH): string {
+        if (process.env.NODE_ENV === 'development') {
+            return '1'.repeat(length);  // e.g., 111111 or 1111
+        }
+
+        const min = Math.pow(10, length - 1);
+        const max = Math.pow(10, length) - 1;
+
+        return Math.floor(min + Math.random() * (max - min + 1)).toString();
+    }
+
+    static generateAdminOtp(length: number = ADMIN_OTP_LENGTH): string {
+        if (process.env.NODE_ENV === 'development') {
+            return '2'.repeat(length);  // e.g., 111111 or 1111
+        }
+
+        const min = Math.pow(10, length - 1);
+        const max = Math.pow(10, length) - 1;
+
+        return Math.floor(min + Math.random() * (max - min + 1)).toString();
+    }
+
+    static getRoleName(roleId: number): string {
+        const roleNames: Record<number, string> = {
+            [UserRole.ADMIN]: 'Admin',
+            [UserRole.MANAGER]: 'Manager',
+            [UserRole.INSPECTOR]: 'Inspector',
+            [UserRole.STAFF]: 'Staff',
+        };
+
+        return roleNames[roleId] || 'Unknown';
+    }
+
+    static getCarListingsStatusName(statusId: UsedCarListingStatus): string {
+        const statusNames: Record<UsedCarListingStatus, string> = {
+            [UsedCarListingStatus.PENDING]: 'Pending',
+            [UsedCarListingStatus.INSPECTOR_ASSIGNED]: 'Inspector Assigned',
+            [UsedCarListingStatus.INSPECTION_STARTED]: 'Inspection Started',
+            [UsedCarListingStatus.INSPECTION_COMPLETED]: 'Inspection Completed',
+            [UsedCarListingStatus.DETAILS_UPDATED_BY_STAFF]: 'Details Updated by Staff',
+            [UsedCarListingStatus.APPROVED_BY_MANAGER]: 'Approved by Manager',
+            [UsedCarListingStatus.APPROVED_BY_ADMIN]: 'Approved by Admin',
+            [UsedCarListingStatus.LISTED]: 'Listed',
+            [UsedCarListingStatus.SOLD]: 'Sold',
+            [UsedCarListingStatus.REJECTED_BY_MANAGER]: 'Rejected by Manager',
+            [UsedCarListingStatus.REJECTED_BY_ADMIN]: 'Rejected by Admin',
+            [UsedCarListingStatus.REJECTED_BY_CUSTOMER]: 'Rejected by Customer',
+            [UsedCarListingStatus.EXPIRED]: 'Expired',
+            [UsedCarListingStatus.CANCELLED]: 'Cancelled',
+        }
+
+        return statusNames[statusId] || 'Unknown';
+    }
+
+    static getUserDocumentStatusName(statusId: UserDocumentVerificationStatus): string {
+        const statusNames: Record<UserDocumentVerificationStatus, string> = {
+            [UserDocumentVerificationStatus.PENDING]: 'Pending',
+            [UserDocumentVerificationStatus.REQUEST_RAISE]: 'Request Raised',
+            [UserDocumentVerificationStatus.VERIFIED]: 'Verified',
+            [UserDocumentVerificationStatus.REJECTED]: 'Rejected',
+        }
+
+        return statusNames[statusId] || 'Unknown';
+    }
+
     // ============ TEXT & STRING ============
     static text(text: string | null | undefined, defaultValue: string | null = null): string | null {
         if (text !== null && text !== undefined && text !== '') {
@@ -9,7 +110,6 @@ export class CommonHelper {
 
     // ============ Image url ============
     static buildImageUrl(key?: string | null, defaultValue: string | null = null): string | null {
-        console.log('key', key);
         if (key !== null && key !== undefined && key !== '') {
             if (/^https?:\/\//i.test(key)) {
                 return key;
@@ -50,12 +150,29 @@ export class CommonHelper {
         return defaultValue;
     }
 
+    static capitalizeWords(input: string): string {
+        if (!input) return input;
+
+        return input
+            .toLowerCase()
+            .split(' ')
+            .filter(Boolean)
+            .map(
+                word => word.charAt(0).toUpperCase() + word.slice(1)
+            )
+            .join(' ');
+    }
+
     // ============ MASKING ============
     static maskMobileNumber(number: string): string {
         if (/^\d{10,}$/.test(number)) {
             return number.substring(0, 2) + '****' + number.substring(number.length - 4);
         }
         return number;
+    }
+
+    static maskRegistrationNumber(number: string): string {
+        return number.substring(0, 5) + '-**-' + number.substring(number.length - 4);
     }
 
     // ============ HTTP OPERATIONS ============

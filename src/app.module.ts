@@ -9,9 +9,12 @@ import { WinstonModule } from 'nest-winston';
 import { LoggerConfigService } from './common/utils/logger.utils';
 import { RepositoriesModule } from './repositories/repositories.module';
 import { CustomerModule } from './modules/customer/customer.module';
-import { AdminModule } from './modules/admin/admin.module';
+import { AdminPanelModule } from './modules/admin-panel/admin-panel.module';
 import { BaseModule } from '@common/base/base.module';
 import { StorageModule } from './common/providers/storage/storage.module';
+import { CommonModule } from './modules/common/common.module';
+import { InspectionImageModule } from './common/providers/inspection-image/inspection-image.module';
+import { CustomerOtpModule } from './common/providers/customer-otp/customer-otp.module';
 
 @Module({
   imports: [
@@ -38,8 +41,11 @@ import { StorageModule } from './common/providers/storage/storage.module';
 
     // Feature modules
     CustomerModule,
-    AdminModule,
-    StorageModule
+    AdminPanelModule,
+    StorageModule,
+    CommonModule,
+    InspectionImageModule,
+    CustomerOtpModule
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -27,23 +27,33 @@ export interface ErrorResponse<T = any> {
 export class ApiResponseUtil {
 
     // 200 - OK
-    static success<T>(data?: T, message = 'Success'): ApiResponse<T> {
-        return {
+    static success<T>(message = 'Success', data?: T): ApiResponse<T> {
+        const res = {
             code: HttpStatus.OK,
             type: ResponseType.SUCCESS,
             message,
             data
         }
+
+        if (data) {
+            res['data'] = data;
+        }
+
+        return res;
     }
 
     // 201 - Created
-    static created<T>(data?: T, message = 'Resource created successfully'): ApiResponse<T> {
-        return {
+    static created<T>(message = 'Resource created successfully', data?: T): ApiResponse<T> {
+        const res = {
             code: HttpStatus.CREATED,
             type: ResponseType.CREATED,
             message,
-            data
+        };
+
+        if (data) {
+            res['data'] = data;
         }
+        return res;
     }
 
     // 202 - Accepted
@@ -65,13 +75,22 @@ export class ApiResponseUtil {
         }
     }
 
+    // 208 - Already Reported
+    static alreadyReported(message = 'Already Reported'): ApiResponse<null> {
+        return {
+            code: HttpStatus.ALREADY_REPORTED,
+            type: ResponseType.ALREADY_REPORTED,
+            message,
+        }
+    }
+
     // 200 - Paginated Response
     static paginated<T>(
+        message = 'Success',
         data: T,
         page: number,
         limit: number,
         total: number,
-        message = 'Success'
     ): PaginatedResponse<T> {
         return {
             code: HttpStatus.OK,
@@ -88,13 +107,13 @@ export class ApiResponseUtil {
     }
 
     // 200 - Updated
-    static updated<T>(data?: T, message = 'Resource updated successfully'): ApiResponse<T> {
-        return this.success(data, message);
+    static updated<T>(message = 'Resource updated successfully', data?: T): ApiResponse<T> {
+        return this.success(message, data);
     }
 
     // 200 - Deleted
-    static deleted<T>(data?: T, message = 'Resource deleted successfully'): ApiResponse<T> {
-        return this.success(data, message);
+    static deleted<T>(message = 'Resource deleted successfully', data?: T): ApiResponse<T> {
+        return this.success(message, data);
     }
 
     // 400 - Bad Request

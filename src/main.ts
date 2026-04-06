@@ -3,27 +3,31 @@ import { AppModule } from './app.module';
 import helmet from 'helmet';
 import { ConfigService } from '@nestjs/config';
 import compression from 'compression';
-import { Logger, ValidationPipe } from '@nestjs/common';
+import { ValidationPipe } from '@nestjs/common';
 import { validationExceptionFactory } from './common/utils/validation.utils';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { AllExceptionsFilter } from './common/filters/http-exception.filter';
+import cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  const prefix = 'api/v1';
   const config = app.get(ConfigService);
+  const prefix = config.getOrThrow<string>('app.apiPrefix');
   const logger = app.get(WINSTON_MODULE_NEST_PROVIDER);
   const port = config.get('app.port') || 3000;
 
   app.use(helmet()); // Secure your app by setting various HTTP headers
   app.use(compression()); // Enable gzip compression
 
+  const corsOrigin = config.getOrThrow<string>('app.corsOrigin').split(',');
   // Enable CORS
   app.enableCors({
-    origin: config.getOrThrow<string>('app.corsOrigin'),
+    origin: corsOrigin,
     credentials: true
   });
+  // enable cookie parser
+  app.use(cookieParser());
 
   app.useGlobalPipes(
     new ValidationPipe({
@@ -37,7 +41,7 @@ async function bootstrap() {
   app.enableShutdownHooks();
 
   app.useLogger(logger);
-  
+
   const httpAdapterHost = app.get(HttpAdapterHost);
   app.useGlobalFilters(new AllExceptionsFilter(httpAdapterHost, logger));
 

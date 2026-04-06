@@ -43,4 +43,38 @@ export class CarModelRepository {
             order: { id: SORT_ORDER.DESC },
         });
     }
+
+    // find models by brand id and year
+    async findByBrandId(brandId: number, search?: string, manager?: EntityManager): Promise<CarModel[]> {
+        const repo = await this.getRepo(manager);
+        return repo.find({
+            where: {
+                brand_id: brandId,
+                is_active: true,
+            },
+            select: ['id', 'display_name'],
+            order: { id: SORT_ORDER.DESC },
+        });
+    }
+
+    async findModelsByBrandOrModel(search: string, manager?: EntityManager): Promise<CarModel[]> {
+        const repo = await this.getRepo(manager);
+        const searchPattern = `%${search}%`;
+
+        return await repo
+            .createQueryBuilder('model')
+            .leftJoinAndSelect('model.brand', 'brand')
+            .where('model.name ILIKE :searchPattern', { searchPattern })
+            .orWhere('model.display_name ILIKE :searchPattern', { searchPattern })
+            .orWhere('brand.display_name ILIKE :searchPattern', { searchPattern })
+            .select([
+                'model.id',
+                'model.name',
+                'model.display_name',
+                'brand.display_name',
+                'brand.logo_url',
+            ])
+            .orderBy('model.id', SORT_ORDER.DESC)
+            .getMany();
+    }
 }

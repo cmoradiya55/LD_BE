@@ -1,5 +1,11 @@
+export const CUSTOMER_OTP_LENGTH = 6;
+export const ADMIN_OTP_LENGTH = 6;
+
 export const MODULE_PREFIX = {
     ADMIN: 'admin',
+    MANAGER: 'manager',
+    INSPECTOR: 'inspector',
+    STAFF: 'staff',
     CUSTOMER: 'customer',
 } as const;
 
@@ -21,10 +27,69 @@ export const ALLOWED_FILE_TYPES: Record<string, string[]> = {
     'image/jpeg': ['jpg', 'jpeg'],
     'image/png': ['png'],
     'image/webp': ['webp'],
+
+    // Documents
     'application/pdf': ['pdf'],
 };
+
+export const ALLOWED_VIDEO_FILE_TYPES: Record<string, string[]> = {
+    // ✅ Videos
+    'video/mp4': ['mp4'],
+    'video/quicktime': ['mov'],
+    'video/x-msvideo': ['avi'],
+    'video/webm': ['webm'],
+    'video/x-matroska': ['mkv'],
+}
+
+// ✅ Video-specific constraints
+export const VIDEO_CONSTRAINTS = {
+    MAX_SIZE: 20 * 1024 * 1024, // 20MB
+    MAX_DURATION: 60, // 60 seconds
+};
+
 
 export const MIN_FILE_UPLOAD_REQUIRED = 1;
 export const MAX_FILE_UPLOAD_ALLOWED = 20;
 
+export const MIN_VIDEO_FILE_UPLOAD_REQUIRED = 1;
+export const MAX_VIDEO_FILE_UPLOAD_ALLOWED = 5;
+
 export const S3_BUCKET_FOLDERS = [] as const;
+
+export const OTP_EXPIRY_MS = {
+    MOBILE: 10 * 60 * 1000,
+    EMAIL: 10 * 60 * 1000,
+    ACCOUNT_DELETE: 10 * 60 * 1000,
+} as const;
+
+export const ADMIN_PANEL_OTP_EXPIRY_MS = {
+    MOBILE: 10 * 60 * 1000,
+    EMAIL: 10 * 60 * 1000,
+    ACCOUNT_DELETE: 10 * 60 * 1000,
+} as const;
+
+export const JWT_TOKEN_TYPES = {
+    ACCESS: 'access',
+    REFRESH: 'refresh',
+} as const;
+
+export const COOKIE_NAMES = {
+    REFRESH_TOKEN: 'refresh_token',
+}
+
+export const ADMIN_COOKIE_NAMES = {
+    REFRESH_TOKEN: 'refresh_token',
+}
+
+export const JWT_UNITS = {
+    MINUTES: 'm',
+    HOURS: 'h',
+    DAYS: 'd',
+} as const;
+
+export const JWT_ACCESS_EXPIRY_UNIT = JWT_UNITS.MINUTES;
+export const JWT_REFRESH_EXPIRY_UNIT = JWT_UNITS.DAYS; // if changed here then change in cookie maxAge calculation also
+
+
+export const ADMIN_JWT_ACCESS_EXPIRY_UNIT = JWT_UNITS.MINUTES;
+export const ADMIN_JWT_REFRESH_EXPIRY_UNIT = JWT_UNITS.DAYS; // if changed here then change in cookie maxAge calculation also

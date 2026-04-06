@@ -31,12 +31,6 @@ export class CarModel {
     @Column({ type: 'smallint' })
     body_type: number;
 
-    @Column({ type: 'smallint', nullable: true })
-    segment: number | null;
-
-    @Column({ type: 'smallint', default: 1 })
-    transportation_category: number;
-
     @Column({ type: 'smallint' })
     production_start_year: number;
 

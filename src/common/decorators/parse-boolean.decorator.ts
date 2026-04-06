@@ -12,5 +12,5 @@ const optionalBooleanMapper = new Map<string | number | boolean, boolean>([
 ]);
 
 export const ParseBoolean = () => {
-    Transform(({ value }) => optionalBooleanMapper.get(value))
+    return Transform(({ value }) => optionalBooleanMapper.get(value))
 }
