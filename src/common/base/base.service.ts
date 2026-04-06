@@ -1,6 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { DataSource, EntityManager } from 'typeorm';
-import { QueryRunner } from 'typeorm/browser';
+import { DataSource, EntityManager, QueryRunner } from 'typeorm';
 
 @Injectable()
 export class BaseService {
